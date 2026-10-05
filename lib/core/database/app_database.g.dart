@@ -3719,6 +3719,576 @@ class QuoteCompanion extends UpdateCompanion<Quota> {
   }
 }
 
+class $RimborsiTable extends Rimborsi with TableInfo<$RimborsiTable, Rimborso> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RimborsiTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _gruppoIdMeta = const VerificationMeta(
+    'gruppoId',
+  );
+  @override
+  late final GeneratedColumn<int> gruppoId = GeneratedColumn<int>(
+    'gruppo_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES gruppi (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _daPartecipanteMeta = const VerificationMeta(
+    'daPartecipante',
+  );
+  @override
+  late final GeneratedColumn<int> daPartecipante = GeneratedColumn<int>(
+    'da_partecipante',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES partecipanti (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _aPartecipanteMeta = const VerificationMeta(
+    'aPartecipante',
+  );
+  @override
+  late final GeneratedColumn<int> aPartecipante = GeneratedColumn<int>(
+    'a_partecipante',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES partecipanti (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _centesimiMeta = const VerificationMeta(
+    'centesimi',
+  );
+  @override
+  late final GeneratedColumn<int> centesimi = GeneratedColumn<int>(
+    'centesimi',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valutaMeta = const VerificationMeta('valuta');
+  @override
+  late final GeneratedColumn<String> valuta = GeneratedColumn<String>(
+    'valuta',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('EUR'),
+  );
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<DateTime> data = GeneratedColumn<DateTime>(
+    'data',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _creatoIlMeta = const VerificationMeta(
+    'creatoIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> creatoIl = GeneratedColumn<DateTime>(
+    'creato_il',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    gruppoId,
+    daPartecipante,
+    aPartecipante,
+    centesimi,
+    valuta,
+    data,
+    creatoIl,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'rimborsi';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Rimborso> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('gruppo_id')) {
+      context.handle(
+        _gruppoIdMeta,
+        gruppoId.isAcceptableOrUnknown(data['gruppo_id']!, _gruppoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gruppoIdMeta);
+    }
+    if (data.containsKey('da_partecipante')) {
+      context.handle(
+        _daPartecipanteMeta,
+        daPartecipante.isAcceptableOrUnknown(
+          data['da_partecipante']!,
+          _daPartecipanteMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_daPartecipanteMeta);
+    }
+    if (data.containsKey('a_partecipante')) {
+      context.handle(
+        _aPartecipanteMeta,
+        aPartecipante.isAcceptableOrUnknown(
+          data['a_partecipante']!,
+          _aPartecipanteMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_aPartecipanteMeta);
+    }
+    if (data.containsKey('centesimi')) {
+      context.handle(
+        _centesimiMeta,
+        centesimi.isAcceptableOrUnknown(data['centesimi']!, _centesimiMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_centesimiMeta);
+    }
+    if (data.containsKey('valuta')) {
+      context.handle(
+        _valutaMeta,
+        valuta.isAcceptableOrUnknown(data['valuta']!, _valutaMeta),
+      );
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+        _dataMeta,
+        this.data.isAcceptableOrUnknown(data['data']!, _dataMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    if (data.containsKey('creato_il')) {
+      context.handle(
+        _creatoIlMeta,
+        creatoIl.isAcceptableOrUnknown(data['creato_il']!, _creatoIlMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Rimborso map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Rimborso(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      gruppoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gruppo_id'],
+      )!,
+      daPartecipante: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}da_partecipante'],
+      )!,
+      aPartecipante: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}a_partecipante'],
+      )!,
+      centesimi: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}centesimi'],
+      )!,
+      valuta: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}valuta'],
+      )!,
+      data: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data'],
+      )!,
+      creatoIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}creato_il'],
+      )!,
+    );
+  }
+
+  @override
+  $RimborsiTable createAlias(String alias) {
+    return $RimborsiTable(attachedDatabase, alias);
+  }
+}
+
+class Rimborso extends DataClass implements Insertable<Rimborso> {
+  final int id;
+
+  /// Identificativo stabile: i rimborsi viaggiano con il gruppo
+  /// (DECISIONI.md, voce 035).
+  final String uuid;
+  final int gruppoId;
+
+  /// Chi ha dato i soldi.
+  final int daPartecipante;
+
+  /// Chi li ha ricevuti.
+  final int aPartecipante;
+  final int centesimi;
+  final String valuta;
+  final DateTime data;
+  final DateTime creatoIl;
+  const Rimborso({
+    required this.id,
+    required this.uuid,
+    required this.gruppoId,
+    required this.daPartecipante,
+    required this.aPartecipante,
+    required this.centesimi,
+    required this.valuta,
+    required this.data,
+    required this.creatoIl,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['uuid'] = Variable<String>(uuid);
+    map['gruppo_id'] = Variable<int>(gruppoId);
+    map['da_partecipante'] = Variable<int>(daPartecipante);
+    map['a_partecipante'] = Variable<int>(aPartecipante);
+    map['centesimi'] = Variable<int>(centesimi);
+    map['valuta'] = Variable<String>(valuta);
+    map['data'] = Variable<DateTime>(data);
+    map['creato_il'] = Variable<DateTime>(creatoIl);
+    return map;
+  }
+
+  RimborsiCompanion toCompanion(bool nullToAbsent) {
+    return RimborsiCompanion(
+      id: Value(id),
+      uuid: Value(uuid),
+      gruppoId: Value(gruppoId),
+      daPartecipante: Value(daPartecipante),
+      aPartecipante: Value(aPartecipante),
+      centesimi: Value(centesimi),
+      valuta: Value(valuta),
+      data: Value(data),
+      creatoIl: Value(creatoIl),
+    );
+  }
+
+  factory Rimborso.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Rimborso(
+      id: serializer.fromJson<int>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      gruppoId: serializer.fromJson<int>(json['gruppoId']),
+      daPartecipante: serializer.fromJson<int>(json['daPartecipante']),
+      aPartecipante: serializer.fromJson<int>(json['aPartecipante']),
+      centesimi: serializer.fromJson<int>(json['centesimi']),
+      valuta: serializer.fromJson<String>(json['valuta']),
+      data: serializer.fromJson<DateTime>(json['data']),
+      creatoIl: serializer.fromJson<DateTime>(json['creatoIl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'gruppoId': serializer.toJson<int>(gruppoId),
+      'daPartecipante': serializer.toJson<int>(daPartecipante),
+      'aPartecipante': serializer.toJson<int>(aPartecipante),
+      'centesimi': serializer.toJson<int>(centesimi),
+      'valuta': serializer.toJson<String>(valuta),
+      'data': serializer.toJson<DateTime>(data),
+      'creatoIl': serializer.toJson<DateTime>(creatoIl),
+    };
+  }
+
+  Rimborso copyWith({
+    int? id,
+    String? uuid,
+    int? gruppoId,
+    int? daPartecipante,
+    int? aPartecipante,
+    int? centesimi,
+    String? valuta,
+    DateTime? data,
+    DateTime? creatoIl,
+  }) => Rimborso(
+    id: id ?? this.id,
+    uuid: uuid ?? this.uuid,
+    gruppoId: gruppoId ?? this.gruppoId,
+    daPartecipante: daPartecipante ?? this.daPartecipante,
+    aPartecipante: aPartecipante ?? this.aPartecipante,
+    centesimi: centesimi ?? this.centesimi,
+    valuta: valuta ?? this.valuta,
+    data: data ?? this.data,
+    creatoIl: creatoIl ?? this.creatoIl,
+  );
+  Rimborso copyWithCompanion(RimborsiCompanion data) {
+    return Rimborso(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      gruppoId: data.gruppoId.present ? data.gruppoId.value : this.gruppoId,
+      daPartecipante: data.daPartecipante.present
+          ? data.daPartecipante.value
+          : this.daPartecipante,
+      aPartecipante: data.aPartecipante.present
+          ? data.aPartecipante.value
+          : this.aPartecipante,
+      centesimi: data.centesimi.present ? data.centesimi.value : this.centesimi,
+      valuta: data.valuta.present ? data.valuta.value : this.valuta,
+      data: data.data.present ? data.data.value : this.data,
+      creatoIl: data.creatoIl.present ? data.creatoIl.value : this.creatoIl,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Rimborso(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('gruppoId: $gruppoId, ')
+          ..write('daPartecipante: $daPartecipante, ')
+          ..write('aPartecipante: $aPartecipante, ')
+          ..write('centesimi: $centesimi, ')
+          ..write('valuta: $valuta, ')
+          ..write('data: $data, ')
+          ..write('creatoIl: $creatoIl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    gruppoId,
+    daPartecipante,
+    aPartecipante,
+    centesimi,
+    valuta,
+    data,
+    creatoIl,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Rimborso &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.gruppoId == this.gruppoId &&
+          other.daPartecipante == this.daPartecipante &&
+          other.aPartecipante == this.aPartecipante &&
+          other.centesimi == this.centesimi &&
+          other.valuta == this.valuta &&
+          other.data == this.data &&
+          other.creatoIl == this.creatoIl);
+}
+
+class RimborsiCompanion extends UpdateCompanion<Rimborso> {
+  final Value<int> id;
+  final Value<String> uuid;
+  final Value<int> gruppoId;
+  final Value<int> daPartecipante;
+  final Value<int> aPartecipante;
+  final Value<int> centesimi;
+  final Value<String> valuta;
+  final Value<DateTime> data;
+  final Value<DateTime> creatoIl;
+  const RimborsiCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.gruppoId = const Value.absent(),
+    this.daPartecipante = const Value.absent(),
+    this.aPartecipante = const Value.absent(),
+    this.centesimi = const Value.absent(),
+    this.valuta = const Value.absent(),
+    this.data = const Value.absent(),
+    this.creatoIl = const Value.absent(),
+  });
+  RimborsiCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    required int gruppoId,
+    required int daPartecipante,
+    required int aPartecipante,
+    required int centesimi,
+    this.valuta = const Value.absent(),
+    required DateTime data,
+    this.creatoIl = const Value.absent(),
+  }) : uuid = Value(uuid),
+       gruppoId = Value(gruppoId),
+       daPartecipante = Value(daPartecipante),
+       aPartecipante = Value(aPartecipante),
+       centesimi = Value(centesimi),
+       data = Value(data);
+  static Insertable<Rimborso> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<int>? gruppoId,
+    Expression<int>? daPartecipante,
+    Expression<int>? aPartecipante,
+    Expression<int>? centesimi,
+    Expression<String>? valuta,
+    Expression<DateTime>? data,
+    Expression<DateTime>? creatoIl,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (gruppoId != null) 'gruppo_id': gruppoId,
+      if (daPartecipante != null) 'da_partecipante': daPartecipante,
+      if (aPartecipante != null) 'a_partecipante': aPartecipante,
+      if (centesimi != null) 'centesimi': centesimi,
+      if (valuta != null) 'valuta': valuta,
+      if (data != null) 'data': data,
+      if (creatoIl != null) 'creato_il': creatoIl,
+    });
+  }
+
+  RimborsiCompanion copyWith({
+    Value<int>? id,
+    Value<String>? uuid,
+    Value<int>? gruppoId,
+    Value<int>? daPartecipante,
+    Value<int>? aPartecipante,
+    Value<int>? centesimi,
+    Value<String>? valuta,
+    Value<DateTime>? data,
+    Value<DateTime>? creatoIl,
+  }) {
+    return RimborsiCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      gruppoId: gruppoId ?? this.gruppoId,
+      daPartecipante: daPartecipante ?? this.daPartecipante,
+      aPartecipante: aPartecipante ?? this.aPartecipante,
+      centesimi: centesimi ?? this.centesimi,
+      valuta: valuta ?? this.valuta,
+      data: data ?? this.data,
+      creatoIl: creatoIl ?? this.creatoIl,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (gruppoId.present) {
+      map['gruppo_id'] = Variable<int>(gruppoId.value);
+    }
+    if (daPartecipante.present) {
+      map['da_partecipante'] = Variable<int>(daPartecipante.value);
+    }
+    if (aPartecipante.present) {
+      map['a_partecipante'] = Variable<int>(aPartecipante.value);
+    }
+    if (centesimi.present) {
+      map['centesimi'] = Variable<int>(centesimi.value);
+    }
+    if (valuta.present) {
+      map['valuta'] = Variable<String>(valuta.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<DateTime>(data.value);
+    }
+    if (creatoIl.present) {
+      map['creato_il'] = Variable<DateTime>(creatoIl.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RimborsiCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('gruppoId: $gruppoId, ')
+          ..write('daPartecipante: $daPartecipante, ')
+          ..write('aPartecipante: $aPartecipante, ')
+          ..write('centesimi: $centesimi, ')
+          ..write('valuta: $valuta, ')
+          ..write('data: $data, ')
+          ..write('creatoIl: $creatoIl')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3733,11 +4303,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CategorieTable categorie = $CategorieTable(this);
   late final $SpeseTable spese = $SpeseTable(this);
   late final $QuoteTable quote = $QuoteTable(this);
+  late final $RimborsiTable rimborsi = $RimborsiTable(this);
   late final ListeDao listeDao = ListeDao(this as AppDatabase);
   late final DebitiDao debitiDao = DebitiDao(this as AppDatabase);
   late final GruppiDao gruppiDao = GruppiDao(this as AppDatabase);
   late final CategorieDao categorieDao = CategorieDao(this as AppDatabase);
   late final SpeseDao speseDao = SpeseDao(this as AppDatabase);
+  late final SaldiDao saldiDao = SaldiDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -3752,6 +4324,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     categorie,
     spese,
     quote,
+    rimborsi,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -3810,6 +4383,27 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('quote', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'gruppi',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('rimborsi', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'partecipanti',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('rimborsi', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'partecipanti',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('rimborsi', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -5091,6 +5685,25 @@ final class $$GruppiTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$RimborsiTable, List<Rimborso>> _rimborsiRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.rimborsi,
+    aliasName: 'gruppi__id__rimborsi__gruppo_id',
+  );
+
+  $$RimborsiTableProcessedTableManager get rimborsiRefs {
+    final manager = $$RimborsiTableTableManager(
+      $_db,
+      $_db.rimborsi,
+    ).filter((f) => f.gruppoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_rimborsiRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$GruppiTableFilterComposer
@@ -5178,6 +5791,31 @@ class $$GruppiTableFilterComposer
           }) => $$SpeseTableFilterComposer(
             $db: $db,
             $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> rimborsiRefs(
+    Expression<bool> Function($$RimborsiTableFilterComposer f) f,
+  ) {
+    final $$RimborsiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.rimborsi,
+      getReferencedColumn: (t) => t.gruppoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RimborsiTableFilterComposer(
+            $db: $db,
+            $table: $db.rimborsi,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5316,6 +5954,31 @@ class $$GruppiTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> rimborsiRefs<T extends Object>(
+    Expression<T> Function($$RimborsiTableAnnotationComposer a) f,
+  ) {
+    final $$RimborsiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.rimborsi,
+      getReferencedColumn: (t) => t.gruppoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$RimborsiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.rimborsi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$GruppiTableTableManager
@@ -5331,7 +5994,11 @@ class $$GruppiTableTableManager
           $$GruppiTableUpdateCompanionBuilder,
           (Gruppo, $$GruppiTableReferences),
           Gruppo,
-          PrefetchHooks Function({bool partecipantiRefs, bool speseRefs})
+          PrefetchHooks Function({
+            bool partecipantiRefs,
+            bool speseRefs,
+            bool rimborsiRefs,
+          })
         > {
   $$GruppiTableTableManager(_$AppDatabase db, $GruppiTable table)
     : super(
@@ -5389,12 +6056,17 @@ class $$GruppiTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({partecipantiRefs = false, speseRefs = false}) {
+              ({
+                partecipantiRefs = false,
+                speseRefs = false,
+                rimborsiRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (partecipantiRefs) db.partecipanti,
                     if (speseRefs) db.spese,
+                    if (rimborsiRefs) db.rimborsi,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -5433,6 +6105,27 @@ class $$GruppiTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (rimborsiRefs)
+                        await $_getPrefetchedData<
+                          Gruppo,
+                          $GruppiTable,
+                          Rimborso
+                        >(
+                          currentTable: table,
+                          referencedTable: $$GruppiTableReferences
+                              ._rimborsiRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GruppiTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).rimborsiRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gruppoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -5453,7 +6146,11 @@ typedef $$GruppiTableProcessedTableManager =
       $$GruppiTableUpdateCompanionBuilder,
       (Gruppo, $$GruppiTableReferences),
       Gruppo,
-      PrefetchHooks Function({bool partecipantiRefs, bool speseRefs})
+      PrefetchHooks Function({
+        bool partecipantiRefs,
+        bool speseRefs,
+        bool rimborsiRefs,
+      })
     >;
 typedef $$PartecipantiTableCreateCompanionBuilder =
     PartecipantiCompanion Function({
@@ -7309,6 +8006,571 @@ typedef $$QuoteTableProcessedTableManager =
       Quota,
       PrefetchHooks Function({bool spesaId, bool partecipanteId})
     >;
+typedef $$RimborsiTableCreateCompanionBuilder = RimborsiCompanion Function({
+  Value<int> id,
+  required String uuid,
+  required int gruppoId,
+  required int daPartecipante,
+  required int aPartecipante,
+  required int centesimi,
+  Value<String> valuta,
+  required DateTime data,
+  Value<DateTime> creatoIl,
+});
+typedef $$RimborsiTableUpdateCompanionBuilder = RimborsiCompanion Function({
+  Value<int> id,
+  Value<String> uuid,
+  Value<int> gruppoId,
+  Value<int> daPartecipante,
+  Value<int> aPartecipante,
+  Value<int> centesimi,
+  Value<String> valuta,
+  Value<DateTime> data,
+  Value<DateTime> creatoIl,
+});
+
+final class $$RimborsiTableReferences
+    extends BaseReferences<_$AppDatabase, $RimborsiTable, Rimborso> {
+  $$RimborsiTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GruppiTable _gruppoIdTable(_$AppDatabase db) =>
+      db.gruppi.createAlias('rimborsi__gruppo_id__gruppi__id');
+
+  $$GruppiTableProcessedTableManager get gruppoId {
+    final $_column = $_itemColumn<int>('gruppo_id')!;
+
+    final manager = $$GruppiTableTableManager(
+      $_db,
+      $_db.gruppi,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gruppoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PartecipantiTable _daPartecipanteTable(_$AppDatabase db) => db
+      .partecipanti
+      .createAlias('rimborsi__da_partecipante__partecipanti__id');
+
+  $$PartecipantiTableProcessedTableManager get daPartecipante {
+    final $_column = $_itemColumn<int>('da_partecipante')!;
+
+    final manager = $$PartecipantiTableTableManager(
+      $_db,
+      $_db.partecipanti,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_daPartecipanteTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PartecipantiTable _aPartecipanteTable(_$AppDatabase db) =>
+      db.partecipanti.createAlias('rimborsi__a_partecipante__partecipanti__id');
+
+  $$PartecipantiTableProcessedTableManager get aPartecipante {
+    final $_column = $_itemColumn<int>('a_partecipante')!;
+
+    final manager = $$PartecipantiTableTableManager(
+      $_db,
+      $_db.partecipanti,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_aPartecipanteTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$RimborsiTableFilterComposer
+    extends Composer<_$AppDatabase, $RimborsiTable> {
+  $$RimborsiTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get centesimi => $composableBuilder(
+    column: $table.centesimi,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get valuta => $composableBuilder(
+    column: $table.valuta,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get creatoIl => $composableBuilder(
+    column: $table.creatoIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GruppiTableFilterComposer get gruppoId {
+    final $$GruppiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableFilterComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableFilterComposer get daPartecipante {
+    final $$PartecipantiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.daPartecipante,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableFilterComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableFilterComposer get aPartecipante {
+    final $$PartecipantiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.aPartecipante,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableFilterComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RimborsiTableOrderingComposer
+    extends Composer<_$AppDatabase, $RimborsiTable> {
+  $$RimborsiTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get centesimi => $composableBuilder(
+    column: $table.centesimi,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valuta => $composableBuilder(
+    column: $table.valuta,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get creatoIl => $composableBuilder(
+    column: $table.creatoIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GruppiTableOrderingComposer get gruppoId {
+    final $$GruppiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableOrderingComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableOrderingComposer get daPartecipante {
+    final $$PartecipantiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.daPartecipante,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableOrderingComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableOrderingComposer get aPartecipante {
+    final $$PartecipantiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.aPartecipante,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableOrderingComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RimborsiTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RimborsiTable> {
+  $$RimborsiTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<int> get centesimi =>
+      $composableBuilder(column: $table.centesimi, builder: (column) => column);
+
+  GeneratedColumn<String> get valuta =>
+      $composableBuilder(column: $table.valuta, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get creatoIl =>
+      $composableBuilder(column: $table.creatoIl, builder: (column) => column);
+
+  $$GruppiTableAnnotationComposer get gruppoId {
+    final $$GruppiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableAnnotationComposer get daPartecipante {
+    final $$PartecipantiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.daPartecipante,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableAnnotationComposer get aPartecipante {
+    final $$PartecipantiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.aPartecipante,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$RimborsiTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RimborsiTable,
+          Rimborso,
+          $$RimborsiTableFilterComposer,
+          $$RimborsiTableOrderingComposer,
+          $$RimborsiTableAnnotationComposer,
+          $$RimborsiTableCreateCompanionBuilder,
+          $$RimborsiTableUpdateCompanionBuilder,
+          (Rimborso, $$RimborsiTableReferences),
+          Rimborso,
+          PrefetchHooks Function({
+            bool gruppoId,
+            bool daPartecipante,
+            bool aPartecipante,
+          })
+        > {
+  $$RimborsiTableTableManager(_$AppDatabase db, $RimborsiTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RimborsiTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RimborsiTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$RimborsiTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<int> gruppoId = const Value.absent(),
+                Value<int> daPartecipante = const Value.absent(),
+                Value<int> aPartecipante = const Value.absent(),
+                Value<int> centesimi = const Value.absent(),
+                Value<String> valuta = const Value.absent(),
+                Value<DateTime> data = const Value.absent(),
+                Value<DateTime> creatoIl = const Value.absent(),
+              }) => RimborsiCompanion(
+                id: id,
+                uuid: uuid,
+                gruppoId: gruppoId,
+                daPartecipante: daPartecipante,
+                aPartecipante: aPartecipante,
+                centesimi: centesimi,
+                valuta: valuta,
+                data: data,
+                creatoIl: creatoIl,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String uuid,
+                required int gruppoId,
+                required int daPartecipante,
+                required int aPartecipante,
+                required int centesimi,
+                Value<String> valuta = const Value.absent(),
+                required DateTime data,
+                Value<DateTime> creatoIl = const Value.absent(),
+              }) => RimborsiCompanion.insert(
+                id: id,
+                uuid: uuid,
+                gruppoId: gruppoId,
+                daPartecipante: daPartecipante,
+                aPartecipante: aPartecipante,
+                centesimi: centesimi,
+                valuta: valuta,
+                data: data,
+                creatoIl: creatoIl,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$RimborsiTable, Rimborso>(table),
+                  $$RimborsiTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                gruppoId = false,
+                daPartecipante = false,
+                aPartecipante = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (gruppoId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.gruppoId,
+                            referencedTable: $$RimborsiTableReferences
+                                ._gruppoIdTable(db),
+                            referencedColumn: $$RimborsiTableReferences
+                                ._gruppoIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (daPartecipante) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.daPartecipante,
+                            referencedTable: $$RimborsiTableReferences
+                                ._daPartecipanteTable(db),
+                            referencedColumn: $$RimborsiTableReferences
+                                ._daPartecipanteTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (aPartecipante) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.aPartecipante,
+                            referencedTable: $$RimborsiTableReferences
+                                ._aPartecipanteTable(db),
+                            referencedColumn: $$RimborsiTableReferences
+                                ._aPartecipanteTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$RimborsiTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RimborsiTable,
+      Rimborso,
+      $$RimborsiTableFilterComposer,
+      $$RimborsiTableOrderingComposer,
+      $$RimborsiTableAnnotationComposer,
+      $$RimborsiTableCreateCompanionBuilder,
+      $$RimborsiTableUpdateCompanionBuilder,
+      (Rimborso, $$RimborsiTableReferences),
+      Rimborso,
+      PrefetchHooks Function({
+        bool gruppoId,
+        bool daPartecipante,
+        bool aPartecipante,
+      })
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7331,4 +8593,6 @@ class $AppDatabaseManager {
       $$SpeseTableTableManager(_db, _db.spese);
   $$QuoteTableTableManager get quote =>
       $$QuoteTableTableManager(_db, _db.quote);
+  $$RimborsiTableTableManager get rimborsi =>
+      $$RimborsiTableTableManager(_db, _db.rimborsi);
 }

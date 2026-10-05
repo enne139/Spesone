@@ -11,6 +11,8 @@ import 'package:spesone/features/spese/data/categorie_dao.dart';
 import 'package:spesone/features/spese/data/categorie_tables.dart';
 import 'package:spesone/features/spese/data/gruppi_dao.dart';
 import 'package:spesone/features/spese/data/gruppi_tables.dart';
+import 'package:spesone/features/spese/data/rimborsi_tables.dart';
+import 'package:spesone/features/spese/data/saldi_dao.dart';
 import 'package:spesone/features/spese/data/spese_dao.dart';
 import 'package:spesone/features/spese/data/spese_tables.dart';
 
@@ -33,8 +35,16 @@ part 'app_database.g.dart';
     Categorie,
     Spese,
     Quote,
+    Rimborsi,
   ],
-  daos: <Type>[ListeDao, DebitiDao, GruppiDao, CategorieDao, SpeseDao],
+  daos: <Type>[
+    ListeDao,
+    DebitiDao,
+    GruppiDao,
+    CategorieDao,
+    SpeseDao,
+    SaldiDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   /// Database vero, su file, nella cartella dati dell'app.
@@ -49,9 +59,10 @@ class AppDatabase extends _$AppDatabase {
   /// migrazione corrispondente in [migration].
   ///
   /// Storia: 1 liste della spesa, 2 persone e debiti, 3 gruppi di spesa,
-  /// 4 partecipanti propri di ogni gruppo, 5 categorie, 6 spese e quote.
+  /// 4 partecipanti propri di ogni gruppo, 5 categorie, 6 spese e quote,
+  /// 7 rimborsi.
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration {
@@ -107,6 +118,9 @@ class AppDatabase extends _$AppDatabase {
         if (da < 6) {
           await m.createTable(spese);
           await m.createTable(quote);
+        }
+        if (da < 7) {
+          await m.createTable(rimborsi);
         }
       },
       beforeOpen: (OpeningDetails details) async {

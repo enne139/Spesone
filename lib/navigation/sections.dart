@@ -19,8 +19,10 @@ import 'package:spesone/features/spese/condivisione_gruppo_page.dart';
 import 'package:spesone/features/spese/grafico_spese_page.dart';
 import 'package:spesone/features/spese/gruppi_spesa_page.dart';
 import 'package:spesone/features/spese/panoramica_spese_page.dart';
+import 'package:spesone/features/spese/saldi_page.dart';
 import 'package:spesone/features/spese/widgets/fab_nuova_categoria.dart';
 import 'package:spesone/features/spese/widgets/fab_nuova_spesa.dart';
+import 'package:spesone/features/spese/widgets/fab_nuovo_rimborso.dart';
 import 'package:spesone/features/spese/widgets/fab_nuovo_gruppo.dart';
 import 'package:spesone/features/spese/widgets/selettore_gruppi.dart';
 import 'package:spesone/features/spese/widgets/titolo_gruppo_corrente.dart';
@@ -57,6 +59,13 @@ final List<AppSection> appSections = <AppSection>[
         icon: Icons.groups_outlined,
         builder: (BuildContext context) => const GruppiSpesaPage(),
         floatingActionButton: (BuildContext context) => const FabNuovoGruppo(),
+      ),
+      SectionView(
+        title: 'Saldi',
+        icon: Icons.balance_outlined,
+        builder: (BuildContext context) => const SaldiPage(),
+        floatingActionButton: (BuildContext context) =>
+            const FabNuovoRimborso(),
       ),
       SectionView(
         title: 'Categorie',

@@ -99,6 +99,34 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
   }
 
   Future<void> _togli(Partecipante partecipante) async {
+    // Toglierlo lasciando le sue spese cambierebbe in silenzio i conti di
+    // tutti gli altri: meglio fermarsi e dire perche'.
+    // Il database si prende prima dei due await: dopo, il contesto potrebbe
+    // non essere piu' valido.
+    final AppDatabase database = DatabaseScope.of(context);
+    final int spese = await database.speseDao.quanteSpeseCoinvolgono(
+      partecipante.id,
+    );
+    final int rimborsi = await database.saldiDao.quantiRimborsiCoinvolgono(
+      partecipante.id,
+    );
+    if (!mounted) {
+      return;
+    }
+    if (spese + rimborsi > 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            '${partecipante.nome} compare nelle spese o nei rimborsi di '
+            'questo viaggio: non si puo\' togliere senza cambiare i conti '
+            'degli altri.',
+          ),
+          duration: const Duration(seconds: 6),
+        ),
+      );
+      return;
+    }
+
     final bool conferma = await chiediConferma(
       context,
       titolo: 'Togliere ${partecipante.nome}?',
