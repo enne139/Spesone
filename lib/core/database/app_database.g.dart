@@ -4667,6 +4667,221 @@ class CambiCompanion extends UpdateCompanion<Cambio> {
   }
 }
 
+class $ImpostazioniTable extends Impostazioni
+    with TableInfo<$ImpostazioniTable, Impostazione> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ImpostazioniTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _chiaveMeta = const VerificationMeta('chiave');
+  @override
+  late final GeneratedColumn<String> chiave = GeneratedColumn<String>(
+    'chiave',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 60,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valoreMeta = const VerificationMeta('valore');
+  @override
+  late final GeneratedColumn<String> valore = GeneratedColumn<String>(
+    'valore',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [chiave, valore];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'impostazioni';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Impostazione> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('chiave')) {
+      context.handle(
+        _chiaveMeta,
+        chiave.isAcceptableOrUnknown(data['chiave']!, _chiaveMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_chiaveMeta);
+    }
+    if (data.containsKey('valore')) {
+      context.handle(
+        _valoreMeta,
+        valore.isAcceptableOrUnknown(data['valore']!, _valoreMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_valoreMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {chiave};
+  @override
+  Impostazione map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Impostazione(
+      chiave: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}chiave'],
+      )!,
+      valore: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}valore'],
+      )!,
+    );
+  }
+
+  @override
+  $ImpostazioniTable createAlias(String alias) {
+    return $ImpostazioniTable(attachedDatabase, alias);
+  }
+}
+
+class Impostazione extends DataClass implements Insertable<Impostazione> {
+  /// Nome della preferenza, es. `tema`.
+  final String chiave;
+  final String valore;
+  const Impostazione({required this.chiave, required this.valore});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['chiave'] = Variable<String>(chiave);
+    map['valore'] = Variable<String>(valore);
+    return map;
+  }
+
+  ImpostazioniCompanion toCompanion(bool nullToAbsent) {
+    return ImpostazioniCompanion(chiave: Value(chiave), valore: Value(valore));
+  }
+
+  factory Impostazione.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Impostazione(
+      chiave: serializer.fromJson<String>(json['chiave']),
+      valore: serializer.fromJson<String>(json['valore']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'chiave': serializer.toJson<String>(chiave),
+      'valore': serializer.toJson<String>(valore),
+    };
+  }
+
+  Impostazione copyWith({String? chiave, String? valore}) => Impostazione(
+    chiave: chiave ?? this.chiave,
+    valore: valore ?? this.valore,
+  );
+  Impostazione copyWithCompanion(ImpostazioniCompanion data) {
+    return Impostazione(
+      chiave: data.chiave.present ? data.chiave.value : this.chiave,
+      valore: data.valore.present ? data.valore.value : this.valore,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Impostazione(')
+          ..write('chiave: $chiave, ')
+          ..write('valore: $valore')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(chiave, valore);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Impostazione &&
+          other.chiave == this.chiave &&
+          other.valore == this.valore);
+}
+
+class ImpostazioniCompanion extends UpdateCompanion<Impostazione> {
+  final Value<String> chiave;
+  final Value<String> valore;
+  final Value<int> rowid;
+  const ImpostazioniCompanion({
+    this.chiave = const Value.absent(),
+    this.valore = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  ImpostazioniCompanion.insert({
+    required String chiave,
+    required String valore,
+    this.rowid = const Value.absent(),
+  }) : chiave = Value(chiave),
+       valore = Value(valore);
+  static Insertable<Impostazione> custom({
+    Expression<String>? chiave,
+    Expression<String>? valore,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (chiave != null) 'chiave': chiave,
+      if (valore != null) 'valore': valore,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  ImpostazioniCompanion copyWith({
+    Value<String>? chiave,
+    Value<String>? valore,
+    Value<int>? rowid,
+  }) {
+    return ImpostazioniCompanion(
+      chiave: chiave ?? this.chiave,
+      valore: valore ?? this.valore,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (chiave.present) {
+      map['chiave'] = Variable<String>(chiave.value);
+    }
+    if (valore.present) {
+      map['valore'] = Variable<String>(valore.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ImpostazioniCompanion(')
+          ..write('chiave: $chiave, ')
+          ..write('valore: $valore, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4683,12 +4898,16 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $QuoteTable quote = $QuoteTable(this);
   late final $RimborsiTable rimborsi = $RimborsiTable(this);
   late final $CambiTable cambi = $CambiTable(this);
+  late final $ImpostazioniTable impostazioni = $ImpostazioniTable(this);
   late final ListeDao listeDao = ListeDao(this as AppDatabase);
   late final DebitiDao debitiDao = DebitiDao(this as AppDatabase);
   late final GruppiDao gruppiDao = GruppiDao(this as AppDatabase);
   late final CategorieDao categorieDao = CategorieDao(this as AppDatabase);
   late final SpeseDao speseDao = SpeseDao(this as AppDatabase);
   late final SaldiDao saldiDao = SaldiDao(this as AppDatabase);
+  late final ImpostazioniDao impostazioniDao = ImpostazioniDao(
+    this as AppDatabase,
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4705,6 +4924,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     quote,
     rimborsi,
     cambi,
+    impostazioni,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -9355,6 +9575,158 @@ typedef $$CambiTableProcessedTableManager =
       Cambio,
       PrefetchHooks Function({bool gruppoId})
     >;
+typedef $$ImpostazioniTableCreateCompanionBuilder =
+    ImpostazioniCompanion Function({
+      required String chiave,
+      required String valore,
+      Value<int> rowid,
+    });
+typedef $$ImpostazioniTableUpdateCompanionBuilder =
+    ImpostazioniCompanion Function({
+      Value<String> chiave,
+      Value<String> valore,
+      Value<int> rowid,
+    });
+
+class $$ImpostazioniTableFilterComposer
+    extends Composer<_$AppDatabase, $ImpostazioniTable> {
+  $$ImpostazioniTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get chiave => $composableBuilder(
+    column: $table.chiave,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get valore => $composableBuilder(
+    column: $table.valore,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$ImpostazioniTableOrderingComposer
+    extends Composer<_$AppDatabase, $ImpostazioniTable> {
+  $$ImpostazioniTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get chiave => $composableBuilder(
+    column: $table.chiave,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valore => $composableBuilder(
+    column: $table.valore,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$ImpostazioniTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ImpostazioniTable> {
+  $$ImpostazioniTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get chiave =>
+      $composableBuilder(column: $table.chiave, builder: (column) => column);
+
+  GeneratedColumn<String> get valore =>
+      $composableBuilder(column: $table.valore, builder: (column) => column);
+}
+
+class $$ImpostazioniTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ImpostazioniTable,
+          Impostazione,
+          $$ImpostazioniTableFilterComposer,
+          $$ImpostazioniTableOrderingComposer,
+          $$ImpostazioniTableAnnotationComposer,
+          $$ImpostazioniTableCreateCompanionBuilder,
+          $$ImpostazioniTableUpdateCompanionBuilder,
+          (
+            Impostazione,
+            BaseReferences<_$AppDatabase, $ImpostazioniTable, Impostazione>,
+          ),
+          Impostazione,
+          PrefetchHooks Function()
+        > {
+  $$ImpostazioniTableTableManager(_$AppDatabase db, $ImpostazioniTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ImpostazioniTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ImpostazioniTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ImpostazioniTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> chiave = const Value.absent(),
+                Value<String> valore = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => ImpostazioniCompanion(
+                chiave: chiave,
+                valore: valore,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String chiave,
+                required String valore,
+                Value<int> rowid = const Value.absent(),
+              }) => ImpostazioniCompanion.insert(
+                chiave: chiave,
+                valore: valore,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$ImpostazioniTable, Impostazione>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $ImpostazioniTable,
+                    Impostazione
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$ImpostazioniTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ImpostazioniTable,
+      Impostazione,
+      $$ImpostazioniTableFilterComposer,
+      $$ImpostazioniTableOrderingComposer,
+      $$ImpostazioniTableAnnotationComposer,
+      $$ImpostazioniTableCreateCompanionBuilder,
+      $$ImpostazioniTableUpdateCompanionBuilder,
+      (
+        Impostazione,
+        BaseReferences<_$AppDatabase, $ImpostazioniTable, Impostazione>,
+      ),
+      Impostazione,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -9381,4 +9753,6 @@ class $AppDatabaseManager {
       $$RimborsiTableTableManager(_db, _db.rimborsi);
   $$CambiTableTableManager get cambi =>
       $$CambiTableTableManager(_db, _db.cambi);
+  $$ImpostazioniTableTableManager get impostazioni =>
+      $$ImpostazioniTableTableManager(_db, _db.impostazioni);
 }

@@ -1166,3 +1166,30 @@ indistinguibili nel momento di dividere una spesa.
 **Resta automatico** il gruppo creato al primo avvio e quello che nasce se non
 ne resta nessuno (voci 036 e 046): li' nessuno sta chiedendo niente, e un
 modulo a sorpresa sarebbe peggio di un gruppo con dentro solo te.
+
+---
+
+## 048 — Le preferenze stanno nel database, una riga per preferenza
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto: scegliere il tema dalle
+impostazioni. Serviva un posto dove ricordarlo.
+
+**Decisione:** una tabella chiave-valore nel database, non un pacchetto per le
+preferenze. Il tema si salva come parola (`chiaro`, `scuro`, `sistema`), non
+come numero, e un valore che non si riconosce vale "sistema".
+
+**Motivazione:** il database c'e' gia' ed e' l'unico posto in cui l'app tiene
+le cose (voce 007): aggiungere `shared_preferences` significherebbe un secondo
+archivio, un secondo modo di leggere, un secondo modo di sbagliare. Una riga
+per preferenza invece di una colonna ciascuna: aggiungerne una non deve
+costare una migrazione.
+
+La parola invece del numero perche' salvare l'indice di `ThemeMode` legherebbe
+i dati all'ordine di un enum di Flutter: il giorno che quell'ordine cambiasse,
+il tema di tutti cambierebbe in silenzio.
+
+**Conseguenza:** `MaterialApp` ascolta la preferenza, quindi il tema cambia
+mentre lo si sceglie, senza riavviare. Le preferenze restano **di questo
+dispositivo**: non viaggeranno con i gruppi condivisi.

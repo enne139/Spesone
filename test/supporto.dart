@@ -50,3 +50,26 @@ Future<void> vaiAllaSezioneLista(WidgetTester tester) async {
   await tester.tap(find.byIcon(Icons.shopping_cart_outlined).first);
   await tester.pumpAndSettle();
 }
+
+/// Apre le impostazioni dal menu laterale.
+///
+/// Da usare con uno schermo alto (vedi [schermoAlto]): il menu non scorre da
+/// solo, e cio' che resta sotto il bordo non viene costruito, quindi non si
+/// puo' nemmeno cercare.
+Future<void> apriImpostazioni(WidgetTester tester) async {
+  await apriDrawer(tester);
+  await tester.tap(find.text('Impostazioni'));
+  await tester.pumpAndSettle();
+}
+
+/// Allarga lo schermo di prova per far stare tutto il menu laterale.
+///
+/// Lo schermo predefinito delle prove e' 800x600: con molte viste, le ultime
+/// voci del menu finiscono fuori e non vengono costruite. Il telefono vero e'
+/// piu' alto, e il menu scorre comunque.
+void schermoAlto(WidgetTester tester) {
+  tester.view.physicalSize = const Size(800, 1600);
+  tester.view.devicePixelRatio = 1.0;
+  addTearDown(tester.view.resetPhysicalSize);
+  addTearDown(tester.view.resetDevicePixelRatio);
+}

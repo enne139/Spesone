@@ -24,6 +24,12 @@ class SpesoneApp extends StatefulWidget {
 class _SpesoneAppState extends State<SpesoneApp> {
   late final AppDatabase _database = widget.database ?? AppDatabase();
 
+  /// Il tema scelto nelle impostazioni.
+  ///
+  /// Lo stream sta qui, sopra a MaterialApp, perche' e' MaterialApp a doverlo
+  /// sapere: cambiandolo, l'app intera si ridisegna senza riavviarsi.
+  late final Stream<ThemeMode> _tema = _database.impostazioniDao.osservaTema();
+
   @override
   void dispose() {
     // Chiude il database solo se l'ha aperto questo widget: quello passato da
@@ -38,22 +44,37 @@ class _SpesoneAppState extends State<SpesoneApp> {
   Widget build(BuildContext context) {
     return DatabaseScope(
       database: _database,
-      child: MaterialApp(
-        title: 'Spesone',
-        debugShowCheckedModeBanner: false,
-        // L'app e' in italiano: senza questo, i widget di sistema (scelta
-        // della data, menu del testo) resterebbero in inglese.
-        locale: const Locale('it'),
-        supportedLocales: const <Locale>[Locale('it')],
-        localizationsDelegates: const <LocalizationsDelegate<Object>>[
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        theme: AppTheme.light(),
-        darkTheme: AppTheme.dark(),
-        home: const AppShell(),
+      child: StreamBuilder<ThemeMode>(
+        stream: _tema,
+        builder: (BuildContext context, AsyncSnapshot<ThemeMode> snapshot) {
+          return _app(
+            // Finche' la preferenza non e' arrivata si segue il sistema: e'
+            // la risposta giusta finche' non si sa, e non fa lampeggiare
+            // l'app a ogni avvio.
+            snapshot.data ?? ThemeMode.system,
+          );
+        },
       ),
+    );
+  }
+
+  Widget _app(ThemeMode tema) {
+    return MaterialApp(
+      title: 'Spesone',
+      debugShowCheckedModeBanner: false,
+      // L'app e' in italiano: senza questo, i widget di sistema (scelta
+      // della data, menu del testo) resterebbero in inglese.
+      locale: const Locale('it'),
+      supportedLocales: const <Locale>[Locale('it')],
+      localizationsDelegates: const <LocalizationsDelegate<Object>>[
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: tema,
+      home: const AppShell(),
     );
   }
 }

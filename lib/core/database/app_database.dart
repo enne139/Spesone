@@ -4,6 +4,8 @@ import 'package:drift_flutter/drift_flutter.dart';
 
 import 'package:spesone/features/debiti/data/debiti_dao.dart';
 import 'package:spesone/features/debiti/data/debiti_tables.dart';
+import 'package:spesone/features/impostazioni/data/impostazioni_dao.dart';
+import 'package:spesone/features/impostazioni/data/impostazioni_tables.dart';
 import 'package:spesone/features/lista_spesa/data/liste_dao.dart';
 import 'package:spesone/features/lista_spesa/data/liste_tables.dart';
 import 'package:spesone/features/persone/data/persone_tables.dart';
@@ -38,6 +40,7 @@ part 'app_database.g.dart';
     Quote,
     Rimborsi,
     Cambi,
+    Impostazioni,
   ],
   daos: <Type>[
     ListeDao,
@@ -46,6 +49,7 @@ part 'app_database.g.dart';
     CategorieDao,
     SpeseDao,
     SaldiDao,
+    ImpostazioniDao,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -62,9 +66,9 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// Storia: 1 liste della spesa, 2 persone e debiti, 3 gruppi di spesa,
   /// 4 partecipanti propri di ogni gruppo, 5 categorie, 6 spese e quote,
-  /// 7 rimborsi, 8 cambi delle valute.
+  /// 7 rimborsi, 8 cambi delle valute, 9 preferenze.
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration {
@@ -126,6 +130,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (da < 8) {
           await m.createTable(cambi);
+        }
+        if (da < 9) {
+          await m.createTable(impostazioni);
         }
       },
       beforeOpen: (OpeningDetails details) async {
