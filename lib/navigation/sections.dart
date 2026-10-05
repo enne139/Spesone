@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:spesone/features/debiti/crediti_page.dart';
 import 'package:spesone/features/debiti/debiti_da_pagare_page.dart';
 import 'package:spesone/features/debiti/riepilogo_debiti_page.dart';
+import 'package:spesone/features/debiti/widgets/fab_aggiungi_movimento.dart';
 import 'package:spesone/features/lista_spesa/lista_corrente_page.dart';
 import 'package:spesone/features/lista_spesa/liste_archiviate_page.dart';
 import 'package:spesone/features/lista_spesa/prodotti_frequenti_page.dart';
@@ -11,6 +12,7 @@ import 'package:spesone/features/lista_spesa/widgets/fab_aggiungi_voce.dart';
 import 'package:spesone/features/lista_spesa/widgets/selettore_liste.dart';
 import 'package:spesone/features/lista_spesa/widgets/titolo_lista_corrente.dart';
 import 'package:spesone/features/persone/persone_page.dart';
+import 'package:spesone/features/persone/widgets/fab_aggiungi_persona.dart';
 import 'package:spesone/features/spese/categorie_spese_page.dart';
 import 'package:spesone/features/spese/condivisione_gruppo_page.dart';
 import 'package:spesone/features/spese/grafico_spese_page.dart';
@@ -91,16 +93,22 @@ final List<AppSection> appSections = <AppSection>[
         title: 'Riepilogo debiti',
         icon: Icons.balance_outlined,
         builder: (BuildContext context) => const RiepilogoDebitiPage(),
+        floatingActionButton: (BuildContext context) =>
+            const FabAggiungiMovimento(),
       ),
       SectionView(
         title: 'Da ricevere',
         icon: Icons.call_received_outlined,
         builder: (BuildContext context) => const CreditiPage(),
+        floatingActionButton: (BuildContext context) =>
+            const FabAggiungiMovimento(),
       ),
       SectionView(
         title: 'Da pagare',
         icon: Icons.call_made_outlined,
         builder: (BuildContext context) => const DebitiDaPagarePage(),
+        floatingActionButton: (BuildContext context) =>
+            const FabAggiungiMovimento(),
       ),
     ],
   ),
@@ -113,6 +121,8 @@ final List<AppSection> appSections = <AppSection>[
         title: 'Persone',
         icon: Icons.people_outline,
         builder: (BuildContext context) => const PersonePage(),
+        floatingActionButton: (BuildContext context) =>
+            const FabAggiungiPersona(),
       ),
     ],
   ),

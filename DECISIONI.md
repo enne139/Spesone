@@ -515,3 +515,98 @@ farlo riconoscere come libro.
 **Conseguenze:** cambia anche il colore di fondo dell'icona adattiva Android e
 quello della pagina web (`#0A2050`). Il carrello giallo resta lo stesso
 simbolo della sezione Lista nella barra in basso.
+
+---
+
+## 022 — I debiti sono un registro di movimenti, non voci da saldare
+
+**Data:** 2026-10-05
+
+**Contesto:** come rappresentare un debito e cosa succede quando viene
+ripagato.
+
+**Decisione:** scelta dell'autore del progetto. Ogni riga e' un **movimento**
+con un importo **con segno**: positivo se quella persona deve a te, negativo
+se tu devi a lei. Il saldo verso una persona e' la somma dei suoi movimenti.
+Non esiste uno stato "saldato": restituire dei soldi aggiunge la riga opposta,
+e "Salda il conto" e' solo la scorciatoia che aggiunge il movimento che porta
+il saldo a zero.
+
+Di un movimento si registrano persona, importo, motivo (facoltativo) e data.
+
+**Motivazione:** il saldo diventa una somma, non una somma condizionata: meno
+occasioni di sbagliare il conto, e la compensazione fra dare e avere e'
+automatica — se Marco ti deve 20 e tu devi 5 a Marco, c'e' una riga sola da
++15. E' il "calcolo intelligente" chiesto nel README. Lo storico resta sempre
+completo: niente sparisce, nemmeno quando il conto si chiude.
+
+**Conseguenze:** un singolo prestito non si puo' marcare come "restituito"
+senza registrare il movimento di ritorno — ed e' giusto cosi', perche' quel
+movimento e' successo davvero. I pagamenti parziali sono semplicemente
+movimenti piu' piccoli.
+
+---
+
+## 023 — Gli importi si tengono in centesimi interi
+
+**Data:** 2026-10-05
+
+**Contesto:** come salvare e calcolare il denaro.
+
+**Decisione:** `int` di centesimi in tutto il programma. Le uniche conversioni
+da e verso il testo stanno in [lib/core/denaro.dart](lib/core/denaro.dart), e
+l'arrotondamento avviene una volta sola, quando si legge cio' che l'utente ha
+scritto.
+
+**Motivazione:** un `double` non rappresenta esattamente 0,10. Sommando
+abbastanza importi il totale si sposta di qualche centesimo, e su un conto fra
+persone un centesimo che non torna e' una discussione. Con gli interi la somma
+e' esatta per definizione.
+
+**Conseguenze:** niente valute diverse dall'euro per ora; aggiungerle
+significherebbe affiancare un campo valuta e decidere come si sommano saldi in
+valute diverse (cioe' non si sommano).
+
+---
+
+## 024 — L'app parla italiano anche nei widget di sistema
+
+**Data:** 2026-10-05
+
+**Contesto:** il modulo di un movimento usa il calendario di Material, che
+senza traduzioni resta in inglese.
+
+**Decisione:** `flutter_localizations` con `locale: it`, dichiarato in
+[lib/app.dart](lib/app.dart).
+
+**Motivazione:** mesi e pulsanti in inglese in mezzo a un'app italiana sono una
+crepa visibile, e il formato delle date cambia significato fra lingue
+(05/10 non e' il 10 maggio).
+
+**Conseguenza sulle prove — importante:** le etichette dei widget di sistema
+ora sono tradotte, quindi **le prove non possono cercarli per etichetta**. Il
+pulsante del menu laterale si apre chiedendolo allo `Scaffold`
+(`apriDrawer` in [test/supporto.dart](test/supporto.dart)), non toccando un
+pulsante trovato per nome.
+
+---
+
+## 025 — Niente stream dentro una transazione
+
+**Data:** 2026-10-05
+
+**Contesto:** "Salda il conto" leggeva il saldo con `osservaSaldo(...).first`
+dentro la transazione che poi scriveva il movimento di chiusura. Nelle prove
+dirette funzionava, nell'app restava appeso e il conto non si saldava.
+
+**Decisione:** dentro una transazione si leggono i dati con una query secca
+(`getSingleOrNull`), mai con uno `Stream`.
+
+**Motivazione:** uno stream di drift emette quando il database notifica un
+cambiamento, e la notifica arriva solo *dopo* il commit: aspettarlo dentro la
+transazione significa aspettare qualcosa che per definizione non puo'
+succedere. E' lo stesso inganno delle transazioni annidate (voce 014), e come
+quello non da' errore: l'operazione semplicemente non finisce.
+
+**Regola che ne deriva:** dentro `transaction(...)` solo `get*()`, mai
+`watch*()` ne' `.first` su uno stream.

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:spesone/core/database/app_database.dart';
 import 'package:spesone/core/errori.dart';
 import 'package:spesone/features/lista_spesa/data/liste_dao.dart';
-import 'package:spesone/features/lista_spesa/widgets/dialoghi_lista.dart';
+import 'package:spesone/core/widgets/dialoghi.dart';
 import 'package:spesone/features/lista_spesa/widgets/lista_corrente_builder.dart';
 
 /// Pulsante della AppBar che toglie dalla lista le voci gia' prese.

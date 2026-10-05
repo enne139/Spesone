@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:spesone/core/app_theme.dart';
 import 'package:spesone/core/database/app_database.dart';
@@ -40,6 +41,15 @@ class _SpesoneAppState extends State<SpesoneApp> {
       child: MaterialApp(
         title: 'Spesone',
         debugShowCheckedModeBanner: false,
+        // L'app e' in italiano: senza questo, i widget di sistema (scelta
+        // della data, menu del testo) resterebbero in inglese.
+        locale: const Locale('it'),
+        supportedLocales: const <Locale>[Locale('it')],
+        localizationsDelegates: const <LocalizationsDelegate<Object>>[
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
         theme: AppTheme.light(),
         darkTheme: AppTheme.dark(),
         home: const AppShell(),

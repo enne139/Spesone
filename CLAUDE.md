@@ -70,6 +70,15 @@ Un guasto deve **vedersi**, mai diventare un caricamento infinito:
 
 Il perche' e' nella voce 017 di [DECISIONI.md](DECISIONI.md).
 
+## Denaro e transazioni
+
+Gli importi sono **interi di centesimi**, mai `double`: le conversioni stanno
+solo in `lib/core/denaro.dart` (voce 023).
+
+Dentro una `transaction(...)` si legge solo con `get*()`: uno `Stream` o un
+`.first` aspetterebbero una notifica che arriva dopo il commit, e l'operazione
+resta appesa senza dare errore (voci 014 e 025).
+
 ## Prove
 
 ```

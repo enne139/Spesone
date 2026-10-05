@@ -7,7 +7,7 @@ import 'package:spesone/core/formato_data.dart';
 import 'package:spesone/core/widgets/vista_dati.dart';
 import 'package:spesone/features/lista_spesa/data/liste_dao.dart';
 import 'package:spesone/features/lista_spesa/model/riepilogo_lista.dart';
-import 'package:spesone/features/lista_spesa/widgets/dialoghi_lista.dart';
+import 'package:spesone/core/widgets/dialoghi.dart';
 
 /// Le liste archiviate: quelle uscite dal menu laterale ma non cancellate.
 ///

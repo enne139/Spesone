@@ -5,7 +5,7 @@ Compatibile con apple, android, web
 
 ## Obbiettivi 
 
- - [ ] Traccia debiti
+ - [x] Traccia debiti
  - [x] Lista della spesa
  - [ ] Traccia spesa
     - [ ] creare più Gruppi di spesa
@@ -16,7 +16,7 @@ Compatibile con apple, android, web
     - [ ] categoria spesa e data
     - [ ] grafico spese
     - [ ] calcolo dei debiti intelligente
- - [ ] creazione di persone per condivise tra debiti, e traccia spese
+ - [x] creazione di persone per condivise tra debiti, e traccia spese
 
 
 ## L'app

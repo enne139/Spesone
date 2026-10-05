@@ -5,6 +5,7 @@ import 'package:spesone/core/database/database_scope.dart';
 import 'package:spesone/core/errori.dart';
 import 'package:spesone/features/lista_spesa/data/liste_dao.dart';
 import 'package:spesone/features/lista_spesa/model/riepilogo_lista.dart';
+import 'package:spesone/core/widgets/dialoghi.dart';
 import 'package:spesone/features/lista_spesa/widgets/dialoghi_lista.dart';
 import 'package:spesone/navigation/app_shell_scope.dart';
 

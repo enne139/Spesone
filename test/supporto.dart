@@ -33,8 +33,15 @@ Future<void> chiudiApp(WidgetTester tester) async {
 }
 
 /// Apre il menu laterale.
+///
+/// Lo chiede allo Scaffold invece di toccare il pulsante: il nome di quel
+/// pulsante arriva dalle traduzioni di Material e cambia con la lingua
+/// dell'app, quindi cercarlo per etichetta renderebbe le prove fragili.
 Future<void> apriDrawer(WidgetTester tester) async {
-  await tester.tap(find.byTooltip('Open navigation menu'));
+  final ScaffoldState scaffold = tester.firstState<ScaffoldState>(
+    find.byType(Scaffold),
+  );
+  scaffold.openDrawer();
   await tester.pumpAndSettle();
 }
 
