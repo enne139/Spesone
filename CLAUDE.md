@@ -79,6 +79,14 @@ Dentro una `transaction(...)` si legge solo con `get*()`: uno `Stream` o un
 `.first` aspetterebbero una notifica che arriva dopo il commit, e l'operazione
 resta appesa senza dare errore (voci 014 e 025).
 
+## Colori
+
+I colori delle categorie non si scelgono a occhio: si salva l'**indice** di
+una voce di `lib/core/palette_categorie.dart`, che ha un passo per tema. Prima
+di toccare quella tavolozza vanno rifatti i conti su distanza percettiva
+(OKLab, anche sotto daltonismo) e contrasto. Voce 040 di
+[DECISIONI.md](DECISIONI.md).
+
 ## Prove
 
 ```

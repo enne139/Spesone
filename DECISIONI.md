@@ -952,3 +952,37 @@ conosce.
 **Conseguenza:** lo stesso Marco scritto in due gruppi e' due righe diverse, e
 nessuna delle due e' il Marco dei debiti. E' il prezzo della separazione, ed
 e' lo stesso prezzo gia' accettato nella voce 028.
+
+---
+
+## 040 — Il colore di una categoria e' un indice, non un colore
+
+**Data:** 2026-10-05
+
+**Contesto:** ogni categoria ha un colore (voce 031), e l'app ha un tema
+chiaro e uno scuro.
+
+**Decisione:** nel database si salva l'**indice** di una voce della tavolozza
+in [lib/core/palette_categorie.dart](lib/core/palette_categorie.dart), non un
+colore. Ogni voce ha due passi sulla stessa tinta, uno scelto contro la
+superficie chiara e uno contro quella scura.
+
+**Motivazione:** un colore fisso viene scelto guardando un tema solo. Il verde
+scuro che si legge benissimo su fondo bianco sparisce su fondo nero, e
+schiarirlo in automatico non funziona: il passo scuro va scelto e verificato
+per conto suo. Con l'indice, la stessa categoria resta riconoscibile in
+entrambi i temi senza che nessuno debba ricolorarla a mano.
+
+**Conseguenza:** i colori sono **sei**, e non di piu'. Non e' un gusto: per
+ogni coppia e' stata misurata la distanza percettiva in OKLab, a visione
+normale e simulando protanopia, deuteranopia e tritanopia, piu' il contrasto
+contro la superficie di ciascun tema. Con otto tinte le soglie non si
+raggiungevano (14,3 contro il minimo di 15 a visione normale); con sei si
+superano con margine — 20,9 e 21,2 a visione normale, 11,2 e 11,4 sotto
+daltonismo, contro minimi di 15 e 8. Finiti i sei colori gli indici
+ricominciano, e conviene sceglierli a mano.
+
+**Regola che ne deriva:** il colore non porta mai l'informazione da solo. Il
+nome della categoria gli sta sempre accanto, e anche nella scelta del colore
+c'e' scritto come si chiama ("rosa", "azzurro"): chi non distingue due tinte
+deve comunque poter scegliere, e sapere cosa ha scelto.

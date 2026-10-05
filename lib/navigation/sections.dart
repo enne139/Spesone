@@ -19,6 +19,7 @@ import 'package:spesone/features/spese/condivisione_gruppo_page.dart';
 import 'package:spesone/features/spese/grafico_spese_page.dart';
 import 'package:spesone/features/spese/gruppi_spesa_page.dart';
 import 'package:spesone/features/spese/panoramica_spese_page.dart';
+import 'package:spesone/features/spese/widgets/fab_nuova_categoria.dart';
 import 'package:spesone/features/spese/widgets/fab_nuovo_gruppo.dart';
 import 'package:spesone/features/spese/widgets/selettore_gruppi.dart';
 import 'package:spesone/features/spese/widgets/titolo_gruppo_corrente.dart';
@@ -59,6 +60,8 @@ final List<AppSection> appSections = <AppSection>[
         title: 'Categorie',
         icon: Icons.sell_outlined,
         builder: (BuildContext context) => const CategorieSpesePage(),
+        floatingActionButton: (BuildContext context) =>
+            const FabNuovaCategoria(),
       ),
       SectionView(
         title: 'Grafico spese',

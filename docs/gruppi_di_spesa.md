@@ -74,7 +74,9 @@ tua quota**.
 Le categorie sono un elenco **unico per tutta l'app**, non una cosa per
 gruppo: "Cibo", "Alloggio", "Trasporti", "Svago", "Altro" valgono in Grecia
 come nella casa di via Verdi. Ognuna ha un nome e un colore, quello con cui
-comparira' nel grafico.
+comparira' nel grafico. I colori sono sei, scelti calcolando le distanze
+percettive fra tutte le coppie anche sotto daltonismo (DECISIONI.md, voce
+040); il nome del colore e' sempre scritto accanto al tondino.
 
 Si possono aggiungere, rinominare, ricolorare ed eliminare. Eliminando una
 categoria le spese che la usavano restano **senza categoria**: non si
@@ -194,7 +196,7 @@ Grecia, partecipanti: io, Marco, Lucia.
 ## Come lo costruiamo
 
 1. ~~Gruppi e partecipanti: creare, scegliere dal menu, archiviare.~~ **fatto**
-2. Categorie: elenco, colori, insieme di partenza.
+2. ~~Categorie: elenco, colori, insieme di partenza.~~ **fatto**
 3. Spese normali: le tue, con categoria. Totale del viaggio e quanto hai
    speso tu.
 4. Spese condivise: chi ha pagato, per chi, quote.

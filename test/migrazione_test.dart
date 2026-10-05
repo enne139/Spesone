@@ -98,7 +98,7 @@ void main() {
 
       // La versione registrata nel file e' quella nuova: alla prossima apertura
       // la migrazione non viene rifatta.
-      expect(grezzo.userVersion, 4);
+      expect(grezzo.userVersion, 5);
     },
   );
 
@@ -132,7 +132,11 @@ void main() {
         'Spesa',
       );
 
-      // E i gruppi, che sono la novita', funzionano.
+      // E le categorie, che sono l'ultima novita', si creano.
+      await db.categorieDao.assicuraCategoriePredefinite();
+      expect(await db.categorieDao.osservaCategorie().first, isNotEmpty);
+
+      // E i gruppi funzionano.
       final Gruppo gruppo = await db.gruppiDao.assicuraGruppoCorrente();
       expect(gruppo.corrente, isTrue);
       final List<Partecipante> dentro = await db.gruppiDao
@@ -141,7 +145,7 @@ void main() {
       // Ogni gruppo nasce con il suo "io" (voce 039).
       expect(dentro.single.sonoIo, isTrue);
 
-      expect(grezzo.userVersion, 4);
+      expect(grezzo.userVersion, 5);
     },
   );
 }

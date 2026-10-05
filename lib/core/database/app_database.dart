@@ -7,6 +7,8 @@ import 'package:spesone/features/debiti/data/debiti_tables.dart';
 import 'package:spesone/features/lista_spesa/data/liste_dao.dart';
 import 'package:spesone/features/lista_spesa/data/liste_tables.dart';
 import 'package:spesone/features/persone/data/persone_tables.dart';
+import 'package:spesone/features/spese/data/categorie_dao.dart';
+import 'package:spesone/features/spese/data/categorie_tables.dart';
 import 'package:spesone/features/spese/data/gruppi_dao.dart';
 import 'package:spesone/features/spese/data/gruppi_tables.dart';
 
@@ -26,8 +28,9 @@ part 'app_database.g.dart';
     MovimentiDebito,
     Gruppi,
     Partecipanti,
+    Categorie,
   ],
-  daos: <Type>[ListeDao, DebitiDao, GruppiDao],
+  daos: <Type>[ListeDao, DebitiDao, GruppiDao, CategorieDao],
 )
 class AppDatabase extends _$AppDatabase {
   /// Database vero, su file, nella cartella dati dell'app.
@@ -42,9 +45,9 @@ class AppDatabase extends _$AppDatabase {
   /// migrazione corrispondente in [migration].
   ///
   /// Storia: 1 liste della spesa, 2 persone e debiti, 3 gruppi di spesa,
-  /// 4 partecipanti propri di ogni gruppo.
+  /// 4 partecipanti propri di ogni gruppo, 5 categorie.
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -93,6 +96,9 @@ class AppDatabase extends _$AppDatabase {
           if (da == 3) {
             await m.alterTable(TableMigration(persone));
           }
+        }
+        if (da < 5) {
+          await m.createTable(categorie);
         }
       },
       beforeOpen: (OpeningDetails details) async {

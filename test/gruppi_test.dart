@@ -133,4 +133,27 @@ void main() {
 
     await chiudiApp(tester);
   });
+
+  testWidgets('le categorie di partenza ci sono e se ne aggiunge una', (
+    WidgetTester tester,
+  ) async {
+    await avviaApp(tester, db);
+    await apriDrawer(tester);
+    await tester.tap(find.text('Categorie'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Cibo'), findsOneWidget);
+    expect(find.text('Trasporti'), findsOneWidget);
+
+    await tester.tap(find.widgetWithText(FloatingActionButton, 'Categoria'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'Souvenir');
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Aggiungi'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Souvenir'), findsOneWidget);
+
+    await chiudiApp(tester);
+  });
 }
