@@ -7,7 +7,7 @@ Compatibile con apple, android, web
 
  - [x] Traccia debiti
  - [x] Lista della spesa
- - [ ] Traccia spesa
+ - [ ] Traccia spesa — i paletti sono in [docs/gruppi_di_spesa.md](docs/gruppi_di_spesa.md)
     - [ ] creare più Gruppi di spesa
     - [ ] condividere gruppo via wifi (backend)
     - [ ] condividere gruppo via bt

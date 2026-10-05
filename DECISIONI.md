@@ -610,3 +610,106 @@ quello non da' errore: l'operazione semplicemente non finisce.
 
 **Regola che ne deriva:** dentro `transaction(...)` solo `get*()`, mai
 `watch*()` ne' `.first` su uno stream.
+
+---
+
+## 026 — Ogni spesa vive in un gruppo
+
+**Data:** 2026-10-05
+
+**Contesto:** l'app deve servire a segnare le spese di un viaggio o di una
+casa condivisa, con le proprie spese e quelle pagate per altri.
+
+**Decisione:** il **gruppo** e' il contesto di tutto: ha un nome, dei
+partecipanti presi dall'anagrafica e le sue voci. Non esistono spese fuori da
+un gruppo. Quello su cui si lavora si sceglie dal menu laterale della sezione
+Spese, e si archivia quando il viaggio finisce — le stesse azioni, negli
+stessi posti, della lista della spesa (voce 011).
+
+**Motivazione:** le domande a cui l'app deve rispondere ("quanto ho speso",
+"chi deve a chi") hanno senso solo dentro un perimetro: il viaggio, la casa,
+il mese. Senza gruppo quelle risposte sarebbero somme di cose non confrontabili.
+Riusare la forma della lista della spesa fa si' che la seconda funzionalita'
+non vada imparata da capo.
+
+---
+
+## 027 — Parti uguali, correggibili a mano
+
+**Data:** 2026-10-05
+
+**Contesto:** come si divide una spesa pagata per piu' persone.
+
+**Decisione:** scelta dell'autore del progetto. Le quote partono divise in
+parti uguali fra i partecipanti scelti e si possono correggere una per una; il
+resto si ridistribuisce fra le altre, cosi' la somma delle quote e' **sempre**
+uguale al totale. Niente percentuali, niente "quote doppie".
+
+**Motivazione:** in un viaggio quasi tutto si divide in parti uguali, quindi
+quello dev'essere il caso da zero tocchi; le eccezioni esistono pero' davvero
+(chi non ha preso il dolce, la camera singola) e un'app che non le accetta
+costringe a tenere i conti a parte. Le percentuali sarebbero un terzo modo di
+dire la stessa cosa, con una schermata piu' complicata per tutti.
+
+**Conseguenza:** il vincolo "somma delle quote = totale" e' la regola che
+tiene in piedi i saldi, e va verificata nelle prove.
+
+---
+
+## 028 — I saldi dei gruppi e i debiti a mano restano separati
+
+**Data:** 2026-10-05
+
+**Contesto:** una spesa condivisa crea un dare/avere, e un dare/avere esiste
+gia' nella sezione Debiti (voce 022). Si potevano unire.
+
+**Decisione:** scelta esplicita dell'autore del progetto: **completamente
+separati**. Un gruppo calcola i propri saldi dalle proprie voci; la sezione
+Debiti resta per i prestiti segnati a mano. Nessuna generazione automatica,
+nessun travaso alla chiusura del gruppo.
+
+**Motivazione:** le voci di un gruppo e i prestiti sciolti rispondono a due
+domande diverse — "come stiamo messi in questo viaggio" e "quanto ci dobbiamo
+in generale" — e tenerli separati evita che modificare una spesa riscriva
+movimenti altrove, che e' la parte piu' facile da sbagliare.
+
+**Conseguenza, accettata:** "quanto mi deve Marco in tutto" non ha una
+risposta unica nell'app: si guardano i saldi del gruppo e i debiti, e si
+somma a mente. Se un giorno dara' fastidio, la voce da superare e' questa.
+
+---
+
+## 029 — "Io" e' una persona dell'anagrafica
+
+**Data:** 2026-10-05
+
+**Contesto:** una spesa ha bisogno di sapere chi ha pagato, e fra i
+partecipanti ci sei anche tu; anche i debiti parlano implicitamente di "me".
+
+**Decisione:** l'anagrafica contiene una persona segnata come **sei tu**,
+creata al primo avvio e rinominabile ma non eliminabile. Nei moduli compare
+come qualunque altro partecipante.
+
+**Motivazione:** cosi' "chi ha pagato" e "per chi" sono un elenco solo, senza
+casi speciali: le quote, i saldi e i totali si calcolano con la stessa
+formula per tutti, e "quanto ho speso io" diventa "la somma delle quote di
+quella persona". Un "io" implicito avrebbe richiesto di trattarlo a parte in
+ogni calcolo.
+
+---
+
+## 030 — Dentro un gruppo ci sono spese e rimborsi
+
+**Data:** 2026-10-05
+
+**Contesto:** se i saldi di un gruppo nascono solo dalle spese, non tornano
+mai a zero: manca il momento in cui qualcuno restituisce i soldi.
+
+**Decisione:** un gruppo contiene due tipi di voce. La **spesa** (chi ha
+pagato, per chi, quote) e il **rimborso** (da una persona a un'altra, un
+importo). Il rimborso sposta i saldi ma non entra in "quanto ho speso".
+
+**Motivazione:** segue necessariamente dalla voce 028: se i saldi del gruppo
+non si travasano nei debiti, il gruppo deve avere al proprio interno il modo
+di chiudersi. Tenere separati i due tipi evita che un rimborso gonfi il totale
+del viaggio, che e' l'errore classico di chi li registra come spese.
