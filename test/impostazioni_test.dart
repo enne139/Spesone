@@ -72,5 +72,21 @@ void main() {
 
       await chiudiApp(tester);
     });
+
+    testWidgets('i comandi dei dati sono raggiungibili', (
+      WidgetTester tester,
+    ) async {
+      schermoAlto(tester);
+      await avviaApp(tester, db);
+      await apriImpostazioni(tester);
+
+      // Non si apre il selettore di file in una prova: si verifica che i due
+      // comandi ci siano e spieghino cosa fanno.
+      expect(find.text('Esporta i dati'), findsOneWidget);
+      expect(find.text('Importa dati'), findsOneWidget);
+      expect(find.textContaining('Rimette un backup al posto'), findsOneWidget);
+
+      await chiudiApp(tester);
+    });
   });
 }

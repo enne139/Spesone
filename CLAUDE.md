@@ -96,6 +96,15 @@ di toccare quella tavolozza vanno rifatti i conti su distanza percettiva
 (OKLab, anche sotto daltonismo) e contrasto. Voce 040 di
 [DECISIONI.md](DECISIONI.md).
 
+## Backup
+
+L'esportazione scrive le righe grezze di **tutte** le tabelle leggendo
+`db.allTables`: una tabella nuova ci finisce da sola, non va aggiunta a mano.
+L'ordine di dichiarazione in `@DriftDatabase` conta — e' quello in cui le
+righe si reinseriscono senza violare i vincoli — quindi una tabella nuova va
+dichiarata **dopo** quelle a cui fa riferimento. Voce 049 di
+[DECISIONI.md](DECISIONI.md).
+
 ## Prove
 
 ```

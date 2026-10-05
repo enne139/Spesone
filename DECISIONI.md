@@ -1193,3 +1193,41 @@ il tema di tutti cambierebbe in silenzio.
 **Conseguenza:** `MaterialApp` ascolta la preferenza, quindi il tema cambia
 mentre lo si sceglie, senza riavviare. Le preferenze restano **di questo
 dispositivo**: non viaggeranno con i gruppi condivisi.
+
+---
+
+## 049 — Il backup e' un JSON leggibile, e sostituisce
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto: esportare e importare i
+dati.
+
+**Decisione:** si esporta un **JSON** con le righe grezze di ogni tabella —
+nomi delle colonne del database, valori come sono — non una copia del file
+SQLite. Importare **sostituisce tutto**, dentro una transazione, e lo dice
+prima di farlo. Si rifiuta un backup fatto con un'altra versione dello schema,
+spiegandolo.
+
+**Motivazione:** un backup deve poter essere aperto, letto e capito anche
+senza l'app: se un giorno il programma non si apre piu', i dati devono restare
+raggiungibili con un editor di testo. Le righe grezze — invece di un formato
+inventato — fanno si' che il backup non vada riscritto ogni volta che si
+aggiunge una tabella, e che quello che si rilegge sia esattamente quello che
+era scritto.
+
+Sostituire e non fondere: fondere due archivi significa decidere cosa fare dei
+doppioni, e quello e' il problema della condivisione dei gruppi (voce 034), non
+quello di un backup. Un'importazione che fonde "quasi giusto" e' peggio di una
+che sostituisce in modo prevedibile.
+
+La transazione serve al caso brutto: se una riga del backup e' guasta, il
+database resta com'era invece di restare mezzo svuotato. C'e' una prova che lo
+verifica.
+
+**Limite dichiarato:** un backup di una versione precedente non si importa.
+Per farlo servirebbe far passare il JSON attraverso le stesse migrazioni del
+database, e per ora non c'e'. Il file resta comunque leggibile.
+
+**Escluse le preferenze:** il tema e' di questo dispositivo, non un dato
+(voce 048).
