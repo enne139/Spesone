@@ -6,9 +6,11 @@ import 'package:spesone/core/errori.dart';
 import 'package:spesone/core/formato_data.dart';
 import 'package:spesone/core/widgets/dialoghi.dart';
 import 'package:spesone/core/widgets/vista_dati.dart';
-import 'package:spesone/features/debiti/data/debiti_dao.dart';
 import 'package:spesone/features/spese/data/gruppi_dao.dart';
 import 'package:spesone/features/spese/model/riepilogo_gruppo.dart';
+
+/// Le azioni disponibili su un partecipante.
+enum _AzionePartecipante { rinomina, togli }
 
 /// Le impostazioni di un gruppo: nome, valuta e partecipanti.
 ///
@@ -26,7 +28,7 @@ class ImpostazioniViaggioPage extends StatefulWidget {
 
 class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
   GruppiDao? _dao;
-  Stream<List<PartecipanteConPersona>>? _partecipanti;
+  Stream<List<Partecipante>>? _partecipanti;
   Stream<List<RiepilogoGruppo>>? _attivi;
 
   @override
@@ -43,7 +45,7 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
     _attivi = dao.osservaGruppiAttivi();
   }
 
-  Future<void> _rinomina(Gruppo gruppo) async {
+  Future<void> _rinominaGruppo(Gruppo gruppo) async {
     final String? nome = await chiediTesto(
       context,
       titolo: 'Rinomina gruppo',
@@ -60,36 +62,47 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
     );
   }
 
-  Future<void> _aggiungiPartecipante() async {
-    // Il foglio si apre subito e legge l'elenco da se': aspettare qui il
-    // primo valore di uno stream prima di aprirlo lascerebbe il tocco senza
-    // risposta se il database tardasse (voci 014 e 025).
-    final int? personaId = await showModalBottomSheet<int>(
-      context: context,
-      showDragHandle: true,
-      builder: (BuildContext context) =>
-          _SceltaPersona(gruppoId: widget.gruppoId),
+  Future<void> _aggiungi() async {
+    final String? nome = await chiediTesto(
+      context,
+      titolo: 'Nuovo partecipante',
+      azione: 'Aggiungi',
+      etichetta: 'Nome',
+      suggerimento: 'es. Marco',
     );
-    if (personaId == null || !mounted) {
+    if (nome == null || !mounted) {
       return;
     }
-
+    // I partecipanti si scrivono a mano, gruppo per gruppo: non arrivano
+    // dall'anagrafica dei debiti (voce 039).
     await eseguiSegnalandoErrori(
       context,
-      () => _dao!.aggiungiPartecipante(
-        gruppoId: widget.gruppoId,
-        personaId: personaId,
-      ),
+      () => _dao!.aggiungiPartecipante(gruppoId: widget.gruppoId, nome: nome),
     );
   }
 
-  Future<void> _togli(PartecipanteConPersona partecipante) async {
+  Future<void> _rinomina(Partecipante partecipante) async {
+    final String? nome = await chiediTesto(
+      context,
+      titolo: 'Rinomina partecipante',
+      azione: 'Salva',
+      etichetta: 'Nome',
+      valoreIniziale: partecipante.nome,
+    );
+    if (nome == null || !mounted) {
+      return;
+    }
+    await eseguiSegnalandoErrori(
+      context,
+      () => _dao!.rinominaPartecipante(id: partecipante.id, nome: nome),
+    );
+  }
+
+  Future<void> _togli(Partecipante partecipante) async {
     final bool conferma = await chiediConferma(
       context,
-      titolo: 'Togliere ${partecipante.persona.nome}?',
-      messaggio:
-          'Esce da questo gruppo, ma resta nell\'anagrafica e negli altri '
-          'gruppi.',
+      titolo: 'Togliere ${partecipante.nome}?',
+      messaggio: 'Esce da questo gruppo. Gli altri gruppi non cambiano.',
       azione: 'Togli',
       distruttiva: true,
     );
@@ -98,7 +111,7 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
     }
     await eseguiSegnalandoErrori(
       context,
-      () => _dao!.togliPartecipante(partecipante.partecipante.id),
+      () => _dao!.togliPartecipante(partecipante.id),
     );
   }
 
@@ -129,7 +142,7 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
                 trailing: IconButton(
                   icon: const Icon(Icons.drive_file_rename_outline),
                   tooltip: 'Rinomina',
-                  onPressed: () => _rinomina(gruppo),
+                  onPressed: () => _rinominaGruppo(gruppo),
                 ),
               ),
               ListTile(
@@ -145,146 +158,63 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: Text('Partecipanti', style: theme.textTheme.titleMedium),
               ),
-              VistaDati<List<PartecipanteConPersona>>(
+              VistaDati<List<Partecipante>>(
                 stream: _partecipanti,
-                builder:
-                    (
-                      BuildContext context,
-                      List<PartecipanteConPersona> dentro,
-                    ) {
-                      return Column(
-                        children: <Widget>[
-                          for (final PartecipanteConPersona p in dentro)
-                            ListTile(
-                              leading: const Icon(Icons.person_outline),
-                              title: Text(p.persona.nome),
-                              subtitle: p.seiTu ? const Text('sei tu') : null,
-                              // Te stesso non ti togli: il gruppo e' il tuo
-                              // punto di vista sui conti.
-                              trailing: p.seiTu
-                                  ? null
-                                  : IconButton(
-                                      icon: const Icon(
-                                        Icons.person_remove_outlined,
+                builder: (BuildContext context, List<Partecipante> dentro) {
+                  return Column(
+                    children: <Widget>[
+                      for (final Partecipante p in dentro)
+                        ListTile(
+                          leading: const Icon(Icons.person_outline),
+                          title: Text(p.nome),
+                          subtitle: p.sonoIo ? const Text('sei tu') : null,
+                          trailing: PopupMenuButton<_AzionePartecipante>(
+                            tooltip: 'Azioni del partecipante',
+                            onSelected: (_AzionePartecipante azione) =>
+                                switch (azione) {
+                                  _AzionePartecipante.rinomina => _rinomina(p),
+                                  _AzionePartecipante.togli => _togli(p),
+                                },
+                            itemBuilder: (BuildContext context) =>
+                                <PopupMenuEntry<_AzionePartecipante>>[
+                                  const PopupMenuItem<_AzionePartecipante>(
+                                    value: _AzionePartecipante.rinomina,
+                                    child: ListTile(
+                                      leading: Icon(
+                                        Icons.drive_file_rename_outline,
                                       ),
-                                      tooltip: 'Togli dal gruppo',
-                                      onPressed: () => _togli(p),
+                                      title: Text('Rinomina'),
+                                      contentPadding: EdgeInsets.zero,
                                     ),
-                            ),
-                          ListTile(
-                            leading: const Icon(Icons.person_add_outlined),
-                            title: const Text('Aggiungi partecipante'),
-                            onTap: _aggiungiPartecipante,
+                                  ),
+                                  // Te stesso non ti togli: il gruppo e'
+                                  // il tuo punto di vista sui conti.
+                                  if (!p.sonoIo)
+                                    const PopupMenuItem<_AzionePartecipante>(
+                                      value: _AzionePartecipante.togli,
+                                      child: ListTile(
+                                        leading: Icon(
+                                          Icons.person_remove_outlined,
+                                        ),
+                                        title: Text('Togli dal gruppo'),
+                                        contentPadding: EdgeInsets.zero,
+                                      ),
+                                    ),
+                                ],
                           ),
-                        ],
-                      );
-                    },
+                        ),
+                      ListTile(
+                        leading: const Icon(Icons.person_add_outlined),
+                        title: const Text('Aggiungi partecipante'),
+                        onTap: _aggiungi,
+                      ),
+                    ],
+                  );
+                },
               ),
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-/// Foglio che fa scegliere chi aggiungere al gruppo.
-///
-/// Elenca le persone dell'anagrafica che non ne fanno ancora parte, e
-/// permette di crearne una sul momento.
-class _SceltaPersona extends StatefulWidget {
-  const _SceltaPersona({required this.gruppoId});
-
-  final int gruppoId;
-
-  @override
-  State<_SceltaPersona> createState() => _SceltaPersonaState();
-}
-
-class _SceltaPersonaState extends State<_SceltaPersona> {
-  GruppiDao? _dao;
-  Stream<List<Persona>>? _aggiungibili;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final GruppiDao dao = DatabaseScope.of(context).gruppiDao;
-    if (dao == _dao) {
-      return;
-    }
-    _dao = dao;
-    _aggiungibili = dao.osservaPersoneAggiungibili(widget.gruppoId);
-  }
-
-  Future<void> _nuovaPersona() async {
-    final DebitiDao debiti = DatabaseScope.of(context).debitiDao;
-    final NavigatorState navigator = Navigator.of(context);
-
-    final String? nome = await chiediTesto(
-      context,
-      titolo: 'Nuova persona',
-      azione: 'Aggiungi',
-      etichetta: 'Nome',
-      suggerimento: 'es. Marco',
-    );
-    if (nome == null || !mounted) {
-      return;
-    }
-
-    final int id = await debiti.aggiungiPersona(nome);
-    if (!mounted) {
-      return;
-    }
-    navigator.pop(id);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final ThemeData theme = Theme.of(context);
-
-    return SafeArea(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 8),
-            child: Text('Chi aggiungi?', style: theme.textTheme.titleLarge),
-          ),
-          Flexible(
-            child: VistaDati<List<Persona>>(
-              stream: _aggiungibili,
-              builder: (BuildContext context, List<Persona> persone) {
-                return ListView(
-                  shrinkWrap: true,
-                  children: <Widget>[
-                    if (persone.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(20, 8, 20, 8),
-                        child: Text(
-                          'Sono gia\' tutti nel gruppo.',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ),
-                    for (final Persona persona in persone)
-                      ListTile(
-                        leading: const Icon(Icons.person_outline),
-                        title: Text(persona.nome),
-                        onTap: () => Navigator.pop(context, persona.id),
-                      ),
-                  ],
-                );
-              },
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.person_add_outlined),
-            title: const Text('Nuova persona'),
-            onTap: _nuovaPersona,
-          ),
-          const SizedBox(height: 8),
-        ],
       ),
     );
   }

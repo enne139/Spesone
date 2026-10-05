@@ -65,10 +65,30 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.widgetWithText(AppBar, 'Condivisione gruppo'), findsOneWidget);
 
-    await tester.tap(find.byIcon(Icons.person_outline).first);
+    // Le persone non sono piu' una sezione: vivono dentro i Debiti.
+    await tester.tap(find.byIcon(Icons.account_balance_wallet_outlined));
     await tester.pumpAndSettle();
     await apriDrawer(tester);
     expect(find.text('Condivisione gruppo'), findsNothing);
+    expect(find.text('Persone'), findsOneWidget);
+    await chiudiApp(tester);
+  });
+
+  testWidgets('dai debiti si apre l\'anagrafica con il pulsante', (
+    WidgetTester tester,
+  ) async {
+    await avviaApp(tester, db);
+
+    await tester.tap(find.byIcon(Icons.account_balance_wallet_outlined));
+    await tester.pumpAndSettle();
+
+    // Il pulsante nella barra porta all'anagrafica senza passare dal menu.
+    await tester.tap(find.byTooltip('Persone'));
+    await tester.pumpAndSettle();
+
+    expect(find.widgetWithText(AppBar, 'Persone'), findsOneWidget);
+    expect(find.text('Nessuna persona'), findsOneWidget);
+
     await chiudiApp(tester);
   });
 }

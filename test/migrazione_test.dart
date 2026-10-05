@@ -5,7 +5,6 @@ import 'package:sqlite3/sqlite3.dart';
 import 'package:spesone/core/database/app_database.dart';
 import 'package:spesone/features/debiti/model/saldo_persona.dart';
 import 'package:spesone/features/lista_spesa/model/riepilogo_lista.dart';
-import 'package:spesone/features/spese/model/riepilogo_gruppo.dart';
 
 /// Prove delle migrazioni del database.
 ///
@@ -99,7 +98,7 @@ void main() {
 
       // La versione registrata nel file e' quella nuova: alla prossima apertura
       // la migrazione non viene rifatta.
-      expect(grezzo.userVersion, 3);
+      expect(grezzo.userVersion, 4);
     },
   );
 
@@ -133,18 +132,16 @@ void main() {
         'Spesa',
       );
 
-      // Marco c'era prima della colonna: non e' lui "io".
-      expect(saldi.single.persona.sonoIo, isFalse);
-
       // E i gruppi, che sono la novita', funzionano.
       final Gruppo gruppo = await db.gruppiDao.assicuraGruppoCorrente();
       expect(gruppo.corrente, isTrue);
-      final List<PartecipanteConPersona> dentro = await db.gruppiDao
+      final List<Partecipante> dentro = await db.gruppiDao
           .osservaPartecipanti(gruppo.id)
           .first;
-      expect(dentro.single.seiTu, isTrue);
+      // Ogni gruppo nasce con il suo "io" (voce 039).
+      expect(dentro.single.sonoIo, isTrue);
 
-      expect(grezzo.userVersion, 3);
+      expect(grezzo.userVersion, 4);
     },
   );
 }

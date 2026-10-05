@@ -15,20 +15,3 @@ class RiepilogoGruppo {
   /// Vero se il viaggio e' stato archiviato.
   bool get archiviato => gruppo.archiviatoIl != null;
 }
-
-/// Un partecipante insieme alla persona che rappresenta.
-///
-/// Le due cose stanno in tabelle diverse (chi esiste / chi c'era), ma a
-/// schermo si mostrano sempre insieme.
-class PartecipanteConPersona {
-  const PartecipanteConPersona({
-    required this.partecipante,
-    required this.persona,
-  });
-
-  final Partecipante partecipante;
-  final Persona persona;
-
-  /// Vero se questo partecipante sei tu.
-  bool get seiTu => persona.sonoIo;
-}

@@ -16,7 +16,7 @@ Compatibile con apple, android, web
     - [ ] categoria spesa e data
     - [ ] grafico spese
     - [ ] calcolo dei debiti intelligente
- - [x] creazione di persone per condivise tra debiti, e traccia spese
+ - [x] creazione di persone (anagrafica dei debiti; i gruppi di spesa hanno i propri partecipanti, scritti a mano)
 
 
 ## L'app

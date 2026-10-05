@@ -8,7 +8,6 @@ import 'package:spesone/core/widgets/errore_view.dart';
 import 'package:spesone/core/widgets/vista_dati.dart';
 import 'package:spesone/features/spese/data/gruppi_dao.dart';
 import 'package:spesone/features/spese/impostazioni_viaggio_page.dart';
-import 'package:spesone/features/spese/model/riepilogo_gruppo.dart';
 import 'package:spesone/features/spese/widgets/gruppo_corrente_builder.dart';
 
 /// Vista di apertura della sezione Spese: il gruppo su cui stai lavorando.
@@ -30,7 +29,7 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
   Object? _errorePreparazione;
 
   int? _gruppoOsservato;
-  Stream<List<PartecipanteConPersona>>? _partecipanti;
+  Stream<List<Partecipante>>? _partecipanti;
 
   @override
   void didChangeDependencies() {
@@ -60,10 +59,7 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
     unawaited(_preparaGruppo(_dao!));
   }
 
-  Stream<List<PartecipanteConPersona>> _streamPartecipanti(
-    GruppiDao dao,
-    int gruppoId,
-  ) {
+  Stream<List<Partecipante>> _streamPartecipanti(GruppiDao dao, int gruppoId) {
     if (_gruppoOsservato != gruppoId) {
       _gruppoOsservato = gruppoId;
       _partecipanti = dao.osservaPartecipanti(gruppoId);
@@ -85,15 +81,11 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        return VistaDati<List<PartecipanteConPersona>>(
+        return VistaDati<List<Partecipante>>(
           stream: _streamPartecipanti(dao, gruppo.id),
-          builder:
-              (
-                BuildContext context,
-                List<PartecipanteConPersona> partecipanti,
-              ) {
-                return _Panoramica(gruppo: gruppo, partecipanti: partecipanti);
-              },
+          builder: (BuildContext context, List<Partecipante> partecipanti) {
+            return _Panoramica(gruppo: gruppo, partecipanti: partecipanti);
+          },
         );
       },
     );
@@ -104,7 +96,7 @@ class _Panoramica extends StatelessWidget {
   const _Panoramica({required this.gruppo, required this.partecipanti});
 
   final Gruppo gruppo;
-  final List<PartecipanteConPersona> partecipanti;
+  final List<Partecipante> partecipanti;
 
   @override
   Widget build(BuildContext context) {
@@ -136,12 +128,10 @@ class _Panoramica extends StatelessWidget {
                   spacing: 8,
                   runSpacing: 8,
                   children: <Widget>[
-                    for (final PartecipanteConPersona p in partecipanti)
+                    for (final Partecipante p in partecipanti)
                       Chip(
                         avatar: const Icon(Icons.person_outline, size: 18),
-                        label: Text(
-                          p.seiTu ? '${p.persona.nome} (tu)' : p.persona.nome,
-                        ),
+                        label: Text(p.sonoIo ? '${p.nome} (tu)' : p.nome),
                       ),
                   ],
                 ),

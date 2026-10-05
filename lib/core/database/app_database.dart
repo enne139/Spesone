@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:uuid/uuid.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
 import 'package:spesone/features/debiti/data/debiti_dao.dart';
@@ -40,9 +41,10 @@ class AppDatabase extends _$AppDatabase {
   /// Da aumentare di uno a ogni modifica delle tabelle, aggiungendo la
   /// migrazione corrispondente in [migration].
   ///
-  /// Storia: 1 liste della spesa, 2 persone e debiti, 3 gruppi di spesa.
+  /// Storia: 1 liste della spesa, 2 persone e debiti, 3 gruppi di spesa,
+  /// 4 partecipanti propri di ogni gruppo.
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -54,16 +56,43 @@ class AppDatabase extends _$AppDatabase {
           await m.createTable(persone);
           await m.createTable(movimentiDebito);
         }
-        // `createTable` crea sempre la tabella **di oggi**: chi arriva dalla
-        // versione 1 ha appena creato `persone` con dentro `sonoIo`, e
-        // aggiungere la colonna fallirebbe. La si aggiunge solo a chi la
-        // tabella ce l'aveva gia'.
-        if (da == 2) {
-          await m.addColumn(persone, persone.sonoIo);
-        }
         if (da < 3) {
           await m.createTable(gruppi);
+          // `partecipanti` si crea piu' sotto, gia' nella forma di oggi: chi
+          // arriva da qui non ha mai visto quella vecchia.
+        }
+        if (da < 4) {
+          // I partecipanti non rimandano piu' all'anagrafica dei debiti: hanno
+          // un nome proprio (voce 039). La tabella cambia forma, e dato che i
+          // gruppi sono nati in questa stessa sessione di lavoro si rifa' da
+          // zero invece di travasare riga per riga.
+          // Chi era alla versione 3 ha la vecchia tabella, che puntava
+          // all'anagrafica: cambia forma, e dato che i gruppi sono nati nella
+          // stessa sessione di lavoro si rifa' da zero invece di travasarla.
+          if (da == 3) {
+            await m.drop(partecipanti);
+          }
           await m.createTable(partecipanti);
+
+          // Ogni gruppo gia' esistente riceve il suo "io", che prima arrivava
+          // dall'anagrafica.
+          const Uuid uuid = Uuid();
+          for (final Gruppo gruppo in await select(gruppi).get()) {
+            await into(partecipanti).insert(
+              PartecipantiCompanion.insert(
+                uuid: uuid.v4(),
+                gruppoId: gruppo.id,
+                nome: 'Io',
+                sonoIo: const Value<bool>(true),
+              ),
+            );
+          }
+
+          // Solo chi era alla 3 ha la colonna `sonoIo` sull'anagrafica:
+          // serviva ai gruppi, che ora hanno i propri partecipanti.
+          if (da == 3) {
+            await m.alterTable(TableMigration(persone));
+          }
         }
       },
       beforeOpen: (OpeningDetails details) async {

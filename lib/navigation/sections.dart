@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:spesone/features/debiti/crediti_page.dart';
 import 'package:spesone/features/debiti/debiti_da_pagare_page.dart';
 import 'package:spesone/features/debiti/riepilogo_debiti_page.dart';
+import 'package:spesone/features/debiti/widgets/azione_apri_persone.dart';
 import 'package:spesone/features/debiti/widgets/fab_aggiungi_movimento.dart';
 import 'package:spesone/features/lista_spesa/lista_corrente_page.dart';
 import 'package:spesone/features/lista_spesa/liste_archiviate_page.dart';
@@ -22,6 +23,13 @@ import 'package:spesone/features/spese/widgets/fab_nuovo_gruppo.dart';
 import 'package:spesone/features/spese/widgets/selettore_gruppi.dart';
 import 'package:spesone/features/spese/widgets/titolo_gruppo_corrente.dart';
 import 'package:spesone/navigation/app_section.dart';
+
+/// Posizione della vista "Persone" fra quelle dei Debiti.
+///
+/// La usa il pulsante nella barra per saltarci: e' l'unico punto in cui
+/// l'ordine delle viste conta, e tenerlo qui lo rende evidente a chi lo
+/// cambia.
+const int vistaPersoneNeiDebiti = 3;
 
 /// Registro unico della navigazione: aggiungere una voce qui la fa comparire
 /// nella barra in basso (sezione) o nel drawer (vista).
@@ -102,6 +110,7 @@ final List<AppSection> appSections = <AppSection>[
         title: 'Riepilogo debiti',
         icon: Icons.balance_outlined,
         builder: (BuildContext context) => const RiepilogoDebitiPage(),
+        actions: (BuildContext context) => const <Widget>[AzioneApriPersone()],
         floatingActionButton: (BuildContext context) =>
             const FabAggiungiMovimento(),
       ),
@@ -109,6 +118,7 @@ final List<AppSection> appSections = <AppSection>[
         title: 'Da ricevere',
         icon: Icons.call_received_outlined,
         builder: (BuildContext context) => const CreditiPage(),
+        actions: (BuildContext context) => const <Widget>[AzioneApriPersone()],
         floatingActionButton: (BuildContext context) =>
             const FabAggiungiMovimento(),
       ),
@@ -116,16 +126,13 @@ final List<AppSection> appSections = <AppSection>[
         title: 'Da pagare',
         icon: Icons.call_made_outlined,
         builder: (BuildContext context) => const DebitiDaPagarePage(),
+        actions: (BuildContext context) => const <Widget>[AzioneApriPersone()],
         floatingActionButton: (BuildContext context) =>
             const FabAggiungiMovimento(),
       ),
-    ],
-  ),
-  AppSection(
-    label: 'Persone',
-    icon: Icons.person_outline,
-    selectedIcon: Icons.person,
-    views: <SectionView>[
+      // L'anagrafica sta qui e non in una sezione sua: serve solo a dare un
+      // nome ai debiti (voce 038). La sua posizione e' in
+      // [vistaPersoneNeiDebiti].
       SectionView(
         title: 'Persone',
         icon: Icons.people_outline,

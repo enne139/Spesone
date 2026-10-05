@@ -12,12 +12,14 @@ import 'package:spesone/features/debiti/widgets/saldi_builder.dart';
 /// Le azioni disponibili su una persona.
 enum _AzionePersona { rinomina, elimina }
 
-/// Anagrafica delle persone: semplici nomi, condivisi fra spese e debiti.
+/// Anagrafica delle persone con cui si hanno debiti e crediti.
 ///
-/// Non sono utenti e non hanno account: servono a intestare una spesa
-/// condivisa o un debito (DECISIONI.md, voce 005). Accanto a ognuna c'e' il
-/// suo saldo, anche quando e' zero: l'anagrafica mostra tutti, le viste dei
-/// debiti solo chi ha un conto aperto.
+/// Vale **solo per i debiti**: i gruppi di spesa hanno i propri partecipanti,
+/// scritti a mano gruppo per gruppo (DECISIONI.md, voci 038 e 039). Non sono
+/// utenti e non hanno account.
+///
+/// Accanto a ognuna c'e' il suo saldo, anche quando e' zero: qui si vedono
+/// tutte, nelle altre viste solo chi ha un conto aperto.
 class PersonePage extends StatelessWidget {
   const PersonePage({super.key});
 
@@ -154,8 +156,8 @@ class _NessunaPersona extends StatelessWidget {
             Text('Nessuna persona', style: theme.textTheme.titleLarge),
             const SizedBox(height: 8),
             Text(
-              'Le persone sono solo nomi, usati per intestare debiti e spese '
-              'condivise. Tocca Persona per aggiungere la prima.',
+              'Le persone sono solo nomi, usati per intestare i debiti. '
+              'Tocca Persona per aggiungere la prima.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: theme.colorScheme.onSurfaceVariant,

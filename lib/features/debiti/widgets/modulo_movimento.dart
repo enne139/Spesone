@@ -148,13 +148,7 @@ class _ModuloMovimentoState extends State<_ModuloMovimento> {
     setState(() {
       _persone = <Persona>[
         ..._persone,
-        // Una persona creata qui non sei mai tu: tu esisti gia'.
-        Persona(
-          id: id,
-          nome: nome.trim(),
-          creataIl: DateTime.now(),
-          sonoIo: false,
-        ),
+        Persona(id: id, nome: nome.trim(), creataIl: DateTime.now()),
       ];
       _personaId = id;
     });

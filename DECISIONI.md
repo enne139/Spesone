@@ -900,3 +900,55 @@ cosa si e' fatto.
 
 **Conseguenza:** i debiti segnati a mano restano invece a `cascade`:
 riguardano solo te e quella persona, e la conferma lo dice gia'.
+
+---
+
+## 038 — L'anagrafica delle persone vale solo per i debiti
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto. Supera la voce 005, dove le
+persone erano "condivise fra debiti e spese".
+
+**Decisione:** le persone servono **solo** a intestare i debiti. La sezione
+"Persone" sparisce dalla barra in basso — che resta a tre voci: Spese, Lista,
+Debiti — e l'anagrafica diventa una vista dei Debiti, raggiungibile dal menu
+laterale o dal pulsante con le persone nella barra in alto.
+
+**Motivazione:** una sezione in fondo allo schermo e' uno dei quattro posti
+piu' preziosi dell'app, e va a cio' che si usa, non a cio' che serve. Dentro
+i Debiti l'anagrafica sta accanto a cio' per cui esiste: i prestiti che si
+segnano a mano.
+
+**Conseguenza:** la voce 029 ("io" come persona dell'anagrafica) decade, e con
+essa la voce 037 (il divieto di eliminare chi fa parte di un gruppo): i gruppi
+non toccano piu' l'anagrafica, quindi eliminare una persona riguarda solo i
+suoi debiti, come prima.
+
+---
+
+## 039 — Ogni gruppo ha i propri partecipanti, scritti a mano
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto. Supera la parte della voce
+026 in cui i partecipanti erano "persone dell'anagrafica".
+
+**Decisione:** un partecipante e' una riga del gruppo con un **nome proprio**,
+scritto a mano quando lo si aggiunge. Nessun rimando all'anagrafica dei
+debiti. Ogni gruppo nasce con un partecipante segnato come te, rinominabile e
+non removibile. Due partecipanti con lo stesso nome non possono stare nello
+stesso gruppo; lo stesso nome in gruppi diversi e' normale e sono due righe
+indipendenti.
+
+**Motivazione:** i gruppi e i debiti rispondono a domande diverse e sono gia'
+separati nei conti (voce 028): legarli attraverso l'anagrafica li avrebbe
+riuniti dalla porta di servizio, facendo cambiare un viaggio chiuso perche'
+qualcuno ha rinominato una persona altrove. E conta per la condivisione (voce
+034): un gruppo che arriva da un altro dispositivo porta i nomi scelti da chi
+l'ha creato, e non deve rimapparli su un'anagrafica che quel dispositivo non
+conosce.
+
+**Conseguenza:** lo stesso Marco scritto in due gruppi e' due righe diverse, e
+nessuna delle due e' il Marco dei debiti. E' il prezzo della separazione, ed
+e' lo stesso prezzo gia' accettato nella voce 028.

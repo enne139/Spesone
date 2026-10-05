@@ -886,21 +886,8 @@ class $PersoneTable extends Persone with TableInfo<$PersoneTable, Persona> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
-  static const VerificationMeta _sonoIoMeta = const VerificationMeta('sonoIo');
   @override
-  late final GeneratedColumn<bool> sonoIo = GeneratedColumn<bool>(
-    'sono_io',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("sono_io" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
-  @override
-  List<GeneratedColumn> get $columns => [id, nome, creataIl, sonoIo];
+  List<GeneratedColumn> get $columns => [id, nome, creataIl];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -930,12 +917,6 @@ class $PersoneTable extends Persone with TableInfo<$PersoneTable, Persona> {
         creataIl.isAcceptableOrUnknown(data['creata_il']!, _creataIlMeta),
       );
     }
-    if (data.containsKey('sono_io')) {
-      context.handle(
-        _sonoIoMeta,
-        sonoIo.isAcceptableOrUnknown(data['sono_io']!, _sonoIoMeta),
-      );
-    }
     return context;
   }
 
@@ -957,10 +938,6 @@ class $PersoneTable extends Persone with TableInfo<$PersoneTable, Persona> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}creata_il'],
       )!,
-      sonoIo: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}sono_io'],
-      )!,
     );
   }
 
@@ -976,26 +953,13 @@ class Persona extends DataClass implements Insertable<Persona> {
   /// Come la chiami tu: "Marco", "Marco del tennis", "mamma".
   final String nome;
   final DateTime creataIl;
-
-  /// Vero sulla persona che sei tu.
-  ///
-  /// Ce n'e' una sola, creata al primo avvio: cosi' "chi ha pagato" e "per
-  /// chi" sono un elenco unico senza casi speciali, e "quanto ho speso io" e'
-  /// la somma delle quote di quella persona (DECISIONI.md, voce 029).
-  final bool sonoIo;
-  const Persona({
-    required this.id,
-    required this.nome,
-    required this.creataIl,
-    required this.sonoIo,
-  });
+  const Persona({required this.id, required this.nome, required this.creataIl});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['nome'] = Variable<String>(nome);
     map['creata_il'] = Variable<DateTime>(creataIl);
-    map['sono_io'] = Variable<bool>(sonoIo);
     return map;
   }
 
@@ -1004,7 +968,6 @@ class Persona extends DataClass implements Insertable<Persona> {
       id: Value(id),
       nome: Value(nome),
       creataIl: Value(creataIl),
-      sonoIo: Value(sonoIo),
     );
   }
 
@@ -1017,7 +980,6 @@ class Persona extends DataClass implements Insertable<Persona> {
       id: serializer.fromJson<int>(json['id']),
       nome: serializer.fromJson<String>(json['nome']),
       creataIl: serializer.fromJson<DateTime>(json['creataIl']),
-      sonoIo: serializer.fromJson<bool>(json['sonoIo']),
     );
   }
   @override
@@ -1027,23 +989,19 @@ class Persona extends DataClass implements Insertable<Persona> {
       'id': serializer.toJson<int>(id),
       'nome': serializer.toJson<String>(nome),
       'creataIl': serializer.toJson<DateTime>(creataIl),
-      'sonoIo': serializer.toJson<bool>(sonoIo),
     };
   }
 
-  Persona copyWith({int? id, String? nome, DateTime? creataIl, bool? sonoIo}) =>
-      Persona(
-        id: id ?? this.id,
-        nome: nome ?? this.nome,
-        creataIl: creataIl ?? this.creataIl,
-        sonoIo: sonoIo ?? this.sonoIo,
-      );
+  Persona copyWith({int? id, String? nome, DateTime? creataIl}) => Persona(
+    id: id ?? this.id,
+    nome: nome ?? this.nome,
+    creataIl: creataIl ?? this.creataIl,
+  );
   Persona copyWithCompanion(PersoneCompanion data) {
     return Persona(
       id: data.id.present ? data.id.value : this.id,
       nome: data.nome.present ? data.nome.value : this.nome,
       creataIl: data.creataIl.present ? data.creataIl.value : this.creataIl,
-      sonoIo: data.sonoIo.present ? data.sonoIo.value : this.sonoIo,
     );
   }
 
@@ -1052,52 +1010,45 @@ class Persona extends DataClass implements Insertable<Persona> {
     return (StringBuffer('Persona(')
           ..write('id: $id, ')
           ..write('nome: $nome, ')
-          ..write('creataIl: $creataIl, ')
-          ..write('sonoIo: $sonoIo')
+          ..write('creataIl: $creataIl')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, nome, creataIl, sonoIo);
+  int get hashCode => Object.hash(id, nome, creataIl);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Persona &&
           other.id == this.id &&
           other.nome == this.nome &&
-          other.creataIl == this.creataIl &&
-          other.sonoIo == this.sonoIo);
+          other.creataIl == this.creataIl);
 }
 
 class PersoneCompanion extends UpdateCompanion<Persona> {
   final Value<int> id;
   final Value<String> nome;
   final Value<DateTime> creataIl;
-  final Value<bool> sonoIo;
   const PersoneCompanion({
     this.id = const Value.absent(),
     this.nome = const Value.absent(),
     this.creataIl = const Value.absent(),
-    this.sonoIo = const Value.absent(),
   });
   PersoneCompanion.insert({
     this.id = const Value.absent(),
     required String nome,
     this.creataIl = const Value.absent(),
-    this.sonoIo = const Value.absent(),
   }) : nome = Value(nome);
   static Insertable<Persona> custom({
     Expression<int>? id,
     Expression<String>? nome,
     Expression<DateTime>? creataIl,
-    Expression<bool>? sonoIo,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (nome != null) 'nome': nome,
       if (creataIl != null) 'creata_il': creataIl,
-      if (sonoIo != null) 'sono_io': sonoIo,
     });
   }
 
@@ -1105,13 +1056,11 @@ class PersoneCompanion extends UpdateCompanion<Persona> {
     Value<int>? id,
     Value<String>? nome,
     Value<DateTime>? creataIl,
-    Value<bool>? sonoIo,
   }) {
     return PersoneCompanion(
       id: id ?? this.id,
       nome: nome ?? this.nome,
       creataIl: creataIl ?? this.creataIl,
-      sonoIo: sonoIo ?? this.sonoIo,
     );
   }
 
@@ -1127,9 +1076,6 @@ class PersoneCompanion extends UpdateCompanion<Persona> {
     if (creataIl.present) {
       map['creata_il'] = Variable<DateTime>(creataIl.value);
     }
-    if (sonoIo.present) {
-      map['sono_io'] = Variable<bool>(sonoIo.value);
-    }
     return map;
   }
 
@@ -1138,8 +1084,7 @@ class PersoneCompanion extends UpdateCompanion<Persona> {
     return (StringBuffer('PersoneCompanion(')
           ..write('id: $id, ')
           ..write('nome: $nome, ')
-          ..write('creataIl: $creataIl, ')
-          ..write('sonoIo: $sonoIo')
+          ..write('creataIl: $creataIl')
           ..write(')'))
         .toString();
   }
@@ -2089,19 +2034,31 @@ class $PartecipantiTable extends Partecipanti
       'REFERENCES gruppi (id) ON DELETE CASCADE',
     ),
   );
-  static const VerificationMeta _personaIdMeta = const VerificationMeta(
-    'personaId',
-  );
+  static const VerificationMeta _nomeMeta = const VerificationMeta('nome');
   @override
-  late final GeneratedColumn<int> personaId = GeneratedColumn<int>(
-    'persona_id',
+  late final GeneratedColumn<String> nome = GeneratedColumn<String>(
+    'nome',
     aliasedName,
     false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES persone (id) ON DELETE RESTRICT',
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 60,
     ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sonoIoMeta = const VerificationMeta('sonoIo');
+  @override
+  late final GeneratedColumn<bool> sonoIo = GeneratedColumn<bool>(
+    'sono_io',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sono_io" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
   );
   static const VerificationMeta _aggiuntoIlMeta = const VerificationMeta(
     'aggiuntoIl',
@@ -2120,7 +2077,8 @@ class $PartecipantiTable extends Partecipanti
     id,
     uuid,
     gruppoId,
-    personaId,
+    nome,
+    sonoIo,
     aggiuntoIl,
   ];
   @override
@@ -2154,13 +2112,19 @@ class $PartecipantiTable extends Partecipanti
     } else if (isInserting) {
       context.missing(_gruppoIdMeta);
     }
-    if (data.containsKey('persona_id')) {
+    if (data.containsKey('nome')) {
       context.handle(
-        _personaIdMeta,
-        personaId.isAcceptableOrUnknown(data['persona_id']!, _personaIdMeta),
+        _nomeMeta,
+        nome.isAcceptableOrUnknown(data['nome']!, _nomeMeta),
       );
     } else if (isInserting) {
-      context.missing(_personaIdMeta);
+      context.missing(_nomeMeta);
+    }
+    if (data.containsKey('sono_io')) {
+      context.handle(
+        _sonoIoMeta,
+        sonoIo.isAcceptableOrUnknown(data['sono_io']!, _sonoIoMeta),
+      );
     }
     if (data.containsKey('aggiunto_il')) {
       context.handle(
@@ -2175,7 +2139,7 @@ class $PartecipantiTable extends Partecipanti
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
   List<Set<GeneratedColumn>> get uniqueKeys => [
-    {gruppoId, personaId},
+    {gruppoId, nome},
   ];
   @override
   Partecipante map(Map<String, dynamic> data, {String? tablePrefix}) {
@@ -2193,9 +2157,13 @@ class $PartecipantiTable extends Partecipanti
         DriftSqlType.int,
         data['${effectivePrefix}gruppo_id'],
       )!,
-      personaId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}persona_id'],
+      nome: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nome'],
+      )!,
+      sonoIo: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sono_io'],
       )!,
       aggiuntoIl: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
@@ -2218,17 +2186,21 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
   final String uuid;
   final int gruppoId;
 
-  /// `restrict`: una persona che fa parte di un gruppo non si puo' eliminare.
+  /// Come lo chiami in questo gruppo.
+  final String nome;
+
+  /// Vero sul partecipante che sei tu.
   ///
-  /// Con `cascade` sparirebbe dal viaggio insieme alle sue spese, cambiando i
-  /// conti di tutti gli altri senza dirlo.
-  final int personaId;
+  /// Ce n'e' uno per gruppo, creato insieme al gruppo: e' il punto di vista da
+  /// cui si leggono "quanto ho speso io" e i saldi.
+  final bool sonoIo;
   final DateTime aggiuntoIl;
   const Partecipante({
     required this.id,
     required this.uuid,
     required this.gruppoId,
-    required this.personaId,
+    required this.nome,
+    required this.sonoIo,
     required this.aggiuntoIl,
   });
   @override
@@ -2237,7 +2209,8 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
     map['id'] = Variable<int>(id);
     map['uuid'] = Variable<String>(uuid);
     map['gruppo_id'] = Variable<int>(gruppoId);
-    map['persona_id'] = Variable<int>(personaId);
+    map['nome'] = Variable<String>(nome);
+    map['sono_io'] = Variable<bool>(sonoIo);
     map['aggiunto_il'] = Variable<DateTime>(aggiuntoIl);
     return map;
   }
@@ -2247,7 +2220,8 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
       id: Value(id),
       uuid: Value(uuid),
       gruppoId: Value(gruppoId),
-      personaId: Value(personaId),
+      nome: Value(nome),
+      sonoIo: Value(sonoIo),
       aggiuntoIl: Value(aggiuntoIl),
     );
   }
@@ -2261,7 +2235,8 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
       id: serializer.fromJson<int>(json['id']),
       uuid: serializer.fromJson<String>(json['uuid']),
       gruppoId: serializer.fromJson<int>(json['gruppoId']),
-      personaId: serializer.fromJson<int>(json['personaId']),
+      nome: serializer.fromJson<String>(json['nome']),
+      sonoIo: serializer.fromJson<bool>(json['sonoIo']),
       aggiuntoIl: serializer.fromJson<DateTime>(json['aggiuntoIl']),
     );
   }
@@ -2272,7 +2247,8 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
       'id': serializer.toJson<int>(id),
       'uuid': serializer.toJson<String>(uuid),
       'gruppoId': serializer.toJson<int>(gruppoId),
-      'personaId': serializer.toJson<int>(personaId),
+      'nome': serializer.toJson<String>(nome),
+      'sonoIo': serializer.toJson<bool>(sonoIo),
       'aggiuntoIl': serializer.toJson<DateTime>(aggiuntoIl),
     };
   }
@@ -2281,13 +2257,15 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
     int? id,
     String? uuid,
     int? gruppoId,
-    int? personaId,
+    String? nome,
+    bool? sonoIo,
     DateTime? aggiuntoIl,
   }) => Partecipante(
     id: id ?? this.id,
     uuid: uuid ?? this.uuid,
     gruppoId: gruppoId ?? this.gruppoId,
-    personaId: personaId ?? this.personaId,
+    nome: nome ?? this.nome,
+    sonoIo: sonoIo ?? this.sonoIo,
     aggiuntoIl: aggiuntoIl ?? this.aggiuntoIl,
   );
   Partecipante copyWithCompanion(PartecipantiCompanion data) {
@@ -2295,7 +2273,8 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
       id: data.id.present ? data.id.value : this.id,
       uuid: data.uuid.present ? data.uuid.value : this.uuid,
       gruppoId: data.gruppoId.present ? data.gruppoId.value : this.gruppoId,
-      personaId: data.personaId.present ? data.personaId.value : this.personaId,
+      nome: data.nome.present ? data.nome.value : this.nome,
+      sonoIo: data.sonoIo.present ? data.sonoIo.value : this.sonoIo,
       aggiuntoIl: data.aggiuntoIl.present
           ? data.aggiuntoIl.value
           : this.aggiuntoIl,
@@ -2308,14 +2287,15 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
           ..write('gruppoId: $gruppoId, ')
-          ..write('personaId: $personaId, ')
+          ..write('nome: $nome, ')
+          ..write('sonoIo: $sonoIo, ')
           ..write('aggiuntoIl: $aggiuntoIl')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, uuid, gruppoId, personaId, aggiuntoIl);
+  int get hashCode => Object.hash(id, uuid, gruppoId, nome, sonoIo, aggiuntoIl);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2323,7 +2303,8 @@ class Partecipante extends DataClass implements Insertable<Partecipante> {
           other.id == this.id &&
           other.uuid == this.uuid &&
           other.gruppoId == this.gruppoId &&
-          other.personaId == this.personaId &&
+          other.nome == this.nome &&
+          other.sonoIo == this.sonoIo &&
           other.aggiuntoIl == this.aggiuntoIl);
 }
 
@@ -2331,36 +2312,41 @@ class PartecipantiCompanion extends UpdateCompanion<Partecipante> {
   final Value<int> id;
   final Value<String> uuid;
   final Value<int> gruppoId;
-  final Value<int> personaId;
+  final Value<String> nome;
+  final Value<bool> sonoIo;
   final Value<DateTime> aggiuntoIl;
   const PartecipantiCompanion({
     this.id = const Value.absent(),
     this.uuid = const Value.absent(),
     this.gruppoId = const Value.absent(),
-    this.personaId = const Value.absent(),
+    this.nome = const Value.absent(),
+    this.sonoIo = const Value.absent(),
     this.aggiuntoIl = const Value.absent(),
   });
   PartecipantiCompanion.insert({
     this.id = const Value.absent(),
     required String uuid,
     required int gruppoId,
-    required int personaId,
+    required String nome,
+    this.sonoIo = const Value.absent(),
     this.aggiuntoIl = const Value.absent(),
   }) : uuid = Value(uuid),
        gruppoId = Value(gruppoId),
-       personaId = Value(personaId);
+       nome = Value(nome);
   static Insertable<Partecipante> custom({
     Expression<int>? id,
     Expression<String>? uuid,
     Expression<int>? gruppoId,
-    Expression<int>? personaId,
+    Expression<String>? nome,
+    Expression<bool>? sonoIo,
     Expression<DateTime>? aggiuntoIl,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (uuid != null) 'uuid': uuid,
       if (gruppoId != null) 'gruppo_id': gruppoId,
-      if (personaId != null) 'persona_id': personaId,
+      if (nome != null) 'nome': nome,
+      if (sonoIo != null) 'sono_io': sonoIo,
       if (aggiuntoIl != null) 'aggiunto_il': aggiuntoIl,
     });
   }
@@ -2369,14 +2355,16 @@ class PartecipantiCompanion extends UpdateCompanion<Partecipante> {
     Value<int>? id,
     Value<String>? uuid,
     Value<int>? gruppoId,
-    Value<int>? personaId,
+    Value<String>? nome,
+    Value<bool>? sonoIo,
     Value<DateTime>? aggiuntoIl,
   }) {
     return PartecipantiCompanion(
       id: id ?? this.id,
       uuid: uuid ?? this.uuid,
       gruppoId: gruppoId ?? this.gruppoId,
-      personaId: personaId ?? this.personaId,
+      nome: nome ?? this.nome,
+      sonoIo: sonoIo ?? this.sonoIo,
       aggiuntoIl: aggiuntoIl ?? this.aggiuntoIl,
     );
   }
@@ -2393,8 +2381,11 @@ class PartecipantiCompanion extends UpdateCompanion<Partecipante> {
     if (gruppoId.present) {
       map['gruppo_id'] = Variable<int>(gruppoId.value);
     }
-    if (personaId.present) {
-      map['persona_id'] = Variable<int>(personaId.value);
+    if (nome.present) {
+      map['nome'] = Variable<String>(nome.value);
+    }
+    if (sonoIo.present) {
+      map['sono_io'] = Variable<bool>(sonoIo.value);
     }
     if (aggiuntoIl.present) {
       map['aggiunto_il'] = Variable<DateTime>(aggiuntoIl.value);
@@ -2408,7 +2399,8 @@ class PartecipantiCompanion extends UpdateCompanion<Partecipante> {
           ..write('id: $id, ')
           ..write('uuid: $uuid, ')
           ..write('gruppoId: $gruppoId, ')
-          ..write('personaId: $personaId, ')
+          ..write('nome: $nome, ')
+          ..write('sonoIo: $sonoIo, ')
           ..write('aggiuntoIl: $aggiuntoIl')
           ..write(')'))
         .toString();
@@ -3104,13 +3096,11 @@ typedef $$PersoneTableCreateCompanionBuilder = PersoneCompanion Function({
   Value<int> id,
   required String nome,
   Value<DateTime> creataIl,
-  Value<bool> sonoIo,
 });
 typedef $$PersoneTableUpdateCompanionBuilder = PersoneCompanion Function({
   Value<int> id,
   Value<String> nome,
   Value<DateTime> creataIl,
-  Value<bool> sonoIo,
 });
 
 final class $$PersoneTableReferences
@@ -3132,24 +3122,6 @@ final class $$PersoneTableReferences
     final cache = $_typedResult.readTableOrNull(
       _movimentiDebitoRefsTable($_db),
     );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$PartecipantiTable, List<Partecipante>>
-  _partecipantiRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.partecipanti,
-    aliasName: 'persone__id__partecipanti__persona_id',
-  );
-
-  $$PartecipantiTableProcessedTableManager get partecipantiRefs {
-    final manager = $$PartecipantiTableTableManager(
-      $_db,
-      $_db.partecipanti,
-    ).filter((f) => f.personaId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_partecipantiRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3180,11 +3152,6 @@ class $$PersoneTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get sonoIo => $composableBuilder(
-    column: $table.sonoIo,
-    builder: (column) => ColumnFilters(column),
-  );
-
   Expression<bool> movimentiDebitoRefs(
     Expression<bool> Function($$MovimentiDebitoTableFilterComposer f) f,
   ) {
@@ -3201,31 +3168,6 @@ class $$PersoneTableFilterComposer
           }) => $$MovimentiDebitoTableFilterComposer(
             $db: $db,
             $table: $db.movimentiDebito,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> partecipantiRefs(
-    Expression<bool> Function($$PartecipantiTableFilterComposer f) f,
-  ) {
-    final $$PartecipantiTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.partecipanti,
-      getReferencedColumn: (t) => t.personaId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PartecipantiTableFilterComposer(
-            $db: $db,
-            $table: $db.partecipanti,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3259,11 +3201,6 @@ class $$PersoneTableOrderingComposer
     column: $table.creataIl,
     builder: (column) => ColumnOrderings(column),
   );
-
-  ColumnOrderings<bool> get sonoIo => $composableBuilder(
-    column: $table.sonoIo,
-    builder: (column) => ColumnOrderings(column),
-  );
 }
 
 class $$PersoneTableAnnotationComposer
@@ -3283,9 +3220,6 @@ class $$PersoneTableAnnotationComposer
 
   GeneratedColumn<DateTime> get creataIl =>
       $composableBuilder(column: $table.creataIl, builder: (column) => column);
-
-  GeneratedColumn<bool> get sonoIo =>
-      $composableBuilder(column: $table.sonoIo, builder: (column) => column);
 
   Expression<T> movimentiDebitoRefs<T extends Object>(
     Expression<T> Function($$MovimentiDebitoTableAnnotationComposer a) f,
@@ -3311,31 +3245,6 @@ class $$PersoneTableAnnotationComposer
     );
     return f(composer);
   }
-
-  Expression<T> partecipantiRefs<T extends Object>(
-    Expression<T> Function($$PartecipantiTableAnnotationComposer a) f,
-  ) {
-    final $$PartecipantiTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.partecipanti,
-      getReferencedColumn: (t) => t.personaId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PartecipantiTableAnnotationComposer(
-            $db: $db,
-            $table: $db.partecipanti,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$PersoneTableTableManager
@@ -3351,10 +3260,7 @@ class $$PersoneTableTableManager
           $$PersoneTableUpdateCompanionBuilder,
           (Persona, $$PersoneTableReferences),
           Persona,
-          PrefetchHooks Function({
-            bool movimentiDebitoRefs,
-            bool partecipantiRefs,
-          })
+          PrefetchHooks Function({bool movimentiDebitoRefs})
         > {
   $$PersoneTableTableManager(_$AppDatabase db, $PersoneTable table)
     : super(
@@ -3367,30 +3273,16 @@ class $$PersoneTableTableManager
               $$PersoneTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$PersoneTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> nome = const Value.absent(),
-                Value<DateTime> creataIl = const Value.absent(),
-                Value<bool> sonoIo = const Value.absent(),
-              }) => PersoneCompanion(
-                id: id,
-                nome: nome,
-                creataIl: creataIl,
-                sonoIo: sonoIo,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String nome,
-                Value<DateTime> creataIl = const Value.absent(),
-                Value<bool> sonoIo = const Value.absent(),
-              }) => PersoneCompanion.insert(
-                id: id,
-                nome: nome,
-                creataIl: creataIl,
-                sonoIo: sonoIo,
-              ),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> nome = const Value.absent(),
+            Value<DateTime> creataIl = const Value.absent(),
+          }) => PersoneCompanion(id: id, nome: nome, creataIl: creataIl),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String nome,
+            Value<DateTime> creataIl = const Value.absent(),
+          }) => PersoneCompanion.insert(id: id, nome: nome, creataIl: creataIl),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
@@ -3399,63 +3291,37 @@ class $$PersoneTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback:
-              ({movimentiDebitoRefs = false, partecipantiRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (movimentiDebitoRefs) db.movimentiDebito,
-                    if (partecipantiRefs) db.partecipanti,
-                  ],
-                  addJoins: null,
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (movimentiDebitoRefs)
-                        await $_getPrefetchedData<
-                          Persona,
-                          $PersoneTable,
-                          MovimentoDebito
-                        >(
-                          currentTable: table,
-                          referencedTable: $$PersoneTableReferences
-                              ._movimentiDebitoRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$PersoneTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).movimentiDebitoRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.personaId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (partecipantiRefs)
-                        await $_getPrefetchedData<
-                          Persona,
-                          $PersoneTable,
-                          Partecipante
-                        >(
-                          currentTable: table,
-                          referencedTable: $$PersoneTableReferences
-                              ._partecipantiRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$PersoneTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).partecipantiRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.personaId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
+          prefetchHooksCallback: ({movimentiDebitoRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (movimentiDebitoRefs) db.movimentiDebito,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (movimentiDebitoRefs)
+                    await $_getPrefetchedData<
+                      Persona,
+                      $PersoneTable,
+                      MovimentoDebito
+                    >(
+                      currentTable: table,
+                      referencedTable: $$PersoneTableReferences
+                          ._movimentiDebitoRefsTable(db),
+                      managerFromTypedResult: (p0) => $$PersoneTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).movimentiDebitoRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.personaId == item.id),
+                      typedResults: items,
+                    ),
+                ];
               },
+            );
+          },
         ),
       );
 }
@@ -3472,7 +3338,7 @@ typedef $$PersoneTableProcessedTableManager =
       $$PersoneTableUpdateCompanionBuilder,
       (Persona, $$PersoneTableReferences),
       Persona,
-      PrefetchHooks Function({bool movimentiDebitoRefs, bool partecipantiRefs})
+      PrefetchHooks Function({bool movimentiDebitoRefs})
     >;
 typedef $$MovimentiDebitoTableCreateCompanionBuilder =
     MovimentiDebitoCompanion Function({
@@ -4150,7 +4016,8 @@ typedef $$PartecipantiTableCreateCompanionBuilder =
       Value<int> id,
       required String uuid,
       required int gruppoId,
-      required int personaId,
+      required String nome,
+      Value<bool> sonoIo,
       Value<DateTime> aggiuntoIl,
     });
 typedef $$PartecipantiTableUpdateCompanionBuilder =
@@ -4158,7 +4025,8 @@ typedef $$PartecipantiTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> uuid,
       Value<int> gruppoId,
-      Value<int> personaId,
+      Value<String> nome,
+      Value<bool> sonoIo,
       Value<DateTime> aggiuntoIl,
     });
 
@@ -4182,23 +4050,6 @@ final class $$PartecipantiTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
-
-  static $PersoneTable _personaIdTable(_$AppDatabase db) =>
-      db.persone.createAlias('partecipanti__persona_id__persone__id');
-
-  $$PersoneTableProcessedTableManager get personaId {
-    final $_column = $_itemColumn<int>('persona_id')!;
-
-    final manager = $$PersoneTableTableManager(
-      $_db,
-      $_db.persone,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_personaIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
 }
 
 class $$PartecipantiTableFilterComposer
@@ -4217,6 +4068,16 @@ class $$PartecipantiTableFilterComposer
 
   ColumnFilters<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get sonoIo => $composableBuilder(
+    column: $table.sonoIo,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4247,29 +4108,6 @@ class $$PartecipantiTableFilterComposer
     );
     return composer;
   }
-
-  $$PersoneTableFilterComposer get personaId {
-    final $$PersoneTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.personaId,
-      referencedTable: $db.persone,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PersoneTableFilterComposer(
-            $db: $db,
-            $table: $db.persone,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PartecipantiTableOrderingComposer
@@ -4288,6 +4126,16 @@ class $$PartecipantiTableOrderingComposer
 
   ColumnOrderings<String> get uuid => $composableBuilder(
     column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get sonoIo => $composableBuilder(
+    column: $table.sonoIo,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -4318,29 +4166,6 @@ class $$PartecipantiTableOrderingComposer
     );
     return composer;
   }
-
-  $$PersoneTableOrderingComposer get personaId {
-    final $$PersoneTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.personaId,
-      referencedTable: $db.persone,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PersoneTableOrderingComposer(
-            $db: $db,
-            $table: $db.persone,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PartecipantiTableAnnotationComposer
@@ -4357,6 +4182,12 @@ class $$PartecipantiTableAnnotationComposer
 
   GeneratedColumn<String> get uuid =>
       $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get nome =>
+      $composableBuilder(column: $table.nome, builder: (column) => column);
+
+  GeneratedColumn<bool> get sonoIo =>
+      $composableBuilder(column: $table.sonoIo, builder: (column) => column);
 
   GeneratedColumn<DateTime> get aggiuntoIl => $composableBuilder(
     column: $table.aggiuntoIl,
@@ -4385,29 +4216,6 @@ class $$PartecipantiTableAnnotationComposer
     );
     return composer;
   }
-
-  $$PersoneTableAnnotationComposer get personaId {
-    final $$PersoneTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.personaId,
-      referencedTable: $db.persone,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$PersoneTableAnnotationComposer(
-            $db: $db,
-            $table: $db.persone,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$PartecipantiTableTableManager
@@ -4423,7 +4231,7 @@ class $$PartecipantiTableTableManager
           $$PartecipantiTableUpdateCompanionBuilder,
           (Partecipante, $$PartecipantiTableReferences),
           Partecipante,
-          PrefetchHooks Function({bool gruppoId, bool personaId})
+          PrefetchHooks Function({bool gruppoId})
         > {
   $$PartecipantiTableTableManager(_$AppDatabase db, $PartecipantiTable table)
     : super(
@@ -4441,13 +4249,15 @@ class $$PartecipantiTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> uuid = const Value.absent(),
                 Value<int> gruppoId = const Value.absent(),
-                Value<int> personaId = const Value.absent(),
+                Value<String> nome = const Value.absent(),
+                Value<bool> sonoIo = const Value.absent(),
                 Value<DateTime> aggiuntoIl = const Value.absent(),
               }) => PartecipantiCompanion(
                 id: id,
                 uuid: uuid,
                 gruppoId: gruppoId,
-                personaId: personaId,
+                nome: nome,
+                sonoIo: sonoIo,
                 aggiuntoIl: aggiuntoIl,
               ),
           createCompanionCallback:
@@ -4455,13 +4265,15 @@ class $$PartecipantiTableTableManager
                 Value<int> id = const Value.absent(),
                 required String uuid,
                 required int gruppoId,
-                required int personaId,
+                required String nome,
+                Value<bool> sonoIo = const Value.absent(),
                 Value<DateTime> aggiuntoIl = const Value.absent(),
               }) => PartecipantiCompanion.insert(
                 id: id,
                 uuid: uuid,
                 gruppoId: gruppoId,
-                personaId: personaId,
+                nome: nome,
+                sonoIo: sonoIo,
                 aggiuntoIl: aggiuntoIl,
               ),
           withReferenceMapper: (p0) => p0
@@ -4472,7 +4284,7 @@ class $$PartecipantiTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({gruppoId = false, personaId = false}) {
+          prefetchHooksCallback: ({gruppoId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -4503,17 +4315,6 @@ class $$PartecipantiTableTableManager
                             .id,
                       ) as T;
                     }
-                    if (personaId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.personaId,
-                        referencedTable: $$PartecipantiTableReferences
-                            ._personaIdTable(db),
-                        referencedColumn: $$PartecipantiTableReferences
-                            ._personaIdTable(db)
-                            .id,
-                      ) as T;
-                    }
 
                     return state;
                   },
@@ -4538,7 +4339,7 @@ typedef $$PartecipantiTableProcessedTableManager =
       $$PartecipantiTableUpdateCompanionBuilder,
       (Partecipante, $$PartecipantiTableReferences),
       Partecipante,
-      PrefetchHooks Function({bool gruppoId, bool personaId})
+      PrefetchHooks Function({bool gruppoId})
     >;
 
 class $AppDatabaseManager {

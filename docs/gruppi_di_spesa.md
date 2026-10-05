@@ -17,8 +17,11 @@ duri nel tempo e coinvolga piu' persone, e sapere due cose:
 ### Gruppo
 
 Un gruppo e' il contesto di tutto: "Grecia 2026", "Casa di via Verdi". Ha un
-nome, un elenco di **partecipanti** (persone dell'anagrafica, fra cui te) e le
-sue voci. Un gruppo si archivia quando il viaggio finisce, come si archivia
+nome, un elenco di **partecipanti** e le sue voci.
+
+I partecipanti sono **propri del gruppo** e si scrivono a mano: non arrivano
+dall'anagrafica dei debiti, che e' un'altra cosa e vive dentro i Debiti. Ogni
+gruppo nasce con un partecipante che sei tu. Un gruppo si archivia quando il viaggio finisce, come si archivia
 una lista della spesa.
 
 Ogni spesa appartiene a un gruppo: non esistono spese "sciolte". Il gruppo su

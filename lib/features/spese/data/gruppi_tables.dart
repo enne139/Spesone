@@ -1,7 +1,5 @@
 import 'package:drift/drift.dart';
 
-import 'package:spesone/features/persone/data/persone_tables.dart';
-
 /// Un gruppo di spesa: un viaggio, una casa condivisa, un periodo.
 ///
 /// E' il contesto di tutto: non esistono spese fuori da un gruppo, e il totale
@@ -38,9 +36,11 @@ class Gruppi extends Table {
 
 /// Una persona che fa parte di un gruppo.
 ///
-/// Tiene separata l'anagrafica (chi esiste) dalla partecipazione (chi c'era in
-/// quel viaggio): la stessa persona puo' essere in piu' gruppi, e un gruppo
-/// finito non cambia se poi quella persona viene rinominata.
+/// Il nome sta qui, non in un rimando all'anagrafica dei debiti: i
+/// partecipanti si scrivono a mano gruppo per gruppo (DECISIONI.md, voce 039).
+/// Cosi' "Marco" del viaggio in Grecia resta quello che era anche se
+/// nell'anagrafica dei debiti cambia qualcosa, e un gruppo ricevuto da un
+/// altro dispositivo non deve rimappare nomi su un'anagrafica che non conosce.
 @DataClassName('Partecipante')
 class Partecipanti extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -52,18 +52,21 @@ class Partecipanti extends Table {
   IntColumn get gruppoId =>
       integer().references(Gruppi, #id, onDelete: KeyAction.cascade)();
 
-  /// `restrict`: una persona che fa parte di un gruppo non si puo' eliminare.
+  /// Come lo chiami in questo gruppo.
+  TextColumn get nome => text().withLength(min: 1, max: 60)();
+
+  /// Vero sul partecipante che sei tu.
   ///
-  /// Con `cascade` sparirebbe dal viaggio insieme alle sue spese, cambiando i
-  /// conti di tutti gli altri senza dirlo.
-  IntColumn get personaId =>
-      integer().references(Persone, #id, onDelete: KeyAction.restrict)();
+  /// Ce n'e' uno per gruppo, creato insieme al gruppo: e' il punto di vista da
+  /// cui si leggono "quanto ho speso io" e i saldi.
+  BoolColumn get sonoIo => boolean().withDefault(const Constant(false))();
 
   DateTimeColumn get aggiuntoIl => dateTime().withDefault(currentDateAndTime)();
 
-  /// La stessa persona non puo' comparire due volte nello stesso gruppo.
+  /// Due partecipanti con lo stesso nome nello stesso gruppo sarebbero
+  /// indistinguibili a schermo.
   @override
   List<Set<Column<Object>>> get uniqueKeys => <Set<Column<Object>>>[
-    <Column<Object>>{gruppoId, personaId},
+    <Column<Object>>{gruppoId, nome},
   ];
 }

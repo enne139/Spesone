@@ -27,12 +27,13 @@ void main() {
     // L'identificativo stabile c'e' da subito (voce 035).
     expect(gruppo.uuid, isNotEmpty);
 
-    final List<PartecipanteConPersona> dentro = await dao
+    final List<Partecipante> dentro = await dao
         .osservaPartecipanti(gruppo.id)
         .first;
     expect(dentro, hasLength(1));
-    expect(dentro.single.seiTu, isTrue);
-    expect(dentro.single.persona.nome, 'Io');
+    expect(dentro.single.sonoIo, isTrue);
+    expect(dentro.single.nome, 'Io');
+    expect(dentro.single.uuid, isNotEmpty);
 
     // Chiamata due volte non crea un doppione.
     final Gruppo ancora = await dao.assicuraGruppoCorrente();
@@ -51,73 +52,71 @@ void main() {
     expect(correnti.map((Gruppo g) => g.id), <int>[secondo]);
 
     // Anche il gruppo nuovo nasce con te dentro.
-    final List<PartecipanteConPersona> dentro = await dao
+    final List<Partecipante> dentro = await dao
         .osservaPartecipanti(secondo)
         .first;
-    expect(dentro.single.seiTu, isTrue);
+    expect(dentro.single.sonoIo, isTrue);
   });
 
-  test('"io" e la stessa persona in tutti i gruppi', () async {
+  test('ogni gruppo ha il suo "io", con un identificativo proprio', () async {
     final int primo = (await dao.assicuraGruppoCorrente()).id;
     final int secondo = await dao.creaGruppo('Grecia');
 
-    final PartecipanteConPersona qui =
+    final Partecipante qui =
         (await dao.osservaPartecipanti(primo).first).single;
-    final PartecipanteConPersona la =
+    final Partecipante la =
         (await dao.osservaPartecipanti(secondo).first).single;
 
-    expect(qui.persona.id, la.persona.id);
-    // Ma la partecipazione e' un'altra riga, con un altro identificativo.
-    expect(qui.partecipante.uuid, isNot(la.partecipante.uuid));
+    expect(qui.sonoIo, isTrue);
+    expect(la.sonoIo, isTrue);
+    // Sono due righe diverse: i gruppi non condividono niente fra loro.
+    expect(qui.id, isNot(la.id));
+    expect(qui.uuid, isNot(la.uuid));
   });
 
-  test('si aggiunge e si toglie un partecipante', () async {
+  test('si aggiunge, si rinomina e si toglie un partecipante', () async {
     final int gruppo = (await dao.assicuraGruppoCorrente()).id;
-    final int marco = await db.debitiDao.aggiungiPersona('Marco');
 
-    await dao.aggiungiPartecipante(gruppoId: gruppo, personaId: marco);
-    List<PartecipanteConPersona> dentro = await dao
-        .osservaPartecipanti(gruppo)
-        .first;
+    // I partecipanti si scrivono a mano, non si pescano dall'anagrafica.
+    await dao.aggiungiPartecipante(gruppoId: gruppo, nome: '  Marco  ');
+    List<Partecipante> dentro = await dao.osservaPartecipanti(gruppo).first;
     expect(dentro, hasLength(2));
     // Tu per primo, poi gli altri in ordine alfabetico.
-    expect(dentro.first.seiTu, isTrue);
-    expect(dentro.last.persona.nome, 'Marco');
+    expect(dentro.first.sonoIo, isTrue);
+    expect(dentro.last.nome, 'Marco');
 
-    await dao.togliPartecipante(dentro.last.partecipante.id);
+    await dao.rinominaPartecipante(id: dentro.last.id, nome: 'Marco R.');
+    dentro = await dao.osservaPartecipanti(gruppo).first;
+    expect(dentro.last.nome, 'Marco R.');
+
+    await dao.togliPartecipante(dentro.last.id);
     dentro = await dao.osservaPartecipanti(gruppo).first;
     expect(dentro, hasLength(1));
   });
 
-  test('la stessa persona non entra due volte nello stesso gruppo', () async {
-    final int gruppo = (await dao.assicuraGruppoCorrente()).id;
-    final int marco = await db.debitiDao.aggiungiPersona('Marco');
-    await dao.aggiungiPartecipante(gruppoId: gruppo, personaId: marco);
+  test(
+    'due partecipanti con lo stesso nome non stanno nello stesso gruppo',
+    () async {
+      final int gruppo = (await dao.assicuraGruppoCorrente()).id;
+      await dao.aggiungiPartecipante(gruppoId: gruppo, nome: 'Marco');
 
-    expect(
-      () => dao.aggiungiPartecipante(gruppoId: gruppo, personaId: marco),
-      throwsA(anything),
-    );
-  });
+      // Sarebbero indistinguibili a schermo.
+      expect(
+        () => dao.aggiungiPartecipante(gruppoId: gruppo, nome: 'Marco'),
+        throwsA(anything),
+      );
+    },
+  );
 
-  test('chi e gia nel gruppo non compare fra gli aggiungibili', () async {
-    final int gruppo = (await dao.assicuraGruppoCorrente()).id;
-    final int marco = await db.debitiDao.aggiungiPersona('Marco');
-    await db.debitiDao.aggiungiPersona('Lucia');
+  test('lo stesso nome puo stare in gruppi diversi', () async {
+    final int primo = (await dao.assicuraGruppoCorrente()).id;
+    final int secondo = await dao.creaGruppo('Grecia');
 
-    List<Persona> aggiungibili = await dao
-        .osservaPersoneAggiungibili(gruppo)
-        .first;
-    expect(
-      aggiungibili.map((Persona p) => p.nome),
-      containsAll(<String>['Marco', 'Lucia']),
-    );
-    // Tu sei gia' dentro.
-    expect(aggiungibili.any((Persona p) => p.sonoIo), isFalse);
+    await dao.aggiungiPartecipante(gruppoId: primo, nome: 'Marco');
+    await dao.aggiungiPartecipante(gruppoId: secondo, nome: 'Marco');
 
-    await dao.aggiungiPartecipante(gruppoId: gruppo, personaId: marco);
-    aggiungibili = await dao.osservaPersoneAggiungibili(gruppo).first;
-    expect(aggiungibili.map((Persona p) => p.nome), <String>['Lucia']);
+    expect(await dao.osservaPartecipanti(primo).first, hasLength(2));
+    expect(await dao.osservaPartecipanti(secondo).first, hasLength(2));
   });
 
   test('archiviare il gruppo aperto passa il lavoro a un altro', () async {
@@ -136,46 +135,15 @@ void main() {
 
   test('eliminare un gruppo elimina i suoi partecipanti', () async {
     final int gruppo = (await dao.assicuraGruppoCorrente()).id;
-    final int marco = await db.debitiDao.aggiungiPersona('Marco');
-    await dao.aggiungiPartecipante(gruppoId: gruppo, personaId: marco);
+    await dao.aggiungiPartecipante(gruppoId: gruppo, nome: 'Marco');
 
     await dao.eliminaGruppo(gruppo);
 
-    // Verifica indiretta del vincolo `cascade`.
-    expect(await db.select(db.partecipanti).get(), isEmpty);
-    // Le persone invece restano in anagrafica.
-    expect(await db.select(db.persone).get(), isNotEmpty);
-  });
-
-  test('una persona che fa parte di un gruppo non si elimina', () async {
-    final int gruppo = (await dao.assicuraGruppoCorrente()).id;
-    final int marco = await db.debitiDao.aggiungiPersona('Marco');
-    await dao.aggiungiPartecipante(gruppoId: gruppo, personaId: marco);
-
-    await expectLater(
-      db.debitiDao.eliminaPersona(marco),
-      throwsA(
-        isA<Exception>().having(
-          (Exception e) => e.toString(),
-          'messaggio',
-          contains('gruppo di spesa'),
-        ),
-      ),
-    );
-  });
-
-  test('te stesso non ti elimini dall anagrafica', () async {
-    final Persona io = await db.debitiDao.assicuraPersonaIo();
-
-    await expectLater(
-      db.debitiDao.eliminaPersona(io.id),
-      throwsA(
-        isA<Exception>().having(
-          (Exception e) => e.toString(),
-          'messaggio',
-          contains('te stesso'),
-        ),
-      ),
-    );
+    // Verifica indiretta del vincolo `cascade`. Il gruppo nuovo creato al
+    // suo posto porta con se' solo il proprio "io".
+    final List<Partecipante> rimasti = await db.select(db.partecipanti).get();
+    expect(rimasti.every((Partecipante p) => p.sonoIo), isTrue);
+    // L'anagrafica dei debiti non c'entra niente e resta vuota.
+    expect(await db.select(db.persone).get(), isEmpty);
   });
 }

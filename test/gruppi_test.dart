@@ -82,10 +82,8 @@ void main() {
     expect(find.text('Partecipanti'), findsOneWidget);
     expect(find.text('sei tu'), findsOneWidget);
 
+    // I partecipanti si scrivono a mano, gruppo per gruppo.
     await tester.tap(find.text('Aggiungi partecipante'));
-    await tester.pumpAndSettle();
-    // Anagrafica vuota a parte te: si crea la persona sul momento.
-    await tester.tap(find.text('Nuova persona'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'Marco');
     await tester.pumpAndSettle();
