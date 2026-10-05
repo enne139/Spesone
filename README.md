@@ -1,12 +1,12 @@
 # spesone
 
 ## Caratteristiche 
-Compatibile con apple, andorid, web
+Compatibile con apple, android, web
 
 ## Obbiettivi 
 
  - [ ] Traccia debiti
- - [ ] Lista della spesa
+ - [x] Lista della spesa
  - [ ] Traccia spesa
     - [ ] creare più Gruppi di spesa
     - [ ] condividere gruppo via wifi (backend)
