@@ -197,9 +197,9 @@ Grecia, partecipanti: io, Marco, Lucia.
 
 1. ~~Gruppi e partecipanti: creare, scegliere dal menu, archiviare.~~ **fatto**
 2. ~~Categorie: elenco, colori, insieme di partenza.~~ **fatto**
-3. Spese normali: le tue, con categoria. Totale del viaggio e quanto hai
-   speso tu.
-4. Spese condivise: chi ha pagato, per chi, quote.
+3. ~~Spese normali: le tue, con categoria. Totale del viaggio e quanto hai
+   speso tu.~~ **fatto**
+4. ~~Spese condivise: chi ha pagato, per chi, quote.~~ **fatto**
 5. Valute del viaggio e tassi fissi nelle impostazioni del gruppo.
 6. Saldi del gruppo e rimborsi.
 7. Grafico per categoria e nel tempo.

@@ -20,6 +20,7 @@ import 'package:spesone/features/spese/grafico_spese_page.dart';
 import 'package:spesone/features/spese/gruppi_spesa_page.dart';
 import 'package:spesone/features/spese/panoramica_spese_page.dart';
 import 'package:spesone/features/spese/widgets/fab_nuova_categoria.dart';
+import 'package:spesone/features/spese/widgets/fab_nuova_spesa.dart';
 import 'package:spesone/features/spese/widgets/fab_nuovo_gruppo.dart';
 import 'package:spesone/features/spese/widgets/selettore_gruppi.dart';
 import 'package:spesone/features/spese/widgets/titolo_gruppo_corrente.dart';
@@ -49,6 +50,7 @@ final List<AppSection> appSections = <AppSection>[
         builder: (BuildContext context) => const PanoramicaSpesePage(),
         // Il titolo e' il nome del gruppo aperto, non un'etichetta fissa.
         appBarTitle: (BuildContext context) => const TitoloGruppoCorrente(),
+        floatingActionButton: (BuildContext context) => const FabNuovaSpesa(),
       ),
       SectionView(
         title: 'Gruppi di spesa',

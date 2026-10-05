@@ -2716,6 +2716,1009 @@ class CategorieCompanion extends UpdateCompanion<Categoria> {
   }
 }
 
+class $SpeseTable extends Spese with TableInfo<$SpeseTable, Spesa> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SpeseTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _gruppoIdMeta = const VerificationMeta(
+    'gruppoId',
+  );
+  @override
+  late final GeneratedColumn<int> gruppoId = GeneratedColumn<int>(
+    'gruppo_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES gruppi (id) ON DELETE CASCADE',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<TipoSpesa, int> tipo =
+      GeneratedColumn<int>(
+        'tipo',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: true,
+      ).withConverter<TipoSpesa>($SpeseTable.$convertertipo);
+  static const VerificationMeta _descrizioneMeta = const VerificationMeta(
+    'descrizione',
+  );
+  @override
+  late final GeneratedColumn<String> descrizione = GeneratedColumn<String>(
+    'descrizione',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 120,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _centesimiMeta = const VerificationMeta(
+    'centesimi',
+  );
+  @override
+  late final GeneratedColumn<int> centesimi = GeneratedColumn<int>(
+    'centesimi',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valutaMeta = const VerificationMeta('valuta');
+  @override
+  late final GeneratedColumn<String> valuta = GeneratedColumn<String>(
+    'valuta',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('EUR'),
+  );
+  static const VerificationMeta _dataMeta = const VerificationMeta('data');
+  @override
+  late final GeneratedColumn<DateTime> data = GeneratedColumn<DateTime>(
+    'data',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _pagataDaMeta = const VerificationMeta(
+    'pagataDa',
+  );
+  @override
+  late final GeneratedColumn<int> pagataDa = GeneratedColumn<int>(
+    'pagata_da',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES partecipanti (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _categoriaIdMeta = const VerificationMeta(
+    'categoriaId',
+  );
+  @override
+  late final GeneratedColumn<int> categoriaId = GeneratedColumn<int>(
+    'categoria_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES categorie (id) ON DELETE SET NULL',
+    ),
+  );
+  static const VerificationMeta _creataIlMeta = const VerificationMeta(
+    'creataIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> creataIl = GeneratedColumn<DateTime>(
+    'creata_il',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    gruppoId,
+    tipo,
+    descrizione,
+    centesimi,
+    valuta,
+    data,
+    pagataDa,
+    categoriaId,
+    creataIl,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'spese';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Spesa> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('gruppo_id')) {
+      context.handle(
+        _gruppoIdMeta,
+        gruppoId.isAcceptableOrUnknown(data['gruppo_id']!, _gruppoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gruppoIdMeta);
+    }
+    if (data.containsKey('descrizione')) {
+      context.handle(
+        _descrizioneMeta,
+        descrizione.isAcceptableOrUnknown(
+          data['descrizione']!,
+          _descrizioneMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_descrizioneMeta);
+    }
+    if (data.containsKey('centesimi')) {
+      context.handle(
+        _centesimiMeta,
+        centesimi.isAcceptableOrUnknown(data['centesimi']!, _centesimiMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_centesimiMeta);
+    }
+    if (data.containsKey('valuta')) {
+      context.handle(
+        _valutaMeta,
+        valuta.isAcceptableOrUnknown(data['valuta']!, _valutaMeta),
+      );
+    }
+    if (data.containsKey('data')) {
+      context.handle(
+        _dataMeta,
+        this.data.isAcceptableOrUnknown(data['data']!, _dataMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_dataMeta);
+    }
+    if (data.containsKey('pagata_da')) {
+      context.handle(
+        _pagataDaMeta,
+        pagataDa.isAcceptableOrUnknown(data['pagata_da']!, _pagataDaMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_pagataDaMeta);
+    }
+    if (data.containsKey('categoria_id')) {
+      context.handle(
+        _categoriaIdMeta,
+        categoriaId.isAcceptableOrUnknown(
+          data['categoria_id']!,
+          _categoriaIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('creata_il')) {
+      context.handle(
+        _creataIlMeta,
+        creataIl.isAcceptableOrUnknown(data['creata_il']!, _creataIlMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Spesa map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Spesa(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      gruppoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gruppo_id'],
+      )!,
+      tipo: $SpeseTable.$convertertipo.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.int,
+          data['${effectivePrefix}tipo'],
+        )!,
+      ),
+      descrizione: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}descrizione'],
+      )!,
+      centesimi: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}centesimi'],
+      )!,
+      valuta: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}valuta'],
+      )!,
+      data: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}data'],
+      )!,
+      pagataDa: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}pagata_da'],
+      )!,
+      categoriaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}categoria_id'],
+      ),
+      creataIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}creata_il'],
+      )!,
+    );
+  }
+
+  @override
+  $SpeseTable createAlias(String alias) {
+    return $SpeseTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<TipoSpesa, int, int> $convertertipo =
+      const EnumIndexConverter<TipoSpesa>(TipoSpesa.values);
+}
+
+class Spesa extends DataClass implements Insertable<Spesa> {
+  final int id;
+
+  /// Identificativo stabile: le spese condivise viaggeranno fra dispositivi e
+  /// devono essere riconoscibili (DECISIONI.md, voce 035).
+  final String uuid;
+  final int gruppoId;
+  final TipoSpesa tipo;
+  final String descrizione;
+
+  /// Totale pagato, in centesimi della valuta in cui si e' pagato.
+  final int centesimi;
+
+  /// Codice ISO della valuta. Finche' non arrivano le valute del viaggio e'
+  /// quella principale del gruppo.
+  final String valuta;
+  final DateTime data;
+
+  /// Chi ha anticipato i soldi.
+  ///
+  /// C'e' sempre, anche sulle spese normali, dove sei tu: cosi' saldi e
+  /// totali si calcolano con la stessa formula per tutti i tipi, senza casi
+  /// particolari.
+  final int pagataDa;
+
+  /// Categoria, facoltativa: chiederla obbligatoria rallenterebbe il gesto
+  /// che si ripete cento volte (DECISIONI.md, voce 031).
+  ///
+  /// `setNull`: eliminando una categoria le spese restano, senza etichetta.
+  final int? categoriaId;
+  final DateTime creataIl;
+  const Spesa({
+    required this.id,
+    required this.uuid,
+    required this.gruppoId,
+    required this.tipo,
+    required this.descrizione,
+    required this.centesimi,
+    required this.valuta,
+    required this.data,
+    required this.pagataDa,
+    this.categoriaId,
+    required this.creataIl,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['uuid'] = Variable<String>(uuid);
+    map['gruppo_id'] = Variable<int>(gruppoId);
+    {
+      map['tipo'] = Variable<int>($SpeseTable.$convertertipo.toSql(tipo));
+    }
+    map['descrizione'] = Variable<String>(descrizione);
+    map['centesimi'] = Variable<int>(centesimi);
+    map['valuta'] = Variable<String>(valuta);
+    map['data'] = Variable<DateTime>(data);
+    map['pagata_da'] = Variable<int>(pagataDa);
+    if (!nullToAbsent || categoriaId != null) {
+      map['categoria_id'] = Variable<int>(categoriaId);
+    }
+    map['creata_il'] = Variable<DateTime>(creataIl);
+    return map;
+  }
+
+  SpeseCompanion toCompanion(bool nullToAbsent) {
+    return SpeseCompanion(
+      id: Value(id),
+      uuid: Value(uuid),
+      gruppoId: Value(gruppoId),
+      tipo: Value(tipo),
+      descrizione: Value(descrizione),
+      centesimi: Value(centesimi),
+      valuta: Value(valuta),
+      data: Value(data),
+      pagataDa: Value(pagataDa),
+      categoriaId: categoriaId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(categoriaId),
+      creataIl: Value(creataIl),
+    );
+  }
+
+  factory Spesa.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Spesa(
+      id: serializer.fromJson<int>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      gruppoId: serializer.fromJson<int>(json['gruppoId']),
+      tipo: $SpeseTable.$convertertipo.fromJson(
+        serializer.fromJson<int>(json['tipo']),
+      ),
+      descrizione: serializer.fromJson<String>(json['descrizione']),
+      centesimi: serializer.fromJson<int>(json['centesimi']),
+      valuta: serializer.fromJson<String>(json['valuta']),
+      data: serializer.fromJson<DateTime>(json['data']),
+      pagataDa: serializer.fromJson<int>(json['pagataDa']),
+      categoriaId: serializer.fromJson<int?>(json['categoriaId']),
+      creataIl: serializer.fromJson<DateTime>(json['creataIl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'gruppoId': serializer.toJson<int>(gruppoId),
+      'tipo': serializer.toJson<int>($SpeseTable.$convertertipo.toJson(tipo)),
+      'descrizione': serializer.toJson<String>(descrizione),
+      'centesimi': serializer.toJson<int>(centesimi),
+      'valuta': serializer.toJson<String>(valuta),
+      'data': serializer.toJson<DateTime>(data),
+      'pagataDa': serializer.toJson<int>(pagataDa),
+      'categoriaId': serializer.toJson<int?>(categoriaId),
+      'creataIl': serializer.toJson<DateTime>(creataIl),
+    };
+  }
+
+  Spesa copyWith({
+    int? id,
+    String? uuid,
+    int? gruppoId,
+    TipoSpesa? tipo,
+    String? descrizione,
+    int? centesimi,
+    String? valuta,
+    DateTime? data,
+    int? pagataDa,
+    Value<int?> categoriaId = const Value.absent(),
+    DateTime? creataIl,
+  }) => Spesa(
+    id: id ?? this.id,
+    uuid: uuid ?? this.uuid,
+    gruppoId: gruppoId ?? this.gruppoId,
+    tipo: tipo ?? this.tipo,
+    descrizione: descrizione ?? this.descrizione,
+    centesimi: centesimi ?? this.centesimi,
+    valuta: valuta ?? this.valuta,
+    data: data ?? this.data,
+    pagataDa: pagataDa ?? this.pagataDa,
+    categoriaId: categoriaId.present ? categoriaId.value : this.categoriaId,
+    creataIl: creataIl ?? this.creataIl,
+  );
+  Spesa copyWithCompanion(SpeseCompanion data) {
+    return Spesa(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      gruppoId: data.gruppoId.present ? data.gruppoId.value : this.gruppoId,
+      tipo: data.tipo.present ? data.tipo.value : this.tipo,
+      descrizione: data.descrizione.present
+          ? data.descrizione.value
+          : this.descrizione,
+      centesimi: data.centesimi.present ? data.centesimi.value : this.centesimi,
+      valuta: data.valuta.present ? data.valuta.value : this.valuta,
+      data: data.data.present ? data.data.value : this.data,
+      pagataDa: data.pagataDa.present ? data.pagataDa.value : this.pagataDa,
+      categoriaId: data.categoriaId.present
+          ? data.categoriaId.value
+          : this.categoriaId,
+      creataIl: data.creataIl.present ? data.creataIl.value : this.creataIl,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Spesa(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('gruppoId: $gruppoId, ')
+          ..write('tipo: $tipo, ')
+          ..write('descrizione: $descrizione, ')
+          ..write('centesimi: $centesimi, ')
+          ..write('valuta: $valuta, ')
+          ..write('data: $data, ')
+          ..write('pagataDa: $pagataDa, ')
+          ..write('categoriaId: $categoriaId, ')
+          ..write('creataIl: $creataIl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    gruppoId,
+    tipo,
+    descrizione,
+    centesimi,
+    valuta,
+    data,
+    pagataDa,
+    categoriaId,
+    creataIl,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Spesa &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.gruppoId == this.gruppoId &&
+          other.tipo == this.tipo &&
+          other.descrizione == this.descrizione &&
+          other.centesimi == this.centesimi &&
+          other.valuta == this.valuta &&
+          other.data == this.data &&
+          other.pagataDa == this.pagataDa &&
+          other.categoriaId == this.categoriaId &&
+          other.creataIl == this.creataIl);
+}
+
+class SpeseCompanion extends UpdateCompanion<Spesa> {
+  final Value<int> id;
+  final Value<String> uuid;
+  final Value<int> gruppoId;
+  final Value<TipoSpesa> tipo;
+  final Value<String> descrizione;
+  final Value<int> centesimi;
+  final Value<String> valuta;
+  final Value<DateTime> data;
+  final Value<int> pagataDa;
+  final Value<int?> categoriaId;
+  final Value<DateTime> creataIl;
+  const SpeseCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.gruppoId = const Value.absent(),
+    this.tipo = const Value.absent(),
+    this.descrizione = const Value.absent(),
+    this.centesimi = const Value.absent(),
+    this.valuta = const Value.absent(),
+    this.data = const Value.absent(),
+    this.pagataDa = const Value.absent(),
+    this.categoriaId = const Value.absent(),
+    this.creataIl = const Value.absent(),
+  });
+  SpeseCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    required int gruppoId,
+    required TipoSpesa tipo,
+    required String descrizione,
+    required int centesimi,
+    this.valuta = const Value.absent(),
+    required DateTime data,
+    required int pagataDa,
+    this.categoriaId = const Value.absent(),
+    this.creataIl = const Value.absent(),
+  }) : uuid = Value(uuid),
+       gruppoId = Value(gruppoId),
+       tipo = Value(tipo),
+       descrizione = Value(descrizione),
+       centesimi = Value(centesimi),
+       data = Value(data),
+       pagataDa = Value(pagataDa);
+  static Insertable<Spesa> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<int>? gruppoId,
+    Expression<int>? tipo,
+    Expression<String>? descrizione,
+    Expression<int>? centesimi,
+    Expression<String>? valuta,
+    Expression<DateTime>? data,
+    Expression<int>? pagataDa,
+    Expression<int>? categoriaId,
+    Expression<DateTime>? creataIl,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (gruppoId != null) 'gruppo_id': gruppoId,
+      if (tipo != null) 'tipo': tipo,
+      if (descrizione != null) 'descrizione': descrizione,
+      if (centesimi != null) 'centesimi': centesimi,
+      if (valuta != null) 'valuta': valuta,
+      if (data != null) 'data': data,
+      if (pagataDa != null) 'pagata_da': pagataDa,
+      if (categoriaId != null) 'categoria_id': categoriaId,
+      if (creataIl != null) 'creata_il': creataIl,
+    });
+  }
+
+  SpeseCompanion copyWith({
+    Value<int>? id,
+    Value<String>? uuid,
+    Value<int>? gruppoId,
+    Value<TipoSpesa>? tipo,
+    Value<String>? descrizione,
+    Value<int>? centesimi,
+    Value<String>? valuta,
+    Value<DateTime>? data,
+    Value<int>? pagataDa,
+    Value<int?>? categoriaId,
+    Value<DateTime>? creataIl,
+  }) {
+    return SpeseCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      gruppoId: gruppoId ?? this.gruppoId,
+      tipo: tipo ?? this.tipo,
+      descrizione: descrizione ?? this.descrizione,
+      centesimi: centesimi ?? this.centesimi,
+      valuta: valuta ?? this.valuta,
+      data: data ?? this.data,
+      pagataDa: pagataDa ?? this.pagataDa,
+      categoriaId: categoriaId ?? this.categoriaId,
+      creataIl: creataIl ?? this.creataIl,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (gruppoId.present) {
+      map['gruppo_id'] = Variable<int>(gruppoId.value);
+    }
+    if (tipo.present) {
+      map['tipo'] = Variable<int>($SpeseTable.$convertertipo.toSql(tipo.value));
+    }
+    if (descrizione.present) {
+      map['descrizione'] = Variable<String>(descrizione.value);
+    }
+    if (centesimi.present) {
+      map['centesimi'] = Variable<int>(centesimi.value);
+    }
+    if (valuta.present) {
+      map['valuta'] = Variable<String>(valuta.value);
+    }
+    if (data.present) {
+      map['data'] = Variable<DateTime>(data.value);
+    }
+    if (pagataDa.present) {
+      map['pagata_da'] = Variable<int>(pagataDa.value);
+    }
+    if (categoriaId.present) {
+      map['categoria_id'] = Variable<int>(categoriaId.value);
+    }
+    if (creataIl.present) {
+      map['creata_il'] = Variable<DateTime>(creataIl.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SpeseCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('gruppoId: $gruppoId, ')
+          ..write('tipo: $tipo, ')
+          ..write('descrizione: $descrizione, ')
+          ..write('centesimi: $centesimi, ')
+          ..write('valuta: $valuta, ')
+          ..write('data: $data, ')
+          ..write('pagataDa: $pagataDa, ')
+          ..write('categoriaId: $categoriaId, ')
+          ..write('creataIl: $creataIl')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $QuoteTable extends Quote with TableInfo<$QuoteTable, Quota> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $QuoteTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _spesaIdMeta = const VerificationMeta(
+    'spesaId',
+  );
+  @override
+  late final GeneratedColumn<int> spesaId = GeneratedColumn<int>(
+    'spesa_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES spese (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _partecipanteIdMeta = const VerificationMeta(
+    'partecipanteId',
+  );
+  @override
+  late final GeneratedColumn<int> partecipanteId = GeneratedColumn<int>(
+    'partecipante_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES partecipanti (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _centesimiMeta = const VerificationMeta(
+    'centesimi',
+  );
+  @override
+  late final GeneratedColumn<int> centesimi = GeneratedColumn<int>(
+    'centesimi',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    spesaId,
+    partecipanteId,
+    centesimi,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'quote';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Quota> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('spesa_id')) {
+      context.handle(
+        _spesaIdMeta,
+        spesaId.isAcceptableOrUnknown(data['spesa_id']!, _spesaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_spesaIdMeta);
+    }
+    if (data.containsKey('partecipante_id')) {
+      context.handle(
+        _partecipanteIdMeta,
+        partecipanteId.isAcceptableOrUnknown(
+          data['partecipante_id']!,
+          _partecipanteIdMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_partecipanteIdMeta);
+    }
+    if (data.containsKey('centesimi')) {
+      context.handle(
+        _centesimiMeta,
+        centesimi.isAcceptableOrUnknown(data['centesimi']!, _centesimiMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_centesimiMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {spesaId, partecipanteId},
+  ];
+  @override
+  Quota map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Quota(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      spesaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}spesa_id'],
+      )!,
+      partecipanteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}partecipante_id'],
+      )!,
+      centesimi: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}centesimi'],
+      )!,
+    );
+  }
+
+  @override
+  $QuoteTable createAlias(String alias) {
+    return $QuoteTable(attachedDatabase, alias);
+  }
+}
+
+class Quota extends DataClass implements Insertable<Quota> {
+  final int id;
+  final int spesaId;
+  final int partecipanteId;
+
+  /// Quota in centesimi, nella stessa valuta della spesa.
+  final int centesimi;
+  const Quota({
+    required this.id,
+    required this.spesaId,
+    required this.partecipanteId,
+    required this.centesimi,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['spesa_id'] = Variable<int>(spesaId);
+    map['partecipante_id'] = Variable<int>(partecipanteId);
+    map['centesimi'] = Variable<int>(centesimi);
+    return map;
+  }
+
+  QuoteCompanion toCompanion(bool nullToAbsent) {
+    return QuoteCompanion(
+      id: Value(id),
+      spesaId: Value(spesaId),
+      partecipanteId: Value(partecipanteId),
+      centesimi: Value(centesimi),
+    );
+  }
+
+  factory Quota.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Quota(
+      id: serializer.fromJson<int>(json['id']),
+      spesaId: serializer.fromJson<int>(json['spesaId']),
+      partecipanteId: serializer.fromJson<int>(json['partecipanteId']),
+      centesimi: serializer.fromJson<int>(json['centesimi']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'spesaId': serializer.toJson<int>(spesaId),
+      'partecipanteId': serializer.toJson<int>(partecipanteId),
+      'centesimi': serializer.toJson<int>(centesimi),
+    };
+  }
+
+  Quota copyWith({
+    int? id,
+    int? spesaId,
+    int? partecipanteId,
+    int? centesimi,
+  }) => Quota(
+    id: id ?? this.id,
+    spesaId: spesaId ?? this.spesaId,
+    partecipanteId: partecipanteId ?? this.partecipanteId,
+    centesimi: centesimi ?? this.centesimi,
+  );
+  Quota copyWithCompanion(QuoteCompanion data) {
+    return Quota(
+      id: data.id.present ? data.id.value : this.id,
+      spesaId: data.spesaId.present ? data.spesaId.value : this.spesaId,
+      partecipanteId: data.partecipanteId.present
+          ? data.partecipanteId.value
+          : this.partecipanteId,
+      centesimi: data.centesimi.present ? data.centesimi.value : this.centesimi,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Quota(')
+          ..write('id: $id, ')
+          ..write('spesaId: $spesaId, ')
+          ..write('partecipanteId: $partecipanteId, ')
+          ..write('centesimi: $centesimi')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, spesaId, partecipanteId, centesimi);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Quota &&
+          other.id == this.id &&
+          other.spesaId == this.spesaId &&
+          other.partecipanteId == this.partecipanteId &&
+          other.centesimi == this.centesimi);
+}
+
+class QuoteCompanion extends UpdateCompanion<Quota> {
+  final Value<int> id;
+  final Value<int> spesaId;
+  final Value<int> partecipanteId;
+  final Value<int> centesimi;
+  const QuoteCompanion({
+    this.id = const Value.absent(),
+    this.spesaId = const Value.absent(),
+    this.partecipanteId = const Value.absent(),
+    this.centesimi = const Value.absent(),
+  });
+  QuoteCompanion.insert({
+    this.id = const Value.absent(),
+    required int spesaId,
+    required int partecipanteId,
+    required int centesimi,
+  }) : spesaId = Value(spesaId),
+       partecipanteId = Value(partecipanteId),
+       centesimi = Value(centesimi);
+  static Insertable<Quota> custom({
+    Expression<int>? id,
+    Expression<int>? spesaId,
+    Expression<int>? partecipanteId,
+    Expression<int>? centesimi,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (spesaId != null) 'spesa_id': spesaId,
+      if (partecipanteId != null) 'partecipante_id': partecipanteId,
+      if (centesimi != null) 'centesimi': centesimi,
+    });
+  }
+
+  QuoteCompanion copyWith({
+    Value<int>? id,
+    Value<int>? spesaId,
+    Value<int>? partecipanteId,
+    Value<int>? centesimi,
+  }) {
+    return QuoteCompanion(
+      id: id ?? this.id,
+      spesaId: spesaId ?? this.spesaId,
+      partecipanteId: partecipanteId ?? this.partecipanteId,
+      centesimi: centesimi ?? this.centesimi,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (spesaId.present) {
+      map['spesa_id'] = Variable<int>(spesaId.value);
+    }
+    if (partecipanteId.present) {
+      map['partecipante_id'] = Variable<int>(partecipanteId.value);
+    }
+    if (centesimi.present) {
+      map['centesimi'] = Variable<int>(centesimi.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('QuoteCompanion(')
+          ..write('id: $id, ')
+          ..write('spesaId: $spesaId, ')
+          ..write('partecipanteId: $partecipanteId, ')
+          ..write('centesimi: $centesimi')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -2728,10 +3731,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $GruppiTable gruppi = $GruppiTable(this);
   late final $PartecipantiTable partecipanti = $PartecipantiTable(this);
   late final $CategorieTable categorie = $CategorieTable(this);
+  late final $SpeseTable spese = $SpeseTable(this);
+  late final $QuoteTable quote = $QuoteTable(this);
   late final ListeDao listeDao = ListeDao(this as AppDatabase);
   late final DebitiDao debitiDao = DebitiDao(this as AppDatabase);
   late final GruppiDao gruppiDao = GruppiDao(this as AppDatabase);
   late final CategorieDao categorieDao = CategorieDao(this as AppDatabase);
+  late final SpeseDao speseDao = SpeseDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2744,6 +3750,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     gruppi,
     partecipanti,
     categorie,
+    spese,
+    quote,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -2767,6 +3775,41 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('partecipanti', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'gruppi',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('spese', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'partecipanti',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('spese', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'categorie',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('spese', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'spese',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('quote', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'partecipanti',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('quote', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -4029,6 +5072,25 @@ final class $$GruppiTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$SpeseTable, List<Spesa>> _speseRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.spese,
+    aliasName: 'gruppi__id__spese__gruppo_id',
+  );
+
+  $$SpeseTableProcessedTableManager get speseRefs {
+    final manager = $$SpeseTableTableManager(
+      $_db,
+      $_db.spese,
+    ).filter((f) => f.gruppoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_speseRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$GruppiTableFilterComposer
@@ -4091,6 +5153,31 @@ class $$GruppiTableFilterComposer
           }) => $$PartecipantiTableFilterComposer(
             $db: $db,
             $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> speseRefs(
+    Expression<bool> Function($$SpeseTableFilterComposer f) f,
+  ) {
+    final $$SpeseTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.gruppoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableFilterComposer(
+            $db: $db,
+            $table: $db.spese,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -4204,6 +5291,31 @@ class $$GruppiTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> speseRefs<T extends Object>(
+    Expression<T> Function($$SpeseTableAnnotationComposer a) f,
+  ) {
+    final $$SpeseTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.gruppoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableAnnotationComposer(
+            $db: $db,
+            $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$GruppiTableTableManager
@@ -4219,7 +5331,7 @@ class $$GruppiTableTableManager
           $$GruppiTableUpdateCompanionBuilder,
           (Gruppo, $$GruppiTableReferences),
           Gruppo,
-          PrefetchHooks Function({bool partecipantiRefs})
+          PrefetchHooks Function({bool partecipantiRefs, bool speseRefs})
         > {
   $$GruppiTableTableManager(_$AppDatabase db, $GruppiTable table)
     : super(
@@ -4276,35 +5388,55 @@ class $$GruppiTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({partecipantiRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (partecipantiRefs) db.partecipanti],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (partecipantiRefs)
-                    await $_getPrefetchedData<
-                      Gruppo,
-                      $GruppiTable,
-                      Partecipante
-                    >(
-                      currentTable: table,
-                      referencedTable: $$GruppiTableReferences
-                          ._partecipantiRefsTable(db),
-                      managerFromTypedResult: (p0) => $$GruppiTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).partecipantiRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.gruppoId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({partecipantiRefs = false, speseRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (partecipantiRefs) db.partecipanti,
+                    if (speseRefs) db.spese,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (partecipantiRefs)
+                        await $_getPrefetchedData<
+                          Gruppo,
+                          $GruppiTable,
+                          Partecipante
+                        >(
+                          currentTable: table,
+                          referencedTable: $$GruppiTableReferences
+                              ._partecipantiRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GruppiTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).partecipantiRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gruppoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (speseRefs)
+                        await $_getPrefetchedData<Gruppo, $GruppiTable, Spesa>(
+                          currentTable: table,
+                          referencedTable: $$GruppiTableReferences
+                              ._speseRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GruppiTableReferences(db, table, p0).speseRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gruppoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -4321,7 +5453,7 @@ typedef $$GruppiTableProcessedTableManager =
       $$GruppiTableUpdateCompanionBuilder,
       (Gruppo, $$GruppiTableReferences),
       Gruppo,
-      PrefetchHooks Function({bool partecipantiRefs})
+      PrefetchHooks Function({bool partecipantiRefs, bool speseRefs})
     >;
 typedef $$PartecipantiTableCreateCompanionBuilder =
     PartecipantiCompanion Function({
@@ -4360,6 +5492,44 @@ final class $$PartecipantiTableReferences
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$SpeseTable, List<Spesa>> _speseRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.spese,
+    aliasName: 'partecipanti__id__spese__pagata_da',
+  );
+
+  $$SpeseTableProcessedTableManager get speseRefs {
+    final manager = $$SpeseTableTableManager(
+      $_db,
+      $_db.spese,
+    ).filter((f) => f.pagataDa.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_speseRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$QuoteTable, List<Quota>> _quoteRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.quote,
+    aliasName: 'partecipanti__id__quote__partecipante_id',
+  );
+
+  $$QuoteTableProcessedTableManager get quoteRefs {
+    final manager = $$QuoteTableTableManager(
+      $_db,
+      $_db.quote,
+    ).filter((f) => f.partecipanteId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_quoteRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 }
@@ -4419,6 +5589,56 @@ class $$PartecipantiTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> speseRefs(
+    Expression<bool> Function($$SpeseTableFilterComposer f) f,
+  ) {
+    final $$SpeseTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.pagataDa,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableFilterComposer(
+            $db: $db,
+            $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> quoteRefs(
+    Expression<bool> Function($$QuoteTableFilterComposer f) f,
+  ) {
+    final $$QuoteTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.quote,
+      getReferencedColumn: (t) => t.partecipanteId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QuoteTableFilterComposer(
+            $db: $db,
+            $table: $db.quote,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -4528,6 +5748,56 @@ class $$PartecipantiTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> speseRefs<T extends Object>(
+    Expression<T> Function($$SpeseTableAnnotationComposer a) f,
+  ) {
+    final $$SpeseTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.pagataDa,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableAnnotationComposer(
+            $db: $db,
+            $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<T> quoteRefs<T extends Object>(
+    Expression<T> Function($$QuoteTableAnnotationComposer a) f,
+  ) {
+    final $$QuoteTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.quote,
+      getReferencedColumn: (t) => t.partecipanteId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QuoteTableAnnotationComposer(
+            $db: $db,
+            $table: $db.quote,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$PartecipantiTableTableManager
@@ -4543,7 +5813,11 @@ class $$PartecipantiTableTableManager
           $$PartecipantiTableUpdateCompanionBuilder,
           (Partecipante, $$PartecipantiTableReferences),
           Partecipante,
-          PrefetchHooks Function({bool gruppoId})
+          PrefetchHooks Function({
+            bool gruppoId,
+            bool speseRefs,
+            bool quoteRefs,
+          })
         > {
   $$PartecipantiTableTableManager(_$AppDatabase db, $PartecipantiTable table)
     : super(
@@ -4596,45 +5870,92 @@ class $$PartecipantiTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({gruppoId = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [],
-              addJoins:
-                  <
-                    T extends TableManagerState<
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic,
-                      dynamic
-                    >
-                  >(state) {
-                    if (gruppoId) {
-                      state = state.withJoin(
-                        currentTable: table,
-                        currentColumn: table.gruppoId,
-                        referencedTable: $$PartecipantiTableReferences
-                            ._gruppoIdTable(db),
-                        referencedColumn: $$PartecipantiTableReferences
-                            ._gruppoIdTable(db)
-                            .id,
-                      ) as T;
-                    }
+          prefetchHooksCallback:
+              ({gruppoId = false, speseRefs = false, quoteRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (speseRefs) db.spese,
+                    if (quoteRefs) db.quote,
+                  ],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (gruppoId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.gruppoId,
+                            referencedTable: $$PartecipantiTableReferences
+                                ._gruppoIdTable(db),
+                            referencedColumn: $$PartecipantiTableReferences
+                                ._gruppoIdTable(db)
+                                .id,
+                          ) as T;
+                        }
 
-                    return state;
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (speseRefs)
+                        await $_getPrefetchedData<
+                          Partecipante,
+                          $PartecipantiTable,
+                          Spesa
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PartecipantiTableReferences
+                              ._speseRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PartecipantiTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).speseRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.pagataDa == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (quoteRefs)
+                        await $_getPrefetchedData<
+                          Partecipante,
+                          $PartecipantiTable,
+                          Quota
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PartecipantiTableReferences
+                              ._quoteRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PartecipantiTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).quoteRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.partecipanteId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
                   },
-              getPrefetchedDataCallback: (items) async {
-                return [];
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -4651,7 +5972,7 @@ typedef $$PartecipantiTableProcessedTableManager =
       $$PartecipantiTableUpdateCompanionBuilder,
       (Partecipante, $$PartecipantiTableReferences),
       Partecipante,
-      PrefetchHooks Function({bool gruppoId})
+      PrefetchHooks Function({bool gruppoId, bool speseRefs, bool quoteRefs})
     >;
 typedef $$CategorieTableCreateCompanionBuilder = CategorieCompanion Function({
   Value<int> id,
@@ -4665,6 +5986,30 @@ typedef $$CategorieTableUpdateCompanionBuilder = CategorieCompanion Function({
   Value<int> colore,
   Value<DateTime> creataIl,
 });
+
+final class $$CategorieTableReferences
+    extends BaseReferences<_$AppDatabase, $CategorieTable, Categoria> {
+  $$CategorieTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$SpeseTable, List<Spesa>> _speseRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.spese,
+    aliasName: 'categorie__id__spese__categoria_id',
+  );
+
+  $$SpeseTableProcessedTableManager get speseRefs {
+    final manager = $$SpeseTableTableManager(
+      $_db,
+      $_db.spese,
+    ).filter((f) => f.categoriaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_speseRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
 
 class $$CategorieTableFilterComposer
     extends Composer<_$AppDatabase, $CategorieTable> {
@@ -4694,6 +6039,31 @@ class $$CategorieTableFilterComposer
     column: $table.creataIl,
     builder: (column) => ColumnFilters(column),
   );
+
+  Expression<bool> speseRefs(
+    Expression<bool> Function($$SpeseTableFilterComposer f) f,
+  ) {
+    final $$SpeseTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.categoriaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableFilterComposer(
+            $db: $db,
+            $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$CategorieTableOrderingComposer
@@ -4746,6 +6116,31 @@ class $$CategorieTableAnnotationComposer
 
   GeneratedColumn<DateTime> get creataIl =>
       $composableBuilder(column: $table.creataIl, builder: (column) => column);
+
+  Expression<T> speseRefs<T extends Object>(
+    Expression<T> Function($$SpeseTableAnnotationComposer a) f,
+  ) {
+    final $$SpeseTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.categoriaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableAnnotationComposer(
+            $db: $db,
+            $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$CategorieTableTableManager
@@ -4759,12 +6154,9 @@ class $$CategorieTableTableManager
           $$CategorieTableAnnotationComposer,
           $$CategorieTableCreateCompanionBuilder,
           $$CategorieTableUpdateCompanionBuilder,
-          (
-            Categoria,
-            BaseReferences<_$AppDatabase, $CategorieTable, Categoria>,
-          ),
+          (Categoria, $$CategorieTableReferences),
           Categoria,
-          PrefetchHooks Function()
+          PrefetchHooks Function({bool speseRefs})
         > {
   $$CategorieTableTableManager(_$AppDatabase db, $CategorieTable table)
     : super(
@@ -4805,15 +6197,38 @@ class $$CategorieTableTableManager
               .map(
                 (e) => (
                   e.readTable<$CategorieTable, Categoria>(table),
-                  BaseReferences<_$AppDatabase, $CategorieTable, Categoria>(
-                    db,
-                    table,
-                    e,
-                  ),
+                  $$CategorieTableReferences(db, table, e),
                 ),
               )
               .toList(),
-          prefetchHooksCallback: null,
+          prefetchHooksCallback: ({speseRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (speseRefs) db.spese],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (speseRefs)
+                    await $_getPrefetchedData<
+                      Categoria,
+                      $CategorieTable,
+                      Spesa
+                    >(
+                      currentTable: table,
+                      referencedTable: $$CategorieTableReferences
+                          ._speseRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$CategorieTableReferences(db, table, p0).speseRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.categoriaId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
         ),
       );
 }
@@ -4828,9 +6243,1071 @@ typedef $$CategorieTableProcessedTableManager =
       $$CategorieTableAnnotationComposer,
       $$CategorieTableCreateCompanionBuilder,
       $$CategorieTableUpdateCompanionBuilder,
-      (Categoria, BaseReferences<_$AppDatabase, $CategorieTable, Categoria>),
+      (Categoria, $$CategorieTableReferences),
       Categoria,
-      PrefetchHooks Function()
+      PrefetchHooks Function({bool speseRefs})
+    >;
+typedef $$SpeseTableCreateCompanionBuilder = SpeseCompanion Function({
+  Value<int> id,
+  required String uuid,
+  required int gruppoId,
+  required TipoSpesa tipo,
+  required String descrizione,
+  required int centesimi,
+  Value<String> valuta,
+  required DateTime data,
+  required int pagataDa,
+  Value<int?> categoriaId,
+  Value<DateTime> creataIl,
+});
+typedef $$SpeseTableUpdateCompanionBuilder = SpeseCompanion Function({
+  Value<int> id,
+  Value<String> uuid,
+  Value<int> gruppoId,
+  Value<TipoSpesa> tipo,
+  Value<String> descrizione,
+  Value<int> centesimi,
+  Value<String> valuta,
+  Value<DateTime> data,
+  Value<int> pagataDa,
+  Value<int?> categoriaId,
+  Value<DateTime> creataIl,
+});
+
+final class $$SpeseTableReferences
+    extends BaseReferences<_$AppDatabase, $SpeseTable, Spesa> {
+  $$SpeseTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GruppiTable _gruppoIdTable(_$AppDatabase db) =>
+      db.gruppi.createAlias('spese__gruppo_id__gruppi__id');
+
+  $$GruppiTableProcessedTableManager get gruppoId {
+    final $_column = $_itemColumn<int>('gruppo_id')!;
+
+    final manager = $$GruppiTableTableManager(
+      $_db,
+      $_db.gruppi,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gruppoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PartecipantiTable _pagataDaTable(_$AppDatabase db) =>
+      db.partecipanti.createAlias('spese__pagata_da__partecipanti__id');
+
+  $$PartecipantiTableProcessedTableManager get pagataDa {
+    final $_column = $_itemColumn<int>('pagata_da')!;
+
+    final manager = $$PartecipantiTableTableManager(
+      $_db,
+      $_db.partecipanti,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_pagataDaTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $CategorieTable _categoriaIdTable(_$AppDatabase db) =>
+      db.categorie.createAlias('spese__categoria_id__categorie__id');
+
+  $$CategorieTableProcessedTableManager? get categoriaId {
+    final $_column = $_itemColumn<int>('categoria_id');
+    if ($_column == null) return null;
+    final manager = $$CategorieTableTableManager(
+      $_db,
+      $_db.categorie,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_categoriaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static MultiTypedResultKey<$QuoteTable, List<Quota>> _quoteRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.quote,
+    aliasName: 'spese__id__quote__spesa_id',
+  );
+
+  $$QuoteTableProcessedTableManager get quoteRefs {
+    final manager = $$QuoteTableTableManager(
+      $_db,
+      $_db.quote,
+    ).filter((f) => f.spesaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_quoteRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$SpeseTableFilterComposer extends Composer<_$AppDatabase, $SpeseTable> {
+  $$SpeseTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<TipoSpesa, TipoSpesa, int> get tipo =>
+      $composableBuilder(
+        column: $table.tipo,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get centesimi => $composableBuilder(
+    column: $table.centesimi,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get valuta => $composableBuilder(
+    column: $table.valuta,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get creataIl => $composableBuilder(
+    column: $table.creataIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GruppiTableFilterComposer get gruppoId {
+    final $$GruppiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableFilterComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableFilterComposer get pagataDa {
+    final $$PartecipantiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pagataDa,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableFilterComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategorieTableFilterComposer get categoriaId {
+    final $$CategorieTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategorieTableFilterComposer(
+            $db: $db,
+            $table: $db.categorie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<bool> quoteRefs(
+    Expression<bool> Function($$QuoteTableFilterComposer f) f,
+  ) {
+    final $$QuoteTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.quote,
+      getReferencedColumn: (t) => t.spesaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QuoteTableFilterComposer(
+            $db: $db,
+            $table: $db.quote,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$SpeseTableOrderingComposer
+    extends Composer<_$AppDatabase, $SpeseTable> {
+  $$SpeseTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get tipo => $composableBuilder(
+    column: $table.tipo,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get centesimi => $composableBuilder(
+    column: $table.centesimi,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valuta => $composableBuilder(
+    column: $table.valuta,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get data => $composableBuilder(
+    column: $table.data,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get creataIl => $composableBuilder(
+    column: $table.creataIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GruppiTableOrderingComposer get gruppoId {
+    final $$GruppiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableOrderingComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableOrderingComposer get pagataDa {
+    final $$PartecipantiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pagataDa,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableOrderingComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategorieTableOrderingComposer get categoriaId {
+    final $$CategorieTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategorieTableOrderingComposer(
+            $db: $db,
+            $table: $db.categorie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$SpeseTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SpeseTable> {
+  $$SpeseTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TipoSpesa, int> get tipo =>
+      $composableBuilder(column: $table.tipo, builder: (column) => column);
+
+  GeneratedColumn<String> get descrizione => $composableBuilder(
+    column: $table.descrizione,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get centesimi =>
+      $composableBuilder(column: $table.centesimi, builder: (column) => column);
+
+  GeneratedColumn<String> get valuta =>
+      $composableBuilder(column: $table.valuta, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get data =>
+      $composableBuilder(column: $table.data, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get creataIl =>
+      $composableBuilder(column: $table.creataIl, builder: (column) => column);
+
+  $$GruppiTableAnnotationComposer get gruppoId {
+    final $$GruppiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableAnnotationComposer get pagataDa {
+    final $$PartecipantiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.pagataDa,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$CategorieTableAnnotationComposer get categoriaId {
+    final $$CategorieTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.categoriaId,
+      referencedTable: $db.categorie,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CategorieTableAnnotationComposer(
+            $db: $db,
+            $table: $db.categorie,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  Expression<T> quoteRefs<T extends Object>(
+    Expression<T> Function($$QuoteTableAnnotationComposer a) f,
+  ) {
+    final $$QuoteTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.quote,
+      getReferencedColumn: (t) => t.spesaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$QuoteTableAnnotationComposer(
+            $db: $db,
+            $table: $db.quote,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$SpeseTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SpeseTable,
+          Spesa,
+          $$SpeseTableFilterComposer,
+          $$SpeseTableOrderingComposer,
+          $$SpeseTableAnnotationComposer,
+          $$SpeseTableCreateCompanionBuilder,
+          $$SpeseTableUpdateCompanionBuilder,
+          (Spesa, $$SpeseTableReferences),
+          Spesa,
+          PrefetchHooks Function({
+            bool gruppoId,
+            bool pagataDa,
+            bool categoriaId,
+            bool quoteRefs,
+          })
+        > {
+  $$SpeseTableTableManager(_$AppDatabase db, $SpeseTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SpeseTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SpeseTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SpeseTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<int> gruppoId = const Value.absent(),
+                Value<TipoSpesa> tipo = const Value.absent(),
+                Value<String> descrizione = const Value.absent(),
+                Value<int> centesimi = const Value.absent(),
+                Value<String> valuta = const Value.absent(),
+                Value<DateTime> data = const Value.absent(),
+                Value<int> pagataDa = const Value.absent(),
+                Value<int?> categoriaId = const Value.absent(),
+                Value<DateTime> creataIl = const Value.absent(),
+              }) => SpeseCompanion(
+                id: id,
+                uuid: uuid,
+                gruppoId: gruppoId,
+                tipo: tipo,
+                descrizione: descrizione,
+                centesimi: centesimi,
+                valuta: valuta,
+                data: data,
+                pagataDa: pagataDa,
+                categoriaId: categoriaId,
+                creataIl: creataIl,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String uuid,
+                required int gruppoId,
+                required TipoSpesa tipo,
+                required String descrizione,
+                required int centesimi,
+                Value<String> valuta = const Value.absent(),
+                required DateTime data,
+                required int pagataDa,
+                Value<int?> categoriaId = const Value.absent(),
+                Value<DateTime> creataIl = const Value.absent(),
+              }) => SpeseCompanion.insert(
+                id: id,
+                uuid: uuid,
+                gruppoId: gruppoId,
+                tipo: tipo,
+                descrizione: descrizione,
+                centesimi: centesimi,
+                valuta: valuta,
+                data: data,
+                pagataDa: pagataDa,
+                categoriaId: categoriaId,
+                creataIl: creataIl,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$SpeseTable, Spesa>(table),
+                  $$SpeseTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback:
+              ({
+                gruppoId = false,
+                pagataDa = false,
+                categoriaId = false,
+                quoteRefs = false,
+              }) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [if (quoteRefs) db.quote],
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (gruppoId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.gruppoId,
+                            referencedTable: $$SpeseTableReferences
+                                ._gruppoIdTable(db),
+                            referencedColumn: $$SpeseTableReferences
+                                ._gruppoIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (pagataDa) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.pagataDa,
+                            referencedTable: $$SpeseTableReferences
+                                ._pagataDaTable(db),
+                            referencedColumn: $$SpeseTableReferences
+                                ._pagataDaTable(db)
+                                .id,
+                          ) as T;
+                        }
+                        if (categoriaId) {
+                          state = state.withJoin(
+                            currentTable: table,
+                            currentColumn: table.categoriaId,
+                            referencedTable: $$SpeseTableReferences
+                                ._categoriaIdTable(db),
+                            referencedColumn: $$SpeseTableReferences
+                                ._categoriaIdTable(db)
+                                .id,
+                          ) as T;
+                        }
+
+                        return state;
+                      },
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (quoteRefs)
+                        await $_getPrefetchedData<Spesa, $SpeseTable, Quota>(
+                          currentTable: table,
+                          referencedTable: $$SpeseTableReferences
+                              ._quoteRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$SpeseTableReferences(db, table, p0).quoteRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.spesaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
+              },
+        ),
+      );
+}
+
+typedef $$SpeseTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SpeseTable,
+      Spesa,
+      $$SpeseTableFilterComposer,
+      $$SpeseTableOrderingComposer,
+      $$SpeseTableAnnotationComposer,
+      $$SpeseTableCreateCompanionBuilder,
+      $$SpeseTableUpdateCompanionBuilder,
+      (Spesa, $$SpeseTableReferences),
+      Spesa,
+      PrefetchHooks Function({
+        bool gruppoId,
+        bool pagataDa,
+        bool categoriaId,
+        bool quoteRefs,
+      })
+    >;
+typedef $$QuoteTableCreateCompanionBuilder = QuoteCompanion Function({
+  Value<int> id,
+  required int spesaId,
+  required int partecipanteId,
+  required int centesimi,
+});
+typedef $$QuoteTableUpdateCompanionBuilder = QuoteCompanion Function({
+  Value<int> id,
+  Value<int> spesaId,
+  Value<int> partecipanteId,
+  Value<int> centesimi,
+});
+
+final class $$QuoteTableReferences
+    extends BaseReferences<_$AppDatabase, $QuoteTable, Quota> {
+  $$QuoteTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $SpeseTable _spesaIdTable(_$AppDatabase db) =>
+      db.spese.createAlias('quote__spesa_id__spese__id');
+
+  $$SpeseTableProcessedTableManager get spesaId {
+    final $_column = $_itemColumn<int>('spesa_id')!;
+
+    final manager = $$SpeseTableTableManager(
+      $_db,
+      $_db.spese,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_spesaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PartecipantiTable _partecipanteIdTable(_$AppDatabase db) =>
+      db.partecipanti.createAlias('quote__partecipante_id__partecipanti__id');
+
+  $$PartecipantiTableProcessedTableManager get partecipanteId {
+    final $_column = $_itemColumn<int>('partecipante_id')!;
+
+    final manager = $$PartecipantiTableTableManager(
+      $_db,
+      $_db.partecipanti,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_partecipanteIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$QuoteTableFilterComposer extends Composer<_$AppDatabase, $QuoteTable> {
+  $$QuoteTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get centesimi => $composableBuilder(
+    column: $table.centesimi,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$SpeseTableFilterComposer get spesaId {
+    final $$SpeseTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.spesaId,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableFilterComposer(
+            $db: $db,
+            $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableFilterComposer get partecipanteId {
+    final $$PartecipantiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.partecipanteId,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableFilterComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QuoteTableOrderingComposer
+    extends Composer<_$AppDatabase, $QuoteTable> {
+  $$QuoteTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get centesimi => $composableBuilder(
+    column: $table.centesimi,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$SpeseTableOrderingComposer get spesaId {
+    final $$SpeseTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.spesaId,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableOrderingComposer(
+            $db: $db,
+            $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableOrderingComposer get partecipanteId {
+    final $$PartecipantiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.partecipanteId,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableOrderingComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QuoteTableAnnotationComposer
+    extends Composer<_$AppDatabase, $QuoteTable> {
+  $$QuoteTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get centesimi =>
+      $composableBuilder(column: $table.centesimi, builder: (column) => column);
+
+  $$SpeseTableAnnotationComposer get spesaId {
+    final $$SpeseTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.spesaId,
+      referencedTable: $db.spese,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SpeseTableAnnotationComposer(
+            $db: $db,
+            $table: $db.spese,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PartecipantiTableAnnotationComposer get partecipanteId {
+    final $$PartecipantiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.partecipanteId,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$QuoteTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $QuoteTable,
+          Quota,
+          $$QuoteTableFilterComposer,
+          $$QuoteTableOrderingComposer,
+          $$QuoteTableAnnotationComposer,
+          $$QuoteTableCreateCompanionBuilder,
+          $$QuoteTableUpdateCompanionBuilder,
+          (Quota, $$QuoteTableReferences),
+          Quota,
+          PrefetchHooks Function({bool spesaId, bool partecipanteId})
+        > {
+  $$QuoteTableTableManager(_$AppDatabase db, $QuoteTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$QuoteTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$QuoteTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$QuoteTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> spesaId = const Value.absent(),
+                Value<int> partecipanteId = const Value.absent(),
+                Value<int> centesimi = const Value.absent(),
+              }) => QuoteCompanion(
+                id: id,
+                spesaId: spesaId,
+                partecipanteId: partecipanteId,
+                centesimi: centesimi,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int spesaId,
+                required int partecipanteId,
+                required int centesimi,
+              }) => QuoteCompanion.insert(
+                id: id,
+                spesaId: spesaId,
+                partecipanteId: partecipanteId,
+                centesimi: centesimi,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$QuoteTable, Quota>(table),
+                  $$QuoteTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({spesaId = false, partecipanteId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (spesaId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.spesaId,
+                        referencedTable: $$QuoteTableReferences._spesaIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$QuoteTableReferences
+                            ._spesaIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (partecipanteId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.partecipanteId,
+                        referencedTable: $$QuoteTableReferences
+                            ._partecipanteIdTable(db),
+                        referencedColumn: $$QuoteTableReferences
+                            ._partecipanteIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$QuoteTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $QuoteTable,
+      Quota,
+      $$QuoteTableFilterComposer,
+      $$QuoteTableOrderingComposer,
+      $$QuoteTableAnnotationComposer,
+      $$QuoteTableCreateCompanionBuilder,
+      $$QuoteTableUpdateCompanionBuilder,
+      (Quota, $$QuoteTableReferences),
+      Quota,
+      PrefetchHooks Function({bool spesaId, bool partecipanteId})
     >;
 
 class $AppDatabaseManager {
@@ -4850,4 +7327,8 @@ class $AppDatabaseManager {
       $$PartecipantiTableTableManager(_db, _db.partecipanti);
   $$CategorieTableTableManager get categorie =>
       $$CategorieTableTableManager(_db, _db.categorie);
+  $$SpeseTableTableManager get spese =>
+      $$SpeseTableTableManager(_db, _db.spese);
+  $$QuoteTableTableManager get quote =>
+      $$QuoteTableTableManager(_db, _db.quote);
 }

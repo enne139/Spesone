@@ -986,3 +986,26 @@ ricominciano, e conviene sceglierli a mano.
 nome della categoria gli sta sempre accanto, e anche nella scelta del colore
 c'e' scritto come si chiama ("rosa", "azzurro"): chi non distingue due tinte
 deve comunque poter scegliere, e sapere cosa ha scelto.
+
+---
+
+## 041 — Anche una spesa normale ha la sua quota
+
+**Data:** 2026-10-05
+
+**Contesto:** una spesa normale riguarda solo te, una condivisa ha una quota
+per partecipante. Si poteva salvare la normale senza nessuna quota.
+
+**Decisione:** anche la spesa normale ha una quota, una sola, tua, per
+l'intero importo. E anche il pagante c'e' sempre: sulla normale sei tu.
+
+**Motivazione:** cosi' i due numeri che contano si calcolano con la stessa
+formula per tutti i tipi. "Quanto ho speso io" e' sempre la somma delle tue
+quote; il saldo di un partecipante e' sempre "quanto ha anticipato meno la
+somma delle sue quote". Una spesa normale si annulla da se' — l'hai anticipata
+tu e tocca tutta a te — senza bisogno di escluderla con un caso particolare,
+che e' il genere di eccezione che prima o poi qualcuno dimentica in una query.
+
+**Conseguenza:** l'invariante vale per tutte le spese: **la somma delle quote
+e' il totale**, sempre. Il DAO la verifica prima di scrivere e rifiuta il
+resto, perche' e' l'ultimo punto in cui si puo' fermare un conto sbagliato.

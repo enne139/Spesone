@@ -11,9 +11,9 @@ Compatibile con apple, android, web
     - [x] creare più Gruppi di spesa
     - [ ] condividere gruppo via wifi (backend)
     - [ ] condividere gruppo via bt
-    - [ ] aggiungere spese singole 
-    - [ ] aggiungere spese condivise
-    - [ ] categoria spesa e data
+    - [x] aggiungere spese singole 
+    - [x] aggiungere spese condivise
+    - [x] categoria spesa e data
     - [ ] grafico spese
     - [ ] calcolo dei debiti intelligente
  - [x] creazione di persone (anagrafica dei debiti; i gruppi di spesa hanno i propri partecipanti, scritti a mano)

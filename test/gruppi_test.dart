@@ -26,8 +26,8 @@ void main() {
       find.widgetWithText(AppBar, GruppiDao.nomePredefinito),
       findsOneWidget,
     );
-    expect(find.text('Io (tu)'), findsOneWidget);
     expect(find.text('solo tu · EUR'), findsOneWidget);
+    expect(find.text('Ancora nessuna spesa'), findsOneWidget);
 
     await chiudiApp(tester);
   });
@@ -77,7 +77,7 @@ void main() {
   ) async {
     await avviaApp(tester, db);
 
-    await tester.tap(find.text('Impostazioni del viaggio'));
+    await tester.tap(find.byTooltip('Impostazioni del viaggio'));
     await tester.pumpAndSettle();
     expect(find.text('Partecipanti'), findsOneWidget);
     expect(find.text('sei tu'), findsOneWidget);
@@ -153,6 +153,40 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Souvenir'), findsOneWidget);
+
+    await chiudiApp(tester);
+  });
+
+  testWidgets('si registra una spesa condivisa e i totali tornano', (
+    WidgetTester tester,
+  ) async {
+    final int gruppo = (await dao.assicuraGruppoCorrente()).id;
+    await dao.aggiungiPartecipante(gruppoId: gruppo, nome: 'Marco');
+
+    await avviaApp(tester, db);
+
+    await tester.tap(find.widgetWithText(FloatingActionButton, 'Spesa'));
+    await tester.pumpAndSettle();
+
+    // Una spesa divisa fra te e Marco: 60 euro, 30 a testa.
+    // I segmenti non sono widget a se': si tocca la loro etichetta.
+    await tester.tap(find.text('Condivisa'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).first, 'Cena');
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField).at(1), '60,00');
+    await tester.pumpAndSettle();
+    // Con le quote in vista il foglio e' piu' alto dello schermo di prova: il
+    // pulsante va portato dentro, altrimenti il tocco cade nel vuoto.
+    await tester.ensureVisible(find.widgetWithText(FilledButton, 'Registra'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Registra'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Cena'), findsOneWidget);
+    // Il totale del viaggio e' 60, la tua parte 30.
+    expect(find.text('60,00 €'), findsWidgets);
+    expect(find.text('30,00 €'), findsOneWidget);
 
     await chiudiApp(tester);
   });
