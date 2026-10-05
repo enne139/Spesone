@@ -168,4 +168,42 @@ void main() {
     expect(corrente, isNotNull);
     expect(corrente!.id, isNot(unico));
   });
+
+  test('creando un gruppo si danno i nomi dei partecipanti', () async {
+    final int id = await dao.creaGruppo(
+      'Grecia',
+      nomeIo: 'Enne',
+      altriPartecipanti: <String>['Marco', '  Lucia  ', '   '],
+    );
+
+    final List<Partecipante> dentro = await dao.osservaPartecipanti(id).first;
+    // Tu per primo, poi gli altri in ordine. I campi vuoti si saltano.
+    expect(dentro.first.sonoIo, isTrue);
+    expect(dentro.first.nome, 'Enne');
+    expect(dentro.map((Partecipante p) => p.nome), <String>[
+      'Enne',
+      'Lucia',
+      'Marco',
+    ]);
+  });
+
+  test('il nome con cui ti sei chiamato l ultima volta si ricorda', () async {
+    expect(await dao.ultimoNomeIo(), 'Io');
+
+    await dao.creaGruppo('Grecia', nomeIo: 'Enne');
+
+    expect(await dao.ultimoNomeIo(), 'Enne');
+  });
+
+  test('il nome puo essere diverso in gruppi diversi', () async {
+    final int primo = await dao.creaGruppo('Grecia', nomeIo: 'Enne');
+    final int secondo = await dao.creaGruppo('Casa', nomeIo: 'Papa');
+
+    final Partecipante qui = (await dao.osservaPartecipanti(primo).first)
+        .firstWhere((Partecipante p) => p.sonoIo);
+    final Partecipante la = (await dao.osservaPartecipanti(secondo).first)
+        .firstWhere((Partecipante p) => p.sonoIo);
+    expect(qui.nome, 'Enne');
+    expect(la.nome, 'Papa');
+  });
 }

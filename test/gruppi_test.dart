@@ -40,13 +40,22 @@ void main() {
 
     await tester.tap(find.text('Nuovo gruppo'));
     await tester.pumpAndSettle();
-    await tester.enterText(find.byType(TextField), 'Grecia 2026');
+
+    // Il modulo chiede il nome del gruppo, poi il tuo, poi gli altri.
+    await tester.enterText(find.byType(TextField).at(0), 'Grecia 2026');
+    await tester.enterText(find.byType(TextField).at(1), 'Enne');
+    await tester.enterText(find.byType(TextField).at(2), 'Marco');
     await tester.pumpAndSettle();
-    await tester.tap(find.widgetWithText(TextButton, 'Crea'));
+    await tester.ensureVisible(
+      find.widgetWithText(FilledButton, 'Crea gruppo'),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Crea gruppo'));
     await tester.pumpAndSettle();
 
     // Il menu si chiude e si lavora sul gruppo appena creato.
     expect(find.widgetWithText(AppBar, 'Grecia 2026'), findsOneWidget);
+    expect(find.text('2 partecipanti · EUR'), findsOneWidget);
 
     await chiudiApp(tester);
   });

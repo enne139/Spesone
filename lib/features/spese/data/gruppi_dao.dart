@@ -152,13 +152,51 @@ class GruppiDao extends DatabaseAccessor<AppDatabase> with _$GruppiDaoMixin {
     });
   }
 
-  /// Crea un gruppo con te dentro e lo apre.
-  Future<int> creaGruppo(String nome) {
+  /// Crea un gruppo con i suoi partecipanti e lo apre.
+  ///
+  /// [nomeIo] e' come ti chiami **in questo gruppo**: i partecipanti sono
+  /// propri del gruppo (voce 039), quindi puoi essere "Io" in un viaggio e
+  /// "Papa'" in un altro.
+  Future<int> creaGruppo(
+    String nome, {
+    String nomeIo = 'Io',
+    List<String> altriPartecipanti = const <String>[],
+  }) {
     return transaction(() async {
-      final int id = await _creaGruppo(nome);
+      final int id = await _creaGruppo(nome, nomeIo: nomeIo);
+      for (final String altro in altriPartecipanti) {
+        final String pulito = altro.trim();
+        if (pulito.isEmpty) {
+          continue;
+        }
+        await into(partecipanti).insert(
+          PartecipantiCompanion.insert(
+            uuid: _uuid.v4(),
+            gruppoId: id,
+            nome: pulito,
+          ),
+        );
+      }
       await _apri(id);
       return id;
     });
+  }
+
+  /// Come ti sei chiamato l'ultima volta che hai creato un gruppo.
+  ///
+  /// Serve a proporlo gia' scritto: chiedere il proprio nome a ogni viaggio e'
+  /// giusto, farlo riscrivere ogni volta no.
+  Future<String> ultimoNomeIo() async {
+    final JoinedSelectStatement<HasResultSet, dynamic> query =
+        select(partecipanti).join(<Join<HasResultSet, dynamic>>[
+            innerJoin(gruppi, gruppi.id.equalsExp(partecipanti.gruppoId)),
+          ])
+          ..where(partecipanti.sonoIo.equals(true))
+          ..orderBy(<OrderingTerm>[OrderingTerm.desc(gruppi.creatoIl)])
+          ..limit(1);
+
+    final TypedResult? riga = await query.getSingleOrNull();
+    return riga?.readTable(partecipanti).nome ?? 'Io';
   }
 
   /// Sposta il lavoro su un altro gruppo.
@@ -276,7 +314,7 @@ class GruppiDao extends DatabaseAccessor<AppDatabase> with _$GruppiDaoMixin {
   // --- Parti riusabili, da chiamare dentro una transazione -------------------
 
   /// Crea il gruppo e ci mette dentro te. Non apre transazioni (voce 014).
-  Future<int> _creaGruppo(String nome) async {
+  Future<int> _creaGruppo(String nome, {String nomeIo = 'Io'}) async {
     final int id = await into(gruppi)
         .insert(GruppiCompanion.insert(uuid: _uuid.v4(), nome: nome.trim()));
     // Ogni gruppo nasce con il suo "io": e' il punto di vista da cui si
@@ -285,7 +323,7 @@ class GruppiDao extends DatabaseAccessor<AppDatabase> with _$GruppiDaoMixin {
       PartecipantiCompanion.insert(
         uuid: _uuid.v4(),
         gruppoId: id,
-        nome: 'Io',
+        nome: nomeIo.trim().isEmpty ? 'Io' : nomeIo.trim(),
         sonoIo: const Value<bool>(true),
       ),
     );

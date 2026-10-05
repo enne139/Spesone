@@ -1137,3 +1137,32 @@ finisca in una rotella.
 **Regola che ne deriva:** quando uno stream puo' legittimamente non avere
 niente da dare, la schermata lo dice e offre cosa fare. Il caricamento si
 mostra solo mentre si sta davvero aspettando.
+
+---
+
+## 047 — Creare un gruppo vuol dire dire chi c'e'
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto. Creare un gruppo chiedeva
+solo il nome, e i partecipanti si aggiungevano dopo dalle impostazioni.
+
+**Decisione:** la creazione e' un modulo: nome del gruppo, **il tuo** nome, poi
+gli altri, con un campo in piu' a ogni invio. Il tuo nome arriva gia' scritto
+come l'ultima volta, e si puo' cambiare.
+
+**Motivazione:** un gruppo senza partecipanti non serve a niente — la prima
+spesa condivisa ne ha bisogno — e chiederli dopo significa farsi trovare, al
+momento di registrarla, davanti a un gruppo con dentro solo te. Il nome
+proprio si chiede perche' i partecipanti sono propri del gruppo (voce 039):
+puoi essere "Io" in un viaggio e "Papa'" nella casa condivisa. Si propone
+quello dell'ultima volta perche' chiederlo e' giusto, farlo riscrivere ogni
+volta no.
+
+**Conseguenza:** i nomi duplicati si fermano nel modulo, con un messaggio, e
+non quando la scrittura fallisce: due partecipanti con lo stesso nome sarebbero
+indistinguibili nel momento di dividere una spesa.
+
+**Resta automatico** il gruppo creato al primo avvio e quello che nasce se non
+ne resta nessuno (voci 036 e 046): li' nessuno sta chiedendo niente, e un
+modulo a sorpresa sarebbe peggio di un gruppo con dentro solo te.

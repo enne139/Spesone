@@ -6,6 +6,7 @@ import 'package:spesone/core/errori.dart';
 import 'package:spesone/core/widgets/dialoghi.dart';
 import 'package:spesone/features/spese/data/gruppi_dao.dart';
 import 'package:spesone/features/spese/model/riepilogo_gruppo.dart';
+import 'package:spesone/features/spese/widgets/modulo_nuovo_gruppo.dart';
 import 'package:spesone/navigation/app_shell_scope.dart';
 
 /// Le azioni del menu di un singolo gruppo.
@@ -51,18 +52,19 @@ class _SelettoreGruppiState extends State<SelettoreGruppi> {
     final AppShellScope scope = AppShellScope.of(context);
     final NavigatorState navigator = Navigator.of(context);
 
-    final String? nome = await chiediTesto(
-      context,
-      titolo: 'Nuovo gruppo',
-      azione: 'Crea',
-      etichetta: 'Nome del gruppo',
-      suggerimento: 'es. Grecia 2026',
-    );
-    if (nome == null || !mounted) {
+    final DatiNuovoGruppo? dati = await mostraModuloNuovoGruppo(context);
+    if (dati == null || !mounted) {
       return;
     }
 
-    await eseguiSegnalandoErrori(context, () => _dao!.creaGruppo(nome));
+    await eseguiSegnalandoErrori(
+      context,
+      () => _dao!.creaGruppo(
+        dati.nome,
+        nomeIo: dati.nomeIo,
+        altriPartecipanti: dati.altri,
+      ),
+    );
     if (!mounted) {
       return;
     }
