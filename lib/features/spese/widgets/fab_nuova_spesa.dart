@@ -19,11 +19,13 @@ class FabNuovaSpesa extends StatefulWidget {
 class _FabNuovaSpesaState extends State<FabNuovaSpesa> {
   int? _gruppoOsservato;
   Stream<List<Partecipante>>? _partecipanti;
+  Stream<List<String>>? _valute;
 
   Stream<List<Partecipante>> _stream(GruppiDao dao, int gruppoId) {
     if (_gruppoOsservato != gruppoId) {
       _gruppoOsservato = gruppoId;
       _partecipanti = dao.osservaPartecipanti(gruppoId);
+      _valute = dao.osservaValute(gruppoId);
     }
     return _partecipanti!;
   }
@@ -32,10 +34,12 @@ class _FabNuovaSpesaState extends State<FabNuovaSpesa> {
     BuildContext context,
     Gruppo gruppo,
     List<Partecipante> partecipanti,
+    List<String> valute,
   ) async {
     final DatiSpesa? dati = await mostraModuloSpesa(
       context,
       partecipanti: partecipanti,
+      valute: valute,
     );
     if (dati == null || !context.mounted) {
       return;
@@ -50,7 +54,7 @@ class _FabNuovaSpesaState extends State<FabNuovaSpesa> {
         data: dati.data,
         pagataDa: dati.pagataDa,
         quotePerPartecipante: dati.quote,
-        valuta: gruppo.valutaPrincipale,
+        valuta: dati.valuta,
         categoriaId: dati.categoriaId,
       ),
     );
@@ -73,12 +77,17 @@ class _FabNuovaSpesaState extends State<FabNuovaSpesa> {
         return VistaDati<List<Partecipante>>(
           stream: _stream(dao, gruppo.id),
           builder: (BuildContext context, List<Partecipante> partecipanti) {
-            return FloatingActionButton.extended(
-              onPressed: partecipanti.isEmpty
-                  ? null
-                  : () => _aggiungi(context, gruppo, partecipanti),
-              icon: const Icon(Icons.add),
-              label: const Text('Spesa'),
+            return VistaDati<List<String>>(
+              stream: _valute,
+              builder: (BuildContext context, List<String> valute) {
+                return FloatingActionButton.extended(
+                  onPressed: partecipanti.isEmpty
+                      ? null
+                      : () => _aggiungi(context, gruppo, partecipanti, valute),
+                  icon: const Icon(Icons.add),
+                  label: const Text('Spesa'),
+                );
+              },
             );
           },
         );

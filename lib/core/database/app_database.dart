@@ -7,6 +7,7 @@ import 'package:spesone/features/debiti/data/debiti_tables.dart';
 import 'package:spesone/features/lista_spesa/data/liste_dao.dart';
 import 'package:spesone/features/lista_spesa/data/liste_tables.dart';
 import 'package:spesone/features/persone/data/persone_tables.dart';
+import 'package:spesone/features/spese/data/cambi_tables.dart';
 import 'package:spesone/features/spese/data/categorie_dao.dart';
 import 'package:spesone/features/spese/data/categorie_tables.dart';
 import 'package:spesone/features/spese/data/gruppi_dao.dart';
@@ -36,6 +37,7 @@ part 'app_database.g.dart';
     Spese,
     Quote,
     Rimborsi,
+    Cambi,
   ],
   daos: <Type>[
     ListeDao,
@@ -60,9 +62,9 @@ class AppDatabase extends _$AppDatabase {
   ///
   /// Storia: 1 liste della spesa, 2 persone e debiti, 3 gruppi di spesa,
   /// 4 partecipanti propri di ogni gruppo, 5 categorie, 6 spese e quote,
-  /// 7 rimborsi.
+  /// 7 rimborsi, 8 cambi delle valute.
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration {
@@ -121,6 +123,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (da < 7) {
           await m.createTable(rimborsi);
+        }
+        if (da < 8) {
+          await m.createTable(cambi);
         }
       },
       beforeOpen: (OpeningDetails details) async {

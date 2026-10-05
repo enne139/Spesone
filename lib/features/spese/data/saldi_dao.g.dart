@@ -10,6 +10,7 @@ mixin _$SaldiDaoMixin on DatabaseAccessor<AppDatabase> {
   $SpeseTable get spese => attachedDatabase.spese;
   $QuoteTable get quote => attachedDatabase.quote;
   $RimborsiTable get rimborsi => attachedDatabase.rimborsi;
+  $CambiTable get cambi => attachedDatabase.cambi;
   SaldiDaoManager get managers => SaldiDaoManager(this);
 }
 
@@ -28,4 +29,6 @@ class SaldiDaoManager {
       $$QuoteTableTableManager(_db.attachedDatabase, _db.quote);
   $$RimborsiTableTableManager get rimborsi =>
       $$RimborsiTableTableManager(_db.attachedDatabase, _db.rimborsi);
+  $$CambiTableTableManager get cambi =>
+      $$CambiTableTableManager(_db.attachedDatabase, _db.cambi);
 }

@@ -79,6 +79,10 @@ Dentro una `transaction(...)` si legge solo con `get*()`: uno `Stream` o un
 `.first` aspetterebbero una notifica che arriva dopo il commit, e l'operazione
 resta appesa senza dare errore (voci 014 e 025).
 
+Stessa regola fuori dalle transazioni: **mai uno stream che ne aspetta un
+altro** (`asyncMap` con dentro una lettura). Se servono dati da piu' tabelle,
+si scrive una query sola — join, sottoquery o `customSelect` (voce 044).
+
 ## Colori
 
 I colori delle categorie non si scelgono a occhio: si salva l'**indice** di

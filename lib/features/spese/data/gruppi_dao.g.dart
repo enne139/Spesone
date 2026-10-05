@@ -6,6 +6,7 @@ part of 'gruppi_dao.dart';
 mixin _$GruppiDaoMixin on DatabaseAccessor<AppDatabase> {
   $GruppiTable get gruppi => attachedDatabase.gruppi;
   $PartecipantiTable get partecipanti => attachedDatabase.partecipanti;
+  $CambiTable get cambi => attachedDatabase.cambi;
   GruppiDaoManager get managers => GruppiDaoManager(this);
 }
 
@@ -16,4 +17,6 @@ class GruppiDaoManager {
       $$GruppiTableTableManager(_db.attachedDatabase, _db.gruppi);
   $$PartecipantiTableTableManager get partecipanti =>
       $$PartecipantiTableTableManager(_db.attachedDatabase, _db.partecipanti);
+  $$CambiTableTableManager get cambi =>
+      $$CambiTableTableManager(_db.attachedDatabase, _db.cambi);
 }

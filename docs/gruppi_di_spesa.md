@@ -200,8 +200,8 @@ Grecia, partecipanti: io, Marco, Lucia.
 3. ~~Spese normali: le tue, con categoria. Totale del viaggio e quanto hai
    speso tu.~~ **fatto**
 4. ~~Spese condivise: chi ha pagato, per chi, quote.~~ **fatto**
-5. Valute del viaggio e tassi fissi nelle impostazioni del gruppo.
-6. Saldi del gruppo e rimborsi.
+5. ~~Valute del viaggio e tassi fissi nelle impostazioni del gruppo.~~ **fatto**
+6. ~~Saldi del gruppo e rimborsi.~~ **fatto**
 7. Grafico per categoria e nel tempo.
 8. Condivisione del gruppo via bluetooth e via backend.
 

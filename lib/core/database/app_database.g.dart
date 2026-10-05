@@ -4289,6 +4289,384 @@ class RimborsiCompanion extends UpdateCompanion<Rimborso> {
   }
 }
 
+class $CambiTable extends Cambi with TableInfo<$CambiTable, Cambio> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CambiTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _gruppoIdMeta = const VerificationMeta(
+    'gruppoId',
+  );
+  @override
+  late final GeneratedColumn<int> gruppoId = GeneratedColumn<int>(
+    'gruppo_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES gruppi (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _codiceMeta = const VerificationMeta('codice');
+  @override
+  late final GeneratedColumn<String> codice = GeneratedColumn<String>(
+    'codice',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _tassoMilionesimiMeta = const VerificationMeta(
+    'tassoMilionesimi',
+  );
+  @override
+  late final GeneratedColumn<int> tassoMilionesimi = GeneratedColumn<int>(
+    'tasso_milionesimi',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _aggiornatoIlMeta = const VerificationMeta(
+    'aggiornatoIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> aggiornatoIl = GeneratedColumn<DateTime>(
+    'aggiornato_il',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    gruppoId,
+    codice,
+    tassoMilionesimi,
+    aggiornatoIl,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'cambi';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Cambio> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('gruppo_id')) {
+      context.handle(
+        _gruppoIdMeta,
+        gruppoId.isAcceptableOrUnknown(data['gruppo_id']!, _gruppoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gruppoIdMeta);
+    }
+    if (data.containsKey('codice')) {
+      context.handle(
+        _codiceMeta,
+        codice.isAcceptableOrUnknown(data['codice']!, _codiceMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codiceMeta);
+    }
+    if (data.containsKey('tasso_milionesimi')) {
+      context.handle(
+        _tassoMilionesimiMeta,
+        tassoMilionesimi.isAcceptableOrUnknown(
+          data['tasso_milionesimi']!,
+          _tassoMilionesimiMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_tassoMilionesimiMeta);
+    }
+    if (data.containsKey('aggiornato_il')) {
+      context.handle(
+        _aggiornatoIlMeta,
+        aggiornatoIl.isAcceptableOrUnknown(
+          data['aggiornato_il']!,
+          _aggiornatoIlMeta,
+        ),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {gruppoId, codice},
+  ];
+  @override
+  Cambio map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Cambio(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      gruppoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gruppo_id'],
+      )!,
+      codice: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}codice'],
+      )!,
+      tassoMilionesimi: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}tasso_milionesimi'],
+      )!,
+      aggiornatoIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}aggiornato_il'],
+      )!,
+    );
+  }
+
+  @override
+  $CambiTable createAlias(String alias) {
+    return $CambiTable(attachedDatabase, alias);
+  }
+}
+
+class Cambio extends DataClass implements Insertable<Cambio> {
+  final int id;
+  final int gruppoId;
+
+  /// Codice ISO della valuta, es. "USD".
+  final String codice;
+
+  /// Quanto vale **un'unita'** di questa valuta nella valuta principale del
+  /// gruppo, in milionesimi.
+  ///
+  /// Intero come gli importi, e per lo stesso motivo (voce 023): con un
+  /// numero a virgola i conti non sarebbero ripetibili. Un milione significa
+  /// "uno a uno"; 1 USD = 0,92 € si scrive 920000.
+  final int tassoMilionesimi;
+  final DateTime aggiornatoIl;
+  const Cambio({
+    required this.id,
+    required this.gruppoId,
+    required this.codice,
+    required this.tassoMilionesimi,
+    required this.aggiornatoIl,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['gruppo_id'] = Variable<int>(gruppoId);
+    map['codice'] = Variable<String>(codice);
+    map['tasso_milionesimi'] = Variable<int>(tassoMilionesimi);
+    map['aggiornato_il'] = Variable<DateTime>(aggiornatoIl);
+    return map;
+  }
+
+  CambiCompanion toCompanion(bool nullToAbsent) {
+    return CambiCompanion(
+      id: Value(id),
+      gruppoId: Value(gruppoId),
+      codice: Value(codice),
+      tassoMilionesimi: Value(tassoMilionesimi),
+      aggiornatoIl: Value(aggiornatoIl),
+    );
+  }
+
+  factory Cambio.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Cambio(
+      id: serializer.fromJson<int>(json['id']),
+      gruppoId: serializer.fromJson<int>(json['gruppoId']),
+      codice: serializer.fromJson<String>(json['codice']),
+      tassoMilionesimi: serializer.fromJson<int>(json['tassoMilionesimi']),
+      aggiornatoIl: serializer.fromJson<DateTime>(json['aggiornatoIl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'gruppoId': serializer.toJson<int>(gruppoId),
+      'codice': serializer.toJson<String>(codice),
+      'tassoMilionesimi': serializer.toJson<int>(tassoMilionesimi),
+      'aggiornatoIl': serializer.toJson<DateTime>(aggiornatoIl),
+    };
+  }
+
+  Cambio copyWith({
+    int? id,
+    int? gruppoId,
+    String? codice,
+    int? tassoMilionesimi,
+    DateTime? aggiornatoIl,
+  }) => Cambio(
+    id: id ?? this.id,
+    gruppoId: gruppoId ?? this.gruppoId,
+    codice: codice ?? this.codice,
+    tassoMilionesimi: tassoMilionesimi ?? this.tassoMilionesimi,
+    aggiornatoIl: aggiornatoIl ?? this.aggiornatoIl,
+  );
+  Cambio copyWithCompanion(CambiCompanion data) {
+    return Cambio(
+      id: data.id.present ? data.id.value : this.id,
+      gruppoId: data.gruppoId.present ? data.gruppoId.value : this.gruppoId,
+      codice: data.codice.present ? data.codice.value : this.codice,
+      tassoMilionesimi: data.tassoMilionesimi.present
+          ? data.tassoMilionesimi.value
+          : this.tassoMilionesimi,
+      aggiornatoIl: data.aggiornatoIl.present
+          ? data.aggiornatoIl.value
+          : this.aggiornatoIl,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Cambio(')
+          ..write('id: $id, ')
+          ..write('gruppoId: $gruppoId, ')
+          ..write('codice: $codice, ')
+          ..write('tassoMilionesimi: $tassoMilionesimi, ')
+          ..write('aggiornatoIl: $aggiornatoIl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, gruppoId, codice, tassoMilionesimi, aggiornatoIl);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Cambio &&
+          other.id == this.id &&
+          other.gruppoId == this.gruppoId &&
+          other.codice == this.codice &&
+          other.tassoMilionesimi == this.tassoMilionesimi &&
+          other.aggiornatoIl == this.aggiornatoIl);
+}
+
+class CambiCompanion extends UpdateCompanion<Cambio> {
+  final Value<int> id;
+  final Value<int> gruppoId;
+  final Value<String> codice;
+  final Value<int> tassoMilionesimi;
+  final Value<DateTime> aggiornatoIl;
+  const CambiCompanion({
+    this.id = const Value.absent(),
+    this.gruppoId = const Value.absent(),
+    this.codice = const Value.absent(),
+    this.tassoMilionesimi = const Value.absent(),
+    this.aggiornatoIl = const Value.absent(),
+  });
+  CambiCompanion.insert({
+    this.id = const Value.absent(),
+    required int gruppoId,
+    required String codice,
+    required int tassoMilionesimi,
+    this.aggiornatoIl = const Value.absent(),
+  }) : gruppoId = Value(gruppoId),
+       codice = Value(codice),
+       tassoMilionesimi = Value(tassoMilionesimi);
+  static Insertable<Cambio> custom({
+    Expression<int>? id,
+    Expression<int>? gruppoId,
+    Expression<String>? codice,
+    Expression<int>? tassoMilionesimi,
+    Expression<DateTime>? aggiornatoIl,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (gruppoId != null) 'gruppo_id': gruppoId,
+      if (codice != null) 'codice': codice,
+      if (tassoMilionesimi != null) 'tasso_milionesimi': tassoMilionesimi,
+      if (aggiornatoIl != null) 'aggiornato_il': aggiornatoIl,
+    });
+  }
+
+  CambiCompanion copyWith({
+    Value<int>? id,
+    Value<int>? gruppoId,
+    Value<String>? codice,
+    Value<int>? tassoMilionesimi,
+    Value<DateTime>? aggiornatoIl,
+  }) {
+    return CambiCompanion(
+      id: id ?? this.id,
+      gruppoId: gruppoId ?? this.gruppoId,
+      codice: codice ?? this.codice,
+      tassoMilionesimi: tassoMilionesimi ?? this.tassoMilionesimi,
+      aggiornatoIl: aggiornatoIl ?? this.aggiornatoIl,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (gruppoId.present) {
+      map['gruppo_id'] = Variable<int>(gruppoId.value);
+    }
+    if (codice.present) {
+      map['codice'] = Variable<String>(codice.value);
+    }
+    if (tassoMilionesimi.present) {
+      map['tasso_milionesimi'] = Variable<int>(tassoMilionesimi.value);
+    }
+    if (aggiornatoIl.present) {
+      map['aggiornato_il'] = Variable<DateTime>(aggiornatoIl.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CambiCompanion(')
+          ..write('id: $id, ')
+          ..write('gruppoId: $gruppoId, ')
+          ..write('codice: $codice, ')
+          ..write('tassoMilionesimi: $tassoMilionesimi, ')
+          ..write('aggiornatoIl: $aggiornatoIl')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -4304,6 +4682,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SpeseTable spese = $SpeseTable(this);
   late final $QuoteTable quote = $QuoteTable(this);
   late final $RimborsiTable rimborsi = $RimborsiTable(this);
+  late final $CambiTable cambi = $CambiTable(this);
   late final ListeDao listeDao = ListeDao(this as AppDatabase);
   late final DebitiDao debitiDao = DebitiDao(this as AppDatabase);
   late final GruppiDao gruppiDao = GruppiDao(this as AppDatabase);
@@ -4325,6 +4704,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     spese,
     quote,
     rimborsi,
+    cambi,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -4404,6 +4784,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('rimborsi', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'gruppi',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('cambi', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -5704,6 +6091,25 @@ final class $$GruppiTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$CambiTable, List<Cambio>> _cambiRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.cambi,
+    aliasName: 'gruppi__id__cambi__gruppo_id',
+  );
+
+  $$CambiTableProcessedTableManager get cambiRefs {
+    final manager = $$CambiTableTableManager(
+      $_db,
+      $_db.cambi,
+    ).filter((f) => f.gruppoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_cambiRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$GruppiTableFilterComposer
@@ -5816,6 +6222,31 @@ class $$GruppiTableFilterComposer
           }) => $$RimborsiTableFilterComposer(
             $db: $db,
             $table: $db.rimborsi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> cambiRefs(
+    Expression<bool> Function($$CambiTableFilterComposer f) f,
+  ) {
+    final $$CambiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cambi,
+      getReferencedColumn: (t) => t.gruppoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CambiTableFilterComposer(
+            $db: $db,
+            $table: $db.cambi,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -5979,6 +6410,31 @@ class $$GruppiTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> cambiRefs<T extends Object>(
+    Expression<T> Function($$CambiTableAnnotationComposer a) f,
+  ) {
+    final $$CambiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.cambi,
+      getReferencedColumn: (t) => t.gruppoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$CambiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.cambi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$GruppiTableTableManager
@@ -5998,6 +6454,7 @@ class $$GruppiTableTableManager
             bool partecipantiRefs,
             bool speseRefs,
             bool rimborsiRefs,
+            bool cambiRefs,
           })
         > {
   $$GruppiTableTableManager(_$AppDatabase db, $GruppiTable table)
@@ -6060,6 +6517,7 @@ class $$GruppiTableTableManager
                 partecipantiRefs = false,
                 speseRefs = false,
                 rimborsiRefs = false,
+                cambiRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -6067,6 +6525,7 @@ class $$GruppiTableTableManager
                     if (partecipantiRefs) db.partecipanti,
                     if (speseRefs) db.spese,
                     if (rimborsiRefs) db.rimborsi,
+                    if (cambiRefs) db.cambi,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
@@ -6126,6 +6585,19 @@ class $$GruppiTableTableManager
                               ),
                           typedResults: items,
                         ),
+                      if (cambiRefs)
+                        await $_getPrefetchedData<Gruppo, $GruppiTable, Cambio>(
+                          currentTable: table,
+                          referencedTable: $$GruppiTableReferences
+                              ._cambiRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$GruppiTableReferences(db, table, p0).cambiRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.gruppoId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                     ];
                   },
                 );
@@ -6150,6 +6622,7 @@ typedef $$GruppiTableProcessedTableManager =
         bool partecipantiRefs,
         bool speseRefs,
         bool rimborsiRefs,
+        bool cambiRefs,
       })
     >;
 typedef $$PartecipantiTableCreateCompanionBuilder =
@@ -8571,6 +9044,317 @@ typedef $$RimborsiTableProcessedTableManager =
         bool aPartecipante,
       })
     >;
+typedef $$CambiTableCreateCompanionBuilder = CambiCompanion Function({
+  Value<int> id,
+  required int gruppoId,
+  required String codice,
+  required int tassoMilionesimi,
+  Value<DateTime> aggiornatoIl,
+});
+typedef $$CambiTableUpdateCompanionBuilder = CambiCompanion Function({
+  Value<int> id,
+  Value<int> gruppoId,
+  Value<String> codice,
+  Value<int> tassoMilionesimi,
+  Value<DateTime> aggiornatoIl,
+});
+
+final class $$CambiTableReferences
+    extends BaseReferences<_$AppDatabase, $CambiTable, Cambio> {
+  $$CambiTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GruppiTable _gruppoIdTable(_$AppDatabase db) =>
+      db.gruppi.createAlias('cambi__gruppo_id__gruppi__id');
+
+  $$GruppiTableProcessedTableManager get gruppoId {
+    final $_column = $_itemColumn<int>('gruppo_id')!;
+
+    final manager = $$GruppiTableTableManager(
+      $_db,
+      $_db.gruppi,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gruppoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$CambiTableFilterComposer extends Composer<_$AppDatabase, $CambiTable> {
+  $$CambiTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get codice => $composableBuilder(
+    column: $table.codice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get tassoMilionesimi => $composableBuilder(
+    column: $table.tassoMilionesimi,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get aggiornatoIl => $composableBuilder(
+    column: $table.aggiornatoIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GruppiTableFilterComposer get gruppoId {
+    final $$GruppiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableFilterComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CambiTableOrderingComposer
+    extends Composer<_$AppDatabase, $CambiTable> {
+  $$CambiTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get codice => $composableBuilder(
+    column: $table.codice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get tassoMilionesimi => $composableBuilder(
+    column: $table.tassoMilionesimi,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get aggiornatoIl => $composableBuilder(
+    column: $table.aggiornatoIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GruppiTableOrderingComposer get gruppoId {
+    final $$GruppiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableOrderingComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CambiTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CambiTable> {
+  $$CambiTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get codice =>
+      $composableBuilder(column: $table.codice, builder: (column) => column);
+
+  GeneratedColumn<int> get tassoMilionesimi => $composableBuilder(
+    column: $table.tassoMilionesimi,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get aggiornatoIl => $composableBuilder(
+    column: $table.aggiornatoIl,
+    builder: (column) => column,
+  );
+
+  $$GruppiTableAnnotationComposer get gruppoId {
+    final $$GruppiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$CambiTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $CambiTable,
+          Cambio,
+          $$CambiTableFilterComposer,
+          $$CambiTableOrderingComposer,
+          $$CambiTableAnnotationComposer,
+          $$CambiTableCreateCompanionBuilder,
+          $$CambiTableUpdateCompanionBuilder,
+          (Cambio, $$CambiTableReferences),
+          Cambio,
+          PrefetchHooks Function({bool gruppoId})
+        > {
+  $$CambiTableTableManager(_$AppDatabase db, $CambiTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CambiTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CambiTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CambiTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> gruppoId = const Value.absent(),
+                Value<String> codice = const Value.absent(),
+                Value<int> tassoMilionesimi = const Value.absent(),
+                Value<DateTime> aggiornatoIl = const Value.absent(),
+              }) => CambiCompanion(
+                id: id,
+                gruppoId: gruppoId,
+                codice: codice,
+                tassoMilionesimi: tassoMilionesimi,
+                aggiornatoIl: aggiornatoIl,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int gruppoId,
+                required String codice,
+                required int tassoMilionesimi,
+                Value<DateTime> aggiornatoIl = const Value.absent(),
+              }) => CambiCompanion.insert(
+                id: id,
+                gruppoId: gruppoId,
+                codice: codice,
+                tassoMilionesimi: tassoMilionesimi,
+                aggiornatoIl: aggiornatoIl,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$CambiTable, Cambio>(table),
+                  $$CambiTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({gruppoId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (gruppoId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.gruppoId,
+                        referencedTable: $$CambiTableReferences._gruppoIdTable(
+                          db,
+                        ),
+                        referencedColumn: $$CambiTableReferences
+                            ._gruppoIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$CambiTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $CambiTable,
+      Cambio,
+      $$CambiTableFilterComposer,
+      $$CambiTableOrderingComposer,
+      $$CambiTableAnnotationComposer,
+      $$CambiTableCreateCompanionBuilder,
+      $$CambiTableUpdateCompanionBuilder,
+      (Cambio, $$CambiTableReferences),
+      Cambio,
+      PrefetchHooks Function({bool gruppoId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -8595,4 +9379,6 @@ class $AppDatabaseManager {
       $$QuoteTableTableManager(_db, _db.quote);
   $$RimborsiTableTableManager get rimborsi =>
       $$RimborsiTableTableManager(_db, _db.rimborsi);
+  $$CambiTableTableManager get cambi =>
+      $$CambiTableTableManager(_db, _db.cambi);
 }

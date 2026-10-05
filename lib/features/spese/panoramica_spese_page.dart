@@ -35,10 +35,12 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
 
   int? _gruppoOsservato;
   Stream<List<Partecipante>>? _partecipanti;
+  Stream<List<String>>? _valute;
 
   int? _gruppoSpese;
   int? _ioSpese;
   Stream<List<SpesaCompleta>>? _spese;
+  Stream<TotaliGruppo>? _totali;
 
   @override
   void didChangeDependencies() {
@@ -72,6 +74,7 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
     if (_gruppoOsservato != gruppoId) {
       _gruppoOsservato = gruppoId;
       _partecipanti = dao.osservaPartecipanti(gruppoId);
+      _valute = dao.osservaValute(gruppoId);
     }
     return _partecipanti!;
   }
@@ -80,14 +83,18 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
     if (_gruppoSpese != gruppoId || _ioSpese != ioId) {
       _gruppoSpese = gruppoId;
       _ioSpese = ioId;
-      _spese = DatabaseScope.of(context).speseDao
-          .osservaSpese(gruppoId: gruppoId, ioPartecipanteId: ioId);
+      final SpeseDao dao = DatabaseScope.of(context).speseDao;
+      _spese = dao.osservaSpese(gruppoId: gruppoId, ioPartecipanteId: ioId);
+      // I totali li fa il database: con piu' valute vanno sommate le quote
+      // convertite, non gli importi scritti (voce 043).
+      _totali = dao.osservaTotali(gruppoId: gruppoId, ioPartecipanteId: ioId);
     }
     return _spese!;
   }
 
   Future<void> _modifica(
     List<Partecipante> partecipanti,
+    List<String> valute,
     SpesaCompleta completa,
   ) async {
     final SpeseDao dao = DatabaseScope.of(context).speseDao;
@@ -99,6 +106,7 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
     final DatiSpesa? dati = await mostraModuloSpesa(
       context,
       partecipanti: partecipanti,
+      valute: valute,
       spesa: completa.spesa,
       quoteIniziali: <int, int>{
         for (final Quota q in quote) q.partecipanteId: q.centesimi,
@@ -114,6 +122,7 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
         id: completa.spesa.id,
         descrizione: dati.descrizione,
         centesimi: dati.centesimi,
+        valuta: dati.valuta,
         data: dati.data,
         pagataDa: dati.pagataDa,
         quotePerPartecipante: dati.quote,
@@ -167,23 +176,14 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
             return VistaDati<List<SpesaCompleta>>(
               stream: _streamSpese(gruppo.id, io.id),
               builder: (BuildContext context, List<SpesaCompleta> spese) {
-                // I totali si fanno qui invece che con due query: l'elenco e'
-                // gia' in mano, e sono due somme.
-                final TotaliGruppo totali = TotaliGruppo(
-                  totale: spese.fold<int>(
-                    0,
-                    (int a, SpesaCompleta s) => a + s.spesa.centesimi,
-                  ),
-                  tuo: spese.fold<int>(
-                    0,
-                    (int a, SpesaCompleta s) => a + s.miaQuota,
-                  ),
-                );
-
                 return ListView(
                   padding: const EdgeInsets.only(bottom: 96),
                   children: <Widget>[
-                    TotaliViaggio(totali: totali, gruppo: gruppo),
+                    VistaDati<TotaliGruppo>(
+                      stream: _totali,
+                      builder: (BuildContext context, TotaliGruppo totali) =>
+                          TotaliViaggio(totali: totali, gruppo: gruppo),
+                    ),
                     _IntestazioneGruppo(
                       gruppo: gruppo,
                       partecipanti: partecipanti,
@@ -192,18 +192,50 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
                       const _NessunaSpesa()
                     else
                       for (final SpesaCompleta s in spese)
-                        RigaSpesa(
+                        _SpesaModificabile(
                           spesa: s,
-                          onTap: () => _modifica(partecipanti, s),
-                          onAzione: (AzioneSpesa azione) => switch (azione) {
-                            AzioneSpesa.modifica => _modifica(partecipanti, s),
-                            AzioneSpesa.elimina => _elimina(s),
-                          },
+                          valute: _valute,
+                          onModifica: (List<String> valute) =>
+                              _modifica(partecipanti, valute, s),
+                          onElimina: () => _elimina(s),
                         ),
                   ],
                 );
               },
             );
+          },
+        );
+      },
+    );
+  }
+}
+
+/// Una riga di spesa che si porta dietro le valute del viaggio, per poterla
+/// riaprire in modifica.
+class _SpesaModificabile extends StatelessWidget {
+  const _SpesaModificabile({
+    required this.spesa,
+    required this.valute,
+    required this.onModifica,
+    required this.onElimina,
+  });
+
+  final SpesaCompleta spesa;
+  final Stream<List<String>>? valute;
+  final ValueChanged<List<String>> onModifica;
+  final VoidCallback onElimina;
+
+  @override
+  Widget build(BuildContext context) {
+    return VistaDati<List<String>>(
+      stream: valute,
+      builder: (BuildContext context, List<String> elenco) {
+        return RigaSpesa(
+          spesa: spesa,
+          onTap: () => onModifica(elenco),
+          onAzione: (AzioneSpesa azione) => switch (azione) {
+            AzioneSpesa.modifica => onModifica(elenco),
+            AzioneSpesa.elimina => onElimina(),
           },
         );
       },

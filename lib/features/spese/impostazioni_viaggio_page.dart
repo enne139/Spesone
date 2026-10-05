@@ -7,7 +7,9 @@ import 'package:spesone/core/formato_data.dart';
 import 'package:spesone/core/widgets/dialoghi.dart';
 import 'package:spesone/core/widgets/vista_dati.dart';
 import 'package:spesone/features/spese/data/gruppi_dao.dart';
+import 'package:spesone/core/denaro.dart';
 import 'package:spesone/features/spese/model/riepilogo_gruppo.dart';
+import 'package:spesone/features/spese/widgets/modulo_cambio.dart';
 
 /// Le azioni disponibili su un partecipante.
 enum _AzionePartecipante { rinomina, togli }
@@ -29,6 +31,7 @@ class ImpostazioniViaggioPage extends StatefulWidget {
 class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
   GruppiDao? _dao;
   Stream<List<Partecipante>>? _partecipanti;
+  Stream<List<Cambio>>? _cambi;
   Stream<List<RiepilogoGruppo>>? _attivi;
 
   @override
@@ -40,6 +43,7 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
     }
     _dao = dao;
     _partecipanti = dao.osservaPartecipanti(widget.gruppoId);
+    _cambi = dao.osservaCambi(widget.gruppoId);
     // Il nome del gruppo si legge dall'elenco, che e' gia' osservato: una
     // query in meno da tenere viva.
     _attivi = dao.osservaGruppiAttivi();
@@ -60,6 +64,59 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
       context,
       () => _dao!.rinominaGruppo(id: gruppo.id, nome: nome),
     );
+  }
+
+  Future<void> _nuovoCambio(Gruppo gruppo) async {
+    final DatiCambio? dati = await mostraModuloCambio(
+      context,
+      valutaPrincipale: gruppo.valutaPrincipale,
+    );
+    if (dati == null || !mounted) {
+      return;
+    }
+    await eseguiSegnalandoErrori(
+      context,
+      () => _dao!.impostaCambio(
+        gruppoId: gruppo.id,
+        codice: dati.codice,
+        tassoMilionesimi: dati.tassoMilionesimi,
+      ),
+    );
+  }
+
+  Future<void> _correggiCambio(Gruppo gruppo, Cambio cambio) async {
+    final DatiCambio? dati = await mostraModuloCambio(
+      context,
+      valutaPrincipale: gruppo.valutaPrincipale,
+      cambio: cambio,
+    );
+    if (dati == null || !mounted) {
+      return;
+    }
+    await eseguiSegnalandoErrori(
+      context,
+      () => _dao!.impostaCambio(
+        gruppoId: gruppo.id,
+        codice: dati.codice,
+        tassoMilionesimi: dati.tassoMilionesimi,
+      ),
+    );
+  }
+
+  Future<void> _eliminaCambio(Cambio cambio) async {
+    final bool conferma = await chiediConferma(
+      context,
+      titolo: 'Togliere ${cambio.codice}?',
+      messaggio:
+          'Le spese gia\' registrate in ${cambio.codice} restano, ma da qui '
+          'in avanti contano uno a uno.',
+      azione: 'Togli',
+      distruttiva: true,
+    );
+    if (!conferma || !mounted) {
+      return;
+    }
+    await eseguiSegnalandoErrori(context, () => _dao!.eliminaCambio(cambio.id));
   }
 
   Future<void> _aggiungi() async {
@@ -173,13 +230,57 @@ class _ImpostazioniViaggioPageState extends State<ImpostazioniViaggioPage> {
                   onPressed: () => _rinominaGruppo(gruppo),
                 ),
               ),
+              const Divider(),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: Text('Valute', style: theme.textTheme.titleMedium),
+              ),
               ListTile(
                 leading: const Icon(Icons.euro),
-                title: const Text('Valuta principale'),
-                subtitle: Text(gruppo.valutaPrincipale),
-                // Le altre valute e i loro tassi arrivano con la tappa delle
-                // valute: qui comparira' il loro elenco.
-                enabled: false,
+                title: Text(gruppo.valutaPrincipale),
+                subtitle: const Text(
+                  'valuta principale: totale e saldi sono in questa',
+                ),
+              ),
+              VistaDati<List<Cambio>>(
+                stream: _cambi,
+                builder: (BuildContext context, List<Cambio> elenco) {
+                  return Column(
+                    children: <Widget>[
+                      for (final Cambio c in elenco)
+                        ListTile(
+                          leading: const Icon(Icons.currency_exchange),
+                          title: Text(c.codice),
+                          subtitle: Text(
+                            '1 ${c.codice} = ${formattaTasso(c.tassoMilionesimi)} '
+                            '${gruppo.valutaPrincipale}',
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              IconButton(
+                                icon: const Icon(
+                                  Icons.drive_file_rename_outline,
+                                ),
+                                tooltip: 'Correggi il cambio',
+                                onPressed: () => _correggiCambio(gruppo, c),
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.delete_outline),
+                                tooltip: 'Togli',
+                                onPressed: () => _eliminaCambio(c),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ListTile(
+                        leading: const Icon(Icons.add),
+                        title: const Text('Aggiungi valuta'),
+                        onTap: () => _nuovoCambio(gruppo),
+                      ),
+                    ],
+                  );
+                },
               ),
               const Divider(),
               Padding(

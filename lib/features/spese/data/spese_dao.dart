@@ -2,6 +2,8 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:spesone/core/database/app_database.dart';
+import 'package:spesone/core/denaro.dart';
+import 'package:spesone/features/spese/data/cambi_tables.dart';
 import 'package:spesone/features/spese/data/categorie_tables.dart';
 import 'package:spesone/features/spese/data/gruppi_tables.dart';
 import 'package:spesone/features/spese/data/spese_tables.dart';
@@ -10,7 +12,7 @@ import 'package:spesone/features/spese/model/spesa_completa.dart';
 part 'spese_dao.g.dart';
 
 /// Letture e scritture delle spese di un gruppo.
-@DriftAccessor(tables: [Spese, Quote, Partecipanti, Categorie])
+@DriftAccessor(tables: [Spese, Quote, Partecipanti, Categorie, Cambi])
 class SpeseDao extends DatabaseAccessor<AppDatabase> with _$SpeseDaoMixin {
   SpeseDao(super.attachedDatabase);
 
@@ -39,6 +41,13 @@ class SpeseDao extends DatabaseAccessor<AppDatabase> with _$SpeseDaoMixin {
               quote.spesaId.equalsExp(spese.id) &
                   quote.partecipanteId.equals(ioPartecipanteId),
             ),
+            // Il cambio del viaggio per la valuta di quella spesa. Se manca,
+            // vale uno a uno.
+            leftOuterJoin(
+              cambi,
+              cambi.gruppoId.equalsExp(spese.gruppoId) &
+                  cambi.codice.equalsExp(spese.valuta),
+            ),
           ])
           ..where(spese.gruppoId.equals(gruppoId))
           ..orderBy(<OrderingTerm>[
@@ -55,11 +64,55 @@ class SpeseDao extends DatabaseAccessor<AppDatabase> with _$SpeseDaoMixin {
               pagataDa: r.readTable(partecipanti),
               categoria: r.readTableOrNull(categorie),
               miaQuota: r.readTableOrNull(quote)?.centesimi ?? 0,
+              tassoMilionesimi:
+                  r.readTableOrNull(cambi)?.tassoMilionesimi ?? tassoUnitario,
             ),
           )
           .toList(),
     );
   }
+
+  /// I due numeri in cima alla panoramica, nella valuta principale.
+  ///
+  /// Si sommano le **quote convertite**, non i totali convertiti: cosi' il
+  /// totale del viaggio e la somma dei saldi restano esatti al centesimo anche
+  /// con piu' valute in ballo (DECISIONI.md, voce 043).
+  Stream<TotaliGruppo> osservaTotali({
+    required int gruppoId,
+    required int ioPartecipanteId,
+  }) {
+    return customSelect(
+      '''
+      SELECT
+        COALESCE(SUM($_convertita), 0) AS totale,
+        COALESCE(SUM(CASE WHEN q.partecipante_id = ?
+                          THEN $_convertita ELSE 0 END), 0) AS tuo
+      FROM quote q
+      JOIN spese s ON s.id = q.spesa_id
+      LEFT JOIN cambi c
+        ON c.gruppo_id = s.gruppo_id AND c.codice = s.valuta
+      WHERE s.gruppo_id = ?
+      ''',
+      variables: <Variable<Object>>[
+        Variable<int>(ioPartecipanteId),
+        Variable<int>(gruppoId),
+      ],
+      readsFrom: <ResultSetImplementation<Object, Object>>{quote, spese, cambi},
+    ).watch().map(
+      (List<QueryRow> righe) => TotaliGruppo(
+        totale: righe.first.read<int>('totale'),
+        tuo: righe.first.read<int>('tuo'),
+      ),
+    );
+  }
+
+  /// La quota convertita nella valuta principale, in SQL.
+  ///
+  /// Senza cambio vale uno a uno. L'arrotondamento e' sulla singola quota: e'
+  /// quello che tiene la somma dei saldi a zero.
+  static const String _convertita =
+      'CAST(ROUND(q.centesimi * COALESCE(c.tasso_milionesimi, 1000000) '
+      '/ 1000000.0) AS INTEGER)';
 
   /// Le quote di una spesa, per riaprirla in modifica.
   Future<List<Quota>> quoteDi(int spesaId) {
@@ -116,6 +169,7 @@ class SpeseDao extends DatabaseAccessor<AppDatabase> with _$SpeseDaoMixin {
     required DateTime data,
     required int pagataDa,
     required Map<int, int> quotePerPartecipante,
+    String? valuta,
     int? categoriaId,
   }) async {
     _verificaQuote(centesimi, quotePerPartecipante);
@@ -125,6 +179,9 @@ class SpeseDao extends DatabaseAccessor<AppDatabase> with _$SpeseDaoMixin {
         SpeseCompanion(
           descrizione: Value<String>(descrizione.trim()),
           centesimi: Value<int>(centesimi),
+          valuta: valuta == null
+              ? const Value<String>.absent()
+              : Value<String>(valuta),
           data: Value<DateTime>(data),
           pagataDa: Value<int>(pagataDa),
           categoriaId: Value<int?>(categoriaId),

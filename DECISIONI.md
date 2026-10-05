@@ -1009,3 +1009,69 @@ che e' il genere di eccezione che prima o poi qualcuno dimentica in una query.
 **Conseguenza:** l'invariante vale per tutte le spese: **la somma delle quote
 e' il totale**, sempre. Il DAO la verifica prima di scrivere e rifiuta il
 resto, perche' e' l'ultimo punto in cui si puo' fermare un conto sbagliato.
+
+---
+
+## 042 — I rimborsi proposti sono i meno possibili
+
+**Data:** 2026-10-05
+
+**Contesto:** da dei saldi si possono ricavare molti insiemi di pagamenti che
+chiudono i conti. Il README chiede il "calcolo dei debiti intelligente".
+
+**Decisione:** si guarda solo il **saldo netto** di ciascuno e si accoppia di
+volta in volta chi deve di piu' con chi deve ricevere di piu'. Ne escono al
+massimo (partecipanti - 1) passaggi di denaro.
+
+**Motivazione:** far restituire a ciascuno quello che deve a ciascun altro
+richiederebbe fino a un pagamento per ogni coppia — in cinque, dieci bonifici
+invece di quattro — senza che nessuno ci guadagni niente. Le prove verificano
+non solo quanti sono, ma che eseguirli porti davvero tutti in pari: e' la
+proprieta' che conta.
+
+---
+
+## 043 — Si convertono le quote, non i totali
+
+**Data:** 2026-10-05
+
+**Contesto:** con piu' valute, totali e saldi vanno espressi nella valuta
+principale del gruppo. Convertire sembrava un dettaglio di presentazione.
+
+**Decisione:** la conversione si applica alla **singola quota**, e il totale
+convertito di una spesa e' la somma delle sue quote convertite.
+
+**Motivazione:** convertendo il totale della spesa da una parte e le quote
+dall'altra, i due risultati differiscono di qualche centesimo per
+arrotondamento, e quella differenza finisce dritta nei saldi: la loro somma
+non farebbe piu' zero, e comparirebbe un debito che non esiste. Convertendo
+solo le quote, "quanto ha anticipato" e "quanto gli tocca" sono fatti degli
+stessi numeri arrotondati allo stesso modo, e l'invariante regge. Le prove lo
+verificano con un tasso scelto apposta perche' non dia centesimi tondi.
+
+**Conseguenza:** nell'elenco, accanto all'importo pagato compare la
+conversione con il tilde (`≈ 55,20 €`): e' un valore calcolato, non quello che
+e' stato pagato, e si vede che lo e'.
+
+---
+
+## 044 — Niente `asyncMap` con una lettura dentro
+
+**Data:** 2026-10-05
+
+**Contesto:** tre volte di seguito una schermata e' rimasta a girare per
+sempre, e tutte e tre per la stessa ragione: uno stream che dentro
+`asyncMap` aspettava il primo valore di un altro stream.
+
+**Decisione:** se servono dati da piu' tabelle in una lettura sola, si scrive
+una query sola — con una join, una sottoquery o `customSelect`. Mai uno
+stream che ne aspetta un altro.
+
+**Motivazione:** uno stream di drift emette quando il database notifica un
+cambiamento. Aspettarne il primo valore dentro un altro stream significa
+aspettare una notifica che, se nessuno scrive, non arriva: non e' un errore,
+e' un'attesa infinita — la stessa famiglia delle voci 014 e 025.
+
+**Regola che ne deriva, e un presidio:** `VistaDati` ora si ferma con
+un'asserzione se riceve uno stream nullo. Anche quello mostrava la rotella per
+sempre, ed e' successo per una riga dimenticata.

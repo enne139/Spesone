@@ -98,7 +98,7 @@ void main() {
 
       // La versione registrata nel file e' quella nuova: alla prossima apertura
       // la migrazione non viene rifatta.
-      expect(grezzo.userVersion, 7);
+      expect(grezzo.userVersion, db.schemaVersion);
     },
   );
 
@@ -145,7 +145,7 @@ void main() {
       // Ogni gruppo nasce con il suo "io" (voce 039).
       expect(dentro.single.sonoIo, isTrue);
 
-      expect(grezzo.userVersion, 7);
+      expect(grezzo.userVersion, db.schemaVersion);
     },
   );
 }

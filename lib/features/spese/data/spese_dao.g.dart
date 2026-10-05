@@ -9,6 +9,7 @@ mixin _$SpeseDaoMixin on DatabaseAccessor<AppDatabase> {
   $CategorieTable get categorie => attachedDatabase.categorie;
   $SpeseTable get spese => attachedDatabase.spese;
   $QuoteTable get quote => attachedDatabase.quote;
+  $CambiTable get cambi => attachedDatabase.cambi;
   SpeseDaoManager get managers => SpeseDaoManager(this);
 }
 
@@ -25,4 +26,6 @@ class SpeseDaoManager {
       $$SpeseTableTableManager(_db.attachedDatabase, _db.spese);
   $$QuoteTableTableManager get quote =>
       $$QuoteTableTableManager(_db.attachedDatabase, _db.quote);
+  $$CambiTableTableManager get cambi =>
+      $$CambiTableTableManager(_db.attachedDatabase, _db.cambi);
 }

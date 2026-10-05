@@ -1,4 +1,5 @@
 import 'package:spesone/core/database/app_database.dart';
+import 'package:spesone/core/denaro.dart';
 
 /// Una spesa con tutto quello che serve per mostrarla in un elenco.
 ///
@@ -10,6 +11,7 @@ class SpesaCompleta {
     required this.pagataDa,
     required this.miaQuota,
     this.categoria,
+    this.tassoMilionesimi = tassoUnitario,
   });
 
   final Spesa spesa;
@@ -22,6 +24,23 @@ class SpesaCompleta {
 
   /// Categoria, se ne ha una.
   final Categoria? categoria;
+
+  /// Il cambio del viaggio per la valuta di questa spesa, in milionesimi.
+  ///
+  /// Vale [tassoUnitario] se la spesa e' gia' nella valuta principale o se
+  /// per quella valuta non e' stato fissato un cambio.
+  final int tassoMilionesimi;
+
+  /// Vero se la spesa e' in una valuta diversa da quella dei conti.
+  bool get daConvertire => tassoMilionesimi != tassoUnitario;
+
+  /// Il totale della spesa nella valuta principale, per mostrarlo accanto
+  /// all'originale.
+  int get centesimiConvertiti =>
+      convertiCentesimi(spesa.centesimi, tassoMilionesimi);
+
+  /// La tua quota nella valuta principale.
+  int get miaQuotaConvertita => convertiCentesimi(miaQuota, tassoMilionesimi);
 
   /// Vero se l'hai anticipata tu.
   bool get hoPagatoIo => pagataDa.sonoIo;

@@ -2,13 +2,14 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:spesone/core/database/app_database.dart';
+import 'package:spesone/features/spese/data/cambi_tables.dart';
 import 'package:spesone/features/spese/data/gruppi_tables.dart';
 import 'package:spesone/features/spese/model/riepilogo_gruppo.dart';
 
 part 'gruppi_dao.g.dart';
 
 /// Letture e scritture di gruppi e partecipanti.
-@DriftAccessor(tables: [Gruppi, Partecipanti])
+@DriftAccessor(tables: [Gruppi, Partecipanti, Cambi])
 class GruppiDao extends DatabaseAccessor<AppDatabase> with _$GruppiDaoMixin {
   GruppiDao(super.attachedDatabase);
 
@@ -81,6 +82,42 @@ class GruppiDao extends DatabaseAccessor<AppDatabase> with _$GruppiDaoMixin {
             ),
           )
           .toList(),
+    );
+  }
+
+  /// I cambi fissati per questo viaggio, in ordine di codice.
+  Stream<List<Cambio>> osservaCambi(int gruppoId) {
+    return (select(cambi)
+          ..where((Cambi t) => t.gruppoId.equals(gruppoId))
+          ..orderBy(<OrderingTerm Function(Cambi)>[
+            (Cambi t) => OrderingTerm.asc(t.codice),
+          ]))
+        .watch();
+  }
+
+  /// Le valute utilizzabili in un gruppo: la principale per prima, poi
+  /// quelle con un cambio, in ordine.
+  ///
+  /// E' una query sola e non uno stream che ne aspetta un altro: `asyncMap`
+  /// con dentro una lettura aspetta un valore che, finche' nessuno scrive,
+  /// non arriva mai, e la schermata resta a girare (DECISIONI.md, voce 044).
+  Stream<List<String>> osservaValute(int gruppoId) {
+    return customSelect(
+      '''
+      SELECT g.valuta_principale AS codice, 0 AS ordine
+        FROM gruppi g WHERE g.id = ?
+      UNION ALL
+      SELECT c.codice, 1 FROM cambi c WHERE c.gruppo_id = ?
+      ORDER BY ordine, codice
+      ''',
+      variables: <Variable<Object>>[
+        Variable<int>(gruppoId),
+        Variable<int>(gruppoId),
+      ],
+      readsFrom: <ResultSetImplementation<Object, Object>>{gruppi, cambi},
+    ).watch().map(
+      (List<QueryRow> righe) =>
+          righe.map((QueryRow r) => r.read<String>('codice')).toList(),
     );
   }
 
@@ -158,6 +195,58 @@ class GruppiDao extends DatabaseAccessor<AppDatabase> with _$GruppiDaoMixin {
       await (delete(gruppi)..where((Gruppi t) => t.id.equals(id))).go();
       await _garantisciCorrente();
     });
+  }
+
+  /// Fissa o corregge il cambio di una valuta per questo viaggio.
+  ///
+  /// Correggerlo ricalcola **tutto il viaggio**, spese gia' registrate
+  /// comprese: e' il prezzo di avere un cambio solo per viaggio invece di uno
+  /// per spesa (DECISIONI.md, voce 032), e l'interfaccia lo dice prima di
+  /// salvare.
+  Future<void> impostaCambio({
+    required int gruppoId,
+    required String codice,
+    required int tassoMilionesimi,
+  }) async {
+    if (tassoMilionesimi <= 0) {
+      throw Exception('Il cambio deve essere un numero maggiore di zero.');
+    }
+    final Gruppo gruppo = await (select(
+      gruppi,
+    )..where((Gruppi t) => t.id.equals(gruppoId))).getSingle();
+    final String pulito = codice.trim().toUpperCase();
+    if (pulito == gruppo.valutaPrincipale) {
+      throw Exception(
+        'La valuta principale non ha bisogno di un cambio: vale uno a uno.',
+      );
+    }
+
+    // Il conflitto da gestire e' sulla coppia gruppo+valuta, non sulla chiave
+    // tecnica: senza indicarlo, correggere un cambio esistente fallirebbe.
+    await into(cambi).insert(
+      CambiCompanion.insert(
+        gruppoId: gruppoId,
+        codice: pulito,
+        tassoMilionesimi: tassoMilionesimi,
+        aggiornatoIl: Value<DateTime>(DateTime.now()),
+      ),
+      onConflict: DoUpdate<$CambiTable, Cambio>(
+        (Cambi vecchio) => CambiCompanion(
+          tassoMilionesimi: Value<int>(tassoMilionesimi),
+          aggiornatoIl: Value<DateTime>(DateTime.now()),
+        ),
+        target: <Column<Object>>[cambi.gruppoId, cambi.codice],
+      ),
+    );
+  }
+
+  /// Toglie una valuta dal viaggio.
+  ///
+  /// Le spese gia' registrate in quella valuta restano come sono e tornano a
+  /// contare uno a uno: cancellarle sarebbe peggio, e il conto sbagliato si
+  /// vede subito.
+  Future<void> eliminaCambio(int id) {
+    return (delete(cambi)..where((Cambi t) => t.id.equals(id))).go();
   }
 
   Future<void> aggiungiPartecipante({

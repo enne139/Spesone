@@ -7,11 +7,60 @@
 /// conversioni ammesse fra centesimi e testo.
 library;
 
+/// Un tasso "uno a uno", in milionesimi.
+///
+/// E' il valore che si usa quando una valuta non ha un cambio: la valuta
+/// principale di un gruppo, o una spesa scritta prima che il cambio esistesse.
+const int tassoUnitario = 1000000;
+
+/// Converte un importo nella valuta principale, dato il tasso in milionesimi.
+///
+/// L'arrotondamento al centesimo avviene **qui e una volta sola**: convertire
+/// un numero gia' convertito sposterebbe i conti di qualche centesimo a ogni
+/// passaggio.
+int convertiCentesimi(int centesimi, int tassoMilionesimi) {
+  return (centesimi * tassoMilionesimi / tassoUnitario).round();
+}
+
+/// Scrive un importo con la sua valuta: `12,50 €`, `12,50 USD`.
+///
+/// Solo l'euro ha il simbolo: inventare simboli per le altre valute porta
+/// piu' confusione di quanta ne tolga, e il codice ISO non si puo' fraintendere.
+String formattaImporto(int centesimi, String valuta, {bool conSegno = false}) {
+  final String numero = _scriviNumero(centesimi, conSegno: conSegno);
+  return valuta == 'EUR' ? '$numero €' : '$numero $valuta';
+}
+
+/// Scrive un tasso di cambio come lo si legge: `0,92`.
+String formattaTasso(int tassoMilionesimi) {
+  final String testo = (tassoMilionesimi / tassoUnitario).toStringAsFixed(4);
+  // Via gli zeri finali: 0,9200 si legge peggio di 0,92.
+  final String pulito = testo
+      .replaceFirst(RegExp(r'0+$'), '')
+      .replaceFirst(RegExp(r'\.$'), '');
+  return pulito.replaceAll('.', ',');
+}
+
+/// Legge un tasso scritto a mano e lo trasforma in milionesimi.
+int? tassoDaTesto(String testo) {
+  final String pulito = testo.trim().replaceAll(',', '.').replaceAll(' ', '');
+  final double? valore = double.tryParse(pulito);
+  if (valore == null || valore <= 0 || valore.isInfinite || valore.isNaN) {
+    return null;
+  }
+  return (valore * tassoUnitario).round();
+}
+
 /// Scrive un importo come lo si scrive in italiano: `1.234,56 €`.
 ///
 /// Con [conSegno] antepone `+` agli importi positivi, per distinguere a colpo
 /// d'occhio un credito da un debito.
 String formattaEuro(int centesimi, {bool conSegno = false}) {
+  return formattaImporto(centesimi, 'EUR', conSegno: conSegno);
+}
+
+/// Il numero senza valuta, nel formato italiano.
+String _scriviNumero(int centesimi, {required bool conSegno}) {
   final bool negativo = centesimi < 0;
   final int assoluto = centesimi.abs();
 
@@ -20,7 +69,7 @@ String formattaEuro(int centesimi, {bool conSegno = false}) {
 
   final String segno = negativo ? '-' : (conSegno && centesimi > 0 ? '+' : '');
 
-  return '$segno$interi,$decimali €';
+  return '$segno$interi,$decimali';
 }
 
 /// Legge un importo scritto a mano e lo trasforma in centesimi.

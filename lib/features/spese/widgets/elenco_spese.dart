@@ -55,12 +55,22 @@ class RigaSpesa extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Text(
-                formattaEuro(spesa.spesa.centesimi),
+                formattaImporto(spesa.spesa.centesimi, spesa.spesa.valuta),
                 style: theme.textTheme.titleMedium,
               ),
+              // Con una valuta diversa da quella dei conti si mostra anche la
+              // conversione, con il tilde: e' un valore calcolato, non quello
+              // che e' stato pagato.
+              if (spesa.daConvertire)
+                Text(
+                  '≈ ${formattaEuro(spesa.centesimiConvertiti)}',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
               if (condivisa && spesa.miaQuota != spesa.spesa.centesimi)
                 Text(
-                  'tu ${formattaEuro(spesa.miaQuota)}',
+                  'tu ${formattaImporto(spesa.miaQuota, spesa.spesa.valuta)}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
@@ -118,6 +128,7 @@ class TotaliViaggio extends StatelessWidget {
               child: _Numero(
                 etichetta: 'Totale del viaggio',
                 centesimi: totali.totale,
+                valuta: gruppo.valutaPrincipale,
                 forte: false,
               ),
             ),
@@ -130,6 +141,7 @@ class TotaliViaggio extends StatelessWidget {
               child: _Numero(
                 etichetta: 'Hai speso tu',
                 centesimi: totali.tuo,
+                valuta: gruppo.valutaPrincipale,
                 forte: true,
               ),
             ),
@@ -144,11 +156,15 @@ class _Numero extends StatelessWidget {
   const _Numero({
     required this.etichetta,
     required this.centesimi,
+    required this.valuta,
     required this.forte,
   });
 
   final String etichetta;
   final int centesimi;
+
+  /// Valuta principale del gruppo: i totali sono sempre in quella.
+  final String valuta;
 
   /// Il numero che conta davvero per chi guarda.
   final bool forte;
@@ -168,7 +184,7 @@ class _Numero extends StatelessWidget {
         ),
         const SizedBox(height: 4),
         Text(
-          formattaEuro(centesimi),
+          formattaImporto(centesimi, valuta),
           style: theme.textTheme.titleLarge?.copyWith(
             color: forte
                 ? theme.colorScheme.primary

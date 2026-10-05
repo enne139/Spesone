@@ -16,6 +16,7 @@ class DatiSpesa {
     required this.tipo,
     required this.descrizione,
     required this.centesimi,
+    required this.valuta,
     required this.data,
     required this.pagataDa,
     required this.quote,
@@ -25,6 +26,10 @@ class DatiSpesa {
   final TipoSpesa tipo;
   final String descrizione;
   final int centesimi;
+
+  /// Valuta in cui si e' pagato.
+  final String valuta;
+
   final DateTime data;
 
   /// Partecipante che ha anticipato i soldi.
@@ -42,6 +47,7 @@ class DatiSpesa {
 Future<DatiSpesa?> mostraModuloSpesa(
   BuildContext context, {
   required List<Partecipante> partecipanti,
+  required List<String> valute,
   Spesa? spesa,
   Map<int, int>? quoteIniziali,
 }) {
@@ -51,6 +57,7 @@ Future<DatiSpesa?> mostraModuloSpesa(
     showDragHandle: true,
     builder: (BuildContext context) => _ModuloSpesa(
       partecipanti: partecipanti,
+      valute: valute,
       spesa: spesa,
       quoteIniziali: quoteIniziali,
     ),
@@ -60,11 +67,15 @@ Future<DatiSpesa?> mostraModuloSpesa(
 class _ModuloSpesa extends StatefulWidget {
   const _ModuloSpesa({
     required this.partecipanti,
+    required this.valute,
     this.spesa,
     this.quoteIniziali,
   });
 
   final List<Partecipante> partecipanti;
+
+  /// Le valute del viaggio: la principale piu' quelle con un cambio.
+  final List<String> valute;
   final Spesa? spesa;
   final Map<int, int>? quoteIniziali;
 
@@ -87,6 +98,7 @@ class _ModuloSpesaState extends State<_ModuloSpesa> {
   late TipoSpesa _tipo = widget.spesa?.tipo ?? TipoSpesa.normale;
   late DateTime _data = widget.spesa?.data ?? DateTime.now();
   late int? _categoriaId = widget.spesa?.categoriaId;
+  late String _valuta = widget.spesa?.valuta ?? widget.valute.first;
   late int _pagataDa = widget.spesa?.pagataDa ?? _io.id;
 
   /// Le quote in corso di compilazione.
@@ -243,6 +255,7 @@ class _ModuloSpesaState extends State<_ModuloSpesa> {
         tipo: _tipo,
         descrizione: _descrizione.text,
         centesimi: centesimi,
+        valuta: _valuta,
         data: _data,
         pagataDa: _pagataDa,
         quote: _divisione.quote,
@@ -305,18 +318,45 @@ class _ModuloSpesaState extends State<_ModuloSpesa> {
             ),
             const SizedBox(height: 12),
 
-            TextField(
-              controller: _importo,
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              decoration: InputDecoration(
-                labelText: 'Quanto',
-                hintText: 'es. 12,50',
-                prefixIcon: const Icon(Icons.euro),
-                errorText: _erroreImporto,
-              ),
-              onChanged: _importoCambiato,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _importo,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    decoration: InputDecoration(
+                      labelText: 'Quanto',
+                      hintText: 'es. 12,50',
+                      prefixIcon: const Icon(Icons.euro),
+                      errorText: _erroreImporto,
+                    ),
+                    onChanged: _importoCambiato,
+                  ),
+                ),
+                // La scelta della valuta compare solo se il viaggio ne ha piu'
+                // di una: in euro e basta sarebbe un campo da saltare ogni
+                // volta.
+                if (widget.valute.length > 1) ...<Widget>[
+                  const SizedBox(width: 12),
+                  SizedBox(
+                    width: 110,
+                    child: DropdownButtonFormField<String>(
+                      key: ValueKey<String>(_valuta),
+                      initialValue: _valuta,
+                      decoration: const InputDecoration(labelText: 'Valuta'),
+                      items: <DropdownMenuItem<String>>[
+                        for (final String v in widget.valute)
+                          DropdownMenuItem<String>(value: v, child: Text(v)),
+                      ],
+                      onChanged: (String? v) =>
+                          setState(() => _valuta = v ?? _valuta),
+                    ),
+                  ),
+                ],
+              ],
             ),
             const SizedBox(height: 12),
 

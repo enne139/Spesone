@@ -54,4 +54,34 @@ void main() {
       expect(centesimiDaTesto('0,004'), 0);
     });
   });
+
+  group('valute', () {
+    test('scrive il simbolo solo per l euro', () {
+      expect(formattaImporto(1250, 'EUR'), '12,50 €');
+      expect(formattaImporto(1250, 'USD'), '12,50 USD');
+      expect(formattaImporto(-1250, 'USD', conSegno: true), '-12,50 USD');
+    });
+
+    test('converte con il tasso in milionesimi', () {
+      // 1 USD = 0,92 euro: 50 dollari fanno 46 euro.
+      expect(convertiCentesimi(5000, 920000), 4600);
+      // Il tasso unitario non cambia niente.
+      expect(convertiCentesimi(1234, tassoUnitario), 1234);
+      // L'arrotondamento e' al centesimo.
+      expect(convertiCentesimi(333, 920000), 306);
+    });
+
+    test('legge e riscrive un tasso', () {
+      expect(tassoDaTesto('0,92'), 920000);
+      expect(tassoDaTesto('1'), tassoUnitario);
+      expect(tassoDaTesto('1.0875'), 1087500);
+      expect(tassoDaTesto('0'), isNull);
+      expect(tassoDaTesto('-1'), isNull);
+      expect(tassoDaTesto('abc'), isNull);
+
+      expect(formattaTasso(920000), '0,92');
+      expect(formattaTasso(tassoUnitario), '1');
+      expect(formattaTasso(1087500), '1,0875');
+    });
+  });
 }

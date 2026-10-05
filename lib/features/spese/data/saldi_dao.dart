@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 import 'package:spesone/core/database/app_database.dart';
+import 'package:spesone/features/spese/data/cambi_tables.dart';
 import 'package:spesone/features/spese/data/gruppi_tables.dart';
 import 'package:spesone/features/spese/data/rimborsi_tables.dart';
 import 'package:spesone/features/spese/data/spese_tables.dart';
@@ -11,7 +12,7 @@ part 'saldi_dao.g.dart';
 
 /// I conti di un gruppo: chi ha anticipato, a chi tocca cosa, chi ha gia'
 /// rimborsato.
-@DriftAccessor(tables: [Partecipanti, Spese, Quote, Rimborsi])
+@DriftAccessor(tables: [Partecipanti, Spese, Quote, Rimborsi, Cambi])
 class SaldiDao extends DatabaseAccessor<AppDatabase> with _$SaldiDaoMixin {
   SaldiDao(super.attachedDatabase);
 
@@ -28,13 +29,27 @@ class SaldiDao extends DatabaseAccessor<AppDatabase> with _$SaldiDaoMixin {
       '''
       SELECT
         p.*,
-        COALESCE((SELECT SUM(s.centesimi) FROM spese s
+        COALESCE((SELECT SUM($_quotaConvertita)
+                  FROM quote q
+                  JOIN spese s ON s.id = q.spesa_id
+                  LEFT JOIN cambi c
+                    ON c.gruppo_id = s.gruppo_id AND c.codice = s.valuta
                   WHERE s.pagata_da = p.id), 0) AS anticipato,
-        COALESCE((SELECT SUM(q.centesimi) FROM quote q
+        COALESCE((SELECT SUM($_quotaConvertita)
+                  FROM quote q
+                  JOIN spese s ON s.id = q.spesa_id
+                  LEFT JOIN cambi c
+                    ON c.gruppo_id = s.gruppo_id AND c.codice = s.valuta
                   WHERE q.partecipante_id = p.id), 0) AS quote_sue,
-        COALESCE((SELECT SUM(r.centesimi) FROM rimborsi r
+        COALESCE((SELECT SUM($_rimborsoConvertito)
+                  FROM rimborsi r
+                  LEFT JOIN cambi c
+                    ON c.gruppo_id = r.gruppo_id AND c.codice = r.valuta
                   WHERE r.da_partecipante = p.id), 0) AS dati,
-        COALESCE((SELECT SUM(r.centesimi) FROM rimborsi r
+        COALESCE((SELECT SUM($_rimborsoConvertito)
+                  FROM rimborsi r
+                  LEFT JOIN cambi c
+                    ON c.gruppo_id = r.gruppo_id AND c.codice = r.valuta
                   WHERE r.a_partecipante = p.id), 0) AS ricevuti
       FROM partecipanti p
       WHERE p.gruppo_id = ?
@@ -46,6 +61,7 @@ class SaldiDao extends DatabaseAccessor<AppDatabase> with _$SaldiDaoMixin {
         spese,
         quote,
         rimborsi,
+        cambi,
       },
     ).watch().map(
       (List<QueryRow> righe) => righe
@@ -61,6 +77,20 @@ class SaldiDao extends DatabaseAccessor<AppDatabase> with _$SaldiDaoMixin {
           .toList(),
     );
   }
+
+  /// Una quota convertita nella valuta principale, in SQL.
+  ///
+  /// Si convertono le **quote**, non i totali: l'arrotondamento sulla singola
+  /// quota e' cio' che tiene la somma dei saldi esattamente a zero anche con
+  /// piu' valute (DECISIONI.md, voce 043).
+  static const String _quotaConvertita =
+      'CAST(ROUND(q.centesimi * COALESCE(c.tasso_milionesimi, 1000000) '
+      '/ 1000000.0) AS INTEGER)';
+
+  /// Come sopra, per un rimborso.
+  static const String _rimborsoConvertito =
+      'CAST(ROUND(r.centesimi * COALESCE(c.tasso_milionesimi, 1000000) '
+      '/ 1000000.0) AS INTEGER)';
 
   /// I rimborsi gia' registrati, dal piu' recente.
   Stream<List<Rimborso>> osservaRimborsi(int gruppoId) {

@@ -11,12 +11,24 @@ import 'package:spesone/core/widgets/errore_view.dart';
 class VistaDati<T> extends StatelessWidget {
   const VistaDati({required this.stream, required this.builder, super.key});
 
+  /// Lo stream da mostrare.
+  ///
+  /// E' nullo solo finche' `didChangeDependencies` non l'ha creato: quando si
+  /// costruisce dev'esserci. Uno stream dimenticato a `null` mostrerebbe la
+  /// rotella per sempre — e' successo — quindi qui si ferma subito, in modo
+  /// rumoroso (DECISIONI.md, voce 044).
   final Stream<T>? stream;
 
   final Widget Function(BuildContext context, T dati) builder;
 
   @override
   Widget build(BuildContext context) {
+    assert(
+      stream != null,
+      'VistaDati senza stream: la rotella girerebbe per sempre. '
+      'Lo stream va creato in didChangeDependencies.',
+    );
+
     return StreamBuilder<T>(
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<T> snapshot) {
