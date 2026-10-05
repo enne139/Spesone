@@ -1,0 +1,82 @@
+import 'package:drift/native.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:sqlite3/sqlite3.dart';
+
+import 'package:spesone/core/database/app_database.dart';
+import 'package:spesone/features/debiti/model/saldo_persona.dart';
+import 'package:spesone/features/lista_spesa/model/riepilogo_lista.dart';
+
+/// Prova della migrazione del database dalla versione 1 alla 2.
+///
+/// E' la prova piu' importante del livello dati: un errore qui non si vede in
+/// sviluppo, dove il database nasce gia' aggiornato, ma impedisce l'apertura
+/// dell'app a chi l'aveva gia' installata — con dentro le sue liste.
+void main() {
+  /// Le tabelle della versione 1, scritte come le creava drift allora.
+  const String schemaVersione1 = '''
+    CREATE TABLE liste (
+      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      creata_il INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      archiviata_il INTEGER NULL,
+      corrente INTEGER NOT NULL DEFAULT 0 CHECK (corrente IN (0, 1))
+    );
+    CREATE TABLE voci_lista (
+      id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      lista_id INTEGER NOT NULL REFERENCES liste (id) ON DELETE CASCADE,
+      nome TEXT NOT NULL,
+      quantita TEXT NULL,
+      note TEXT NULL,
+      presa INTEGER NOT NULL DEFAULT 0 CHECK (presa IN (0, 1)),
+      aggiunta_il INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+    );
+  ''';
+
+  test('un database della versione 1 si aggiorna senza perdere i dati', () async {
+    // Un database com'era prima dei debiti, con dentro la spesa di qualcuno.
+    final Database grezzo = sqlite3.openInMemory();
+    grezzo.execute(schemaVersione1);
+    grezzo.execute('PRAGMA user_version = 1');
+    grezzo.execute(
+      "INSERT INTO liste (nome, corrente) VALUES ('Spesa settimanale', 1)",
+    );
+    grezzo.execute(
+      "INSERT INTO voci_lista (lista_id, nome, presa) VALUES (1, 'pane', 0)",
+    );
+
+    final AppDatabase db = AppDatabase.conEsecutore(
+      NativeDatabase.opened(grezzo),
+    );
+    addTearDown(db.close);
+
+    // La prima lettura apre il database e fa scattare la migrazione.
+    final List<RiepilogoLista> liste = await db.listeDao
+        .osservaListeAttive()
+        .first;
+
+    expect(liste, hasLength(1));
+    expect(liste.single.lista.nome, 'Spesa settimanale');
+    expect(liste.single.lista.corrente, isTrue);
+    expect(liste.single.voci, 1);
+
+    // Le voci vecchie sono ancora leggibili una per una.
+    final List<VoceLista> voci = await db.listeDao
+        .osservaVoci(liste.single.lista.id)
+        .first;
+    expect(voci.single.nome, 'pane');
+
+    // E le tabelle nuove ci sono e funzionano.
+    final int marco = await db.debitiDao.aggiungiPersona('Marco');
+    await db.debitiDao.aggiungiMovimento(
+      personaId: marco,
+      centesimi: 1500,
+      data: DateTime(2026, 10, 5),
+    );
+    final SaldoPersona saldo = (await db.debitiDao.osservaSaldi().first).single;
+    expect(saldo.centesimi, 1500);
+
+    // La versione registrata nel file e' quella nuova: alla prossima apertura
+    // la migrazione non viene rifatta.
+    expect(grezzo.userVersion, 2);
+  });
+}
