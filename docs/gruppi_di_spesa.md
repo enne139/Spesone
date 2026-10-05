@@ -30,7 +30,8 @@ come la lista della spesa.
 | Campo | |
 | --- | --- |
 | Descrizione | "Cena al ristorante" |
-| Importo | totale pagato |
+| Importo | totale pagato, nella valuta in cui si e' pagato |
+| Valuta | una fra quelle del gruppo |
 | Chi ha pagato | **un** partecipante |
 | Per chi | uno o piu' partecipanti, con la **quota** di ciascuno |
 | Data | |
@@ -43,6 +44,42 @@ quota, il resto si ridistribuisce fra le altre.
 
 Una **spesa personale** e' semplicemente una spesa dove l'unico partecipante
 sei tu: entra nel totale del viaggio, non genera nessun debito.
+
+### Categorie
+
+Le categorie sono un elenco **unico per tutta l'app**, non una cosa per
+gruppo: "Cibo", "Alloggio", "Trasporti", "Svago", "Altro" valgono in Grecia
+come nella casa di via Verdi. Ognuna ha un nome e un colore, quello con cui
+comparira' nel grafico.
+
+Si possono aggiungere, rinominare, ricolorare ed eliminare. Eliminando una
+categoria le spese che la usavano restano **senza categoria**: non si
+cancella niente.
+
+La categoria di una spesa e' facoltativa — chiederla come obbligatoria
+rallenterebbe l'inserimento, che e' la cosa che si fa cento volte.
+
+### Valute
+
+Un gruppo ha una **valuta principale** (di solito l'euro): e' quella in cui
+sono espressi il totale del viaggio, quanto hai speso tu e tutti i saldi.
+
+Nelle **impostazioni del viaggio** si elencano le altre valute usate, ognuna
+con il suo **tasso di cambio fisso**: "in questo viaggio 1 USD = 0,92 €".
+
+Il tasso e' **congelato**: non si aggiorna da solo e non cambia da un giorno
+all'altro: vale per tutto il viaggio. Si scrive a mano e si puo' correggere a
+mano quando serve.
+
+Una spesa si registra **nella valuta in cui si e' pagato**, e l'app la
+converte con il tasso del gruppo. La conversione avviene una volta sola per
+spesa, e le quote convertite sommano sempre al totale convertito: i saldi
+restano esatti al centesimo.
+
+> **Attenzione:** correggere un tasso ricalcola **tutto il viaggio**, anche le
+> spese gia' registrate. E' il prezzo di avere un cambio solo per viaggio
+> invece di uno per spesa, e di solito e' quello che si vuole: si sistema il
+> tasso una volta e i conti tornano tutti.
 
 ### Rimborso
 
@@ -85,7 +122,8 @@ Grecia, partecipanti: io, Marco, Lucia.
 | **Panoramica** | totale del gruppo, quanto hai speso tu, il tuo saldo, ultime voci |
 | **Gruppi di spesa** | elenco dei gruppi, creazione, archiviazione (anche dal menu laterale) |
 | **Saldi** | chi deve dare quanto a chi, con i rimborsi suggeriti |
-| **Categorie** | le categorie con cui classificare una spesa |
+| **Categorie** | le categorie con cui classificare una spesa, con i colori |
+| **Impostazioni del viaggio** | valuta principale, valute usate e loro tassi, partecipanti |
 | **Grafico** | spesa per categoria e nel tempo |
 | **Condivisione** | passare il gruppo a un altro dispositivo (piu' avanti) |
 
@@ -94,7 +132,15 @@ Grecia, partecipanti: io, Marco, Lucia.
 - **Niente collegamento con la sezione Debiti.** I saldi di un gruppo e i
   prestiti segnati a mano sono due conti separati, che non si sommano e non si
   travasano (voce 028).
-- **Solo euro.** Nessuna conversione di valuta (voce 023).
+- **Un tasso per valuta per viaggio**, non uno per spesa: correggerlo
+  ricalcola tutte le spese di quel viaggio.
+- **Nessun tasso preso da internet**: si scrive a mano. Quando ci sara' un
+  backend potra' essere proposto e poi congelato, ma la decisione resta di chi
+  registra.
+- **Tutte le valute hanno due decimali.** Lo yen e il dinaro, che non ne hanno
+  due, non sono gestiti correttamente.
+- **I debiti segnati a mano restano in euro**: le valute sono una cosa dei
+  gruppi (voce 032).
 - **Niente quote in percentuale**: solo parti uguali e importi corretti a mano.
 - **Chi ha pagato e' una persona sola.** Una spesa pagata a meta' da due
   persone si registra come due spese.
@@ -105,8 +151,13 @@ Grecia, partecipanti: io, Marco, Lucia.
 ## Come lo costruiamo
 
 1. Gruppi e partecipanti: creare, scegliere dal menu, archiviare.
-2. Spese con chi ha pagato, per chi e le quote; totale del gruppo e quanto hai
-   speso tu.
-3. Saldi del gruppo e rimborsi.
-4. Categorie.
-5. Grafico.
+2. Categorie: elenco, colori, insieme di partenza.
+3. Spese con chi ha pagato, per chi, quote e categoria; totale del gruppo e
+   quanto hai speso tu.
+4. Valute del viaggio e tassi fissi nelle impostazioni del gruppo.
+5. Saldi del gruppo e rimborsi.
+6. Grafico per categoria e nel tempo.
+
+Le categorie stanno prima delle spese perche' una spesa le usa; le valute
+dopo, perche' il caso "tutto in euro" deve funzionare da solo prima di
+aggiungere la conversione.

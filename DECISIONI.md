@@ -713,3 +713,67 @@ importo). Il rimborso sposta i saldi ma non entra in "quanto ho speso".
 non si travasano nei debiti, il gruppo deve avere al proprio interno il modo
 di chiudersi. Tenere separati i due tipi evita che un rimborso gonfi il totale
 del viaggio, che e' l'errore classico di chi li registra come spese.
+
+---
+
+## 031 — Le categorie sono un elenco unico per tutta l'app
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto. Le spese vanno classificate,
+e il README chiede "categoria spesa e data" e un grafico per categoria.
+
+**Decisione:** un elenco di categorie valido per tutti i gruppi, non uno per
+gruppo. Ogni categoria ha un nome e un **colore**, quello con cui comparira'
+nel grafico. Un insieme di partenza (Cibo, Alloggio, Trasporti, Svago, Altro)
+nasce al primo avvio; si possono aggiungere, rinominare, ricolorare ed
+eliminare. La categoria di una spesa e' **facoltativa**.
+
+**Motivazione:** categorie per gruppo obbligherebbero a ricrearle a ogni
+viaggio e renderebbero impossibile confrontare due viaggi. Il colore sta sulla
+categoria e non sul grafico perche' "Cibo" dev'essere dello stesso colore
+ovunque compaia, altrimenti i grafici non si leggono l'uno con l'altro.
+Facoltativa perche' l'inserimento di una spesa e' il gesto che si ripete cento
+volte: ogni campo obbligatorio in piu' si paga cento volte.
+
+**Conseguenza:** eliminando una categoria le spese che la usavano restano
+senza categoria. Non si cancella una spesa per via della sua etichetta.
+
+---
+
+## 032 — Valute del viaggio, con un tasso fisso per viaggio
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto: si spende in valute diverse,
+e il cambio va congelato nelle impostazioni del viaggio, modificabile a mano.
+Supera il "solo euro" della voce 023.
+
+**Decisione:** ogni gruppo ha una **valuta principale**, in cui sono espressi
+il totale, quanto hai speso tu e i saldi. Nelle impostazioni del gruppo si
+elencano le altre valute usate, ognuna con un **tasso fisso** scritto a mano.
+Una spesa si registra nella valuta in cui si e' pagato e viene convertita con
+quel tasso.
+
+Gli importi restano interi (voce 023); anche i tassi sono interi, in
+milionesimi, per lo stesso motivo.
+
+**Motivazione:** in un viaggio il cambio reale oscilla ogni giorno, ma
+inseguirlo renderebbe i conti irripetibili: lo stesso viaggio darebbe numeri
+diversi a distanza di una settimana, e nessuno saprebbe piu' chi deve cosa.
+Un tasso deciso una volta e scritto nelle impostazioni rende i conti stabili e
+verificabili, e chi vuole essere preciso lo corregge.
+
+**Conseguenza, da dire chiaramente nell'interfaccia:** correggere un tasso
+ricalcola tutto il viaggio, spese gia' registrate comprese. La conversione si
+fa una volta per spesa e le quote convertite sommano sempre al totale
+convertito, cosi' i saldi restano esatti al centesimo e la loro somma resta
+zero.
+
+**Alternativa scartata:** congelare il tasso su ogni singola spesa. Sarebbe
+piu' fedele alla realta' del giorno per giorno, ma trasformerebbe ogni
+correzione in un lavoro a mano spesa per spesa, e il tasso non starebbe piu'
+"nelle impostazioni del viaggio".
+
+**Paletto:** tutte le valute sono trattate con due decimali; yen e dinaro non
+sono gestiti correttamente. I debiti segnati a mano restano in euro.
