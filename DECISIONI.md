@@ -435,3 +435,60 @@ scorciatoia, mai come unico modo di fare una cosa.
 **Regola che ne deriva:** prima di affidare un'azione a un gesto
 (scorrimento, pressione prolungata, trascinamento), ci deve essere un comando
 visibile che fa la stessa cosa.
+
+---
+
+## 019 — Identita' dell'app: nome, pacchetto, icona
+
+**Data:** 2026-10-05
+
+**Contesto:** il progetto nasceva con i segnaposto di Flutter (`spesone`,
+`com.example.spesone`, icona predefinita) e va pubblicato.
+
+**Decisione:** richiesta dell'autore del progetto. Nome **Spesone**,
+identificativo del pacchetto **`spesone.maratuck.com`** su tutte le
+piattaforme, icona a carrello scuro su fondo giallo (`#FFC400`), disegnata in
+SVG in `assets/icona/` e rigenerata con `tool/genera_icone.sh`.
+
+**Motivazione:** il carrello e' lo stesso simbolo che la barra in basso usa
+per la sezione Lista, quindi icona e app parlano la stessa lingua; su Android
+l'icona e' adattiva, cosi' ogni telefono la ritaglia nella forma che usa. Gli
+SVG restano la sorgente: i PNG non si modificano a mano.
+
+**Nota sulla convenzione:** gli identificativi di pacchetto si scrivono di
+solito al contrario, dal dominio al nome (`com.maratuck.spesone`);
+`spesone.maratuck.com` e' valido e funziona, ma e' l'ordine inverso di quello
+abituale. Cambiarlo dopo la prima pubblicazione obbliga chi ha gia' installato
+l'app a disinstallarla e reinstallarla, perche' per Android sarebbe un'altra
+app: se va cambiato, va fatto prima della prima release.
+
+---
+
+## 020 — Distribuzione con GitHub Releases e Obtainium
+
+**Data:** 2026-10-05
+
+**Contesto:** l'app va installata e aggiornata sul telefono senza passare da
+uno store.
+
+**Decisione:** richiesta dell'autore del progetto.
+[.github/workflows/apk.yml](.github/workflows/apk.yml) si avvia sui tag `v*`,
+analizza il codice, lancia le prove, costruisce **un solo APK** per tutte le
+architetture e crea la release con l'APK allegato. Obtainium segue il
+repository e propone l'aggiornamento a ogni release.
+
+La firma usa una chiave propria, presa dai segreti del repository; se i
+segreti mancano il flusso costruisce lo stesso ma **avvisa**.
+
+**Motivazione:** la firma e' il punto critico. Android identifica un'app dalla
+coppia pacchetto + chiave: se ogni release fosse firmata con la chiave di
+debug del runner, che e' diversa ogni volta, l'aggiornamento verrebbe rifiutato
+e Obtainium resterebbe fermo alla prima versione. L'APK unico evita invece di
+far scegliere l'architettura a chi installa.
+
+Il numero di build e' `github.run_number`, che cresce a ogni esecuzione:
+Android si accorge che c'e' un aggiornamento solo se quel numero sale.
+
+**Conseguenze:** l'archivio `spesone.jks` va conservato fuori dal repository e
+non va perso: senza, l'app installata non si puo' piu' aggiornare. Le
+istruzioni sono nel [README](README.md).

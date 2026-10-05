@@ -1,4 +1,4 @@
-package com.example.spesone
+package spesone.maratuck.com
 
 import io.flutter.embedding.android.FlutterActivity
 

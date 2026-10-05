@@ -1,0 +1,123 @@
+# Costruisce l'APK di Spesone e lo pubblica in una release di GitHub, da cui
+# Obtainium lo installa e lo aggiorna.
+#
+# Si avvia da solo quando si pubblica un tag che comincia per "v" (es. v1.0.0),
+# e si puo' lanciare a mano dalla scheda Actions per provare la build senza
+# pubblicare niente.
+name: APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# Serve a creare la release e ad allegarci l'APK.
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    name: Costruisci e pubblica
+    runs-on: ubuntu-latest
+
+    env:
+      # I segreti si leggono qui perche' una condizione `if` non puo' leggerli
+      # direttamente: cosi' il passo della firma sa se la chiave c'e'.
+      CHIAVE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v4
+
+      - name: Prepara Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Prepara Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Scarica le dipendenze
+        run: flutter pub get
+
+      - name: Rigenera il codice di drift
+        # I file .g.dart stanno nel repository, ma rigenerarli qui garantisce
+        # che l'APK corrisponda sempre alle tabelle scritte a mano.
+        run: dart run build_runner build
+
+      - name: Analisi statica
+        run: flutter analyze
+
+      - name: Prove
+        run: flutter test
+
+      - name: Calcola la versione
+        id: versione
+        # Da un tag "v1.2.3" esce il nome versione "1.2.3". Lanciando a mano il
+        # flusso non c'e' tag, quindi si usa la versione del pubspec.
+        run: |
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            NOME="${GITHUB_REF_NAME#v}"
+          else
+            NOME=$(grep '^version:' pubspec.yaml | sed 's/version: *//' | cut -d+ -f1)
+          fi
+          echo "nome=$NOME" >> "$GITHUB_OUTPUT"
+          echo "Versione: $NOME"
+
+      - name: Prepara la chiave di firma
+        if: env.CHIAVE_BASE64 != ''
+        # Senza chiave propria, ogni macchina firma con una chiave di debug
+        # diversa e Android rifiuta l'aggiornamento ("firma non corrispondente").
+        # Con i segreti impostati, tutte le release sono firmate uguali.
+        env:
+          PASSWORD_ARCHIVIO: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          PASSWORD_CHIAVE: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$CHIAVE_BASE64" | base64 --decode > "${RUNNER_TEMP}/spesone.jks"
+          cat > android/key.properties <<PROPS
+          storeFile=${RUNNER_TEMP}/spesone.jks
+          storePassword=${PASSWORD_ARCHIVIO}
+          keyAlias=${ALIAS}
+          keyPassword=${PASSWORD_CHIAVE}
+          PROPS
+
+      - name: Avvisa se la firma manca
+        if: env.CHIAVE_BASE64 == ''
+        run: |
+          echo "::warning::Nessuna chiave di firma nei segreti: l'APK sara' firmato con la chiave di debug e gli aggiornamenti in Obtainium falliranno. Vedi README.md."
+
+      - name: Costruisci l'APK
+        # Un solo APK per tutte le architetture: Obtainium non deve scegliere.
+        # Il numero di build cresce a ogni esecuzione, come Android richiede per
+        # riconoscere un aggiornamento.
+        run: |
+          flutter build apk --release \
+            --build-name="${{ steps.versione.outputs.nome }}" \
+            --build-number="${{ github.run_number }}"
+
+      - name: Rinomina l'APK
+        run: |
+          mv build/app/outputs/flutter-apk/app-release.apk \
+             "Spesone-v${{ steps.versione.outputs.nome }}.apk"
+
+      - name: Conserva l'APK fra gli artefatti
+        # Utile quando il flusso parte a mano: l'APK si scarica dalla pagina
+        # dell'esecuzione senza pubblicare una release.
+        uses: actions/upload-artifact@v4
+        with:
+          name: Spesone-v${{ steps.versione.outputs.nome }}
+          path: Spesone-*.apk
+          if-no-files-found: error
+
+      - name: Pubblica la release
+        if: github.ref_type == 'tag'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Spesone-*.apk
+          generate_release_notes: true

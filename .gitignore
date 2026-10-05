@@ -46,3 +46,8 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Chiavi di firma Android: mai nel repository.
+android/key.properties
+**/*.jks
+**/*.keystore

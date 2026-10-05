@@ -19,18 +19,82 @@ Compatibile con apple, android, web
  - [ ] creazione di persone per condivise tra debiti, e traccia spese
 
 
-A new Flutter project.
+## L'app
 
-## Getting Started
+- **Nome:** Spesone
+- **Pacchetto Android:** `spesone.maratuck.com`
+- **Piattaforme:** Android, iOS, web, Linux, Windows, macOS
 
-This project is a starting point for a Flutter application.
+Il codice e' diviso per funzionalita' in `lib/features/`, la navigazione sta in
+`lib/navigation/`, i dati in SQLite tramite drift. Le regole di lavoro sono in
+[CLAUDE.md](CLAUDE.md), il perche' di ogni scelta in [DECISIONI.md](DECISIONI.md).
 
-A few resources to get you started if this is your first Flutter project:
+## Installazione su Android con Obtainium
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+[Obtainium](https://github.com/ImranR98/Obtainium) installa e aggiorna l'app
+direttamente da questo repository, senza passare da uno store.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. Installa Obtainium.
+2. **Aggiungi app** e incolla l'indirizzo di questo repository.
+3. Obtainium trova l'ultima release, installa `Spesone-vX.Y.Z.apk` e da li' in
+   avanti avvisa a ogni versione nuova.
+
+L'APK e' unico per tutte le architetture, quindi non c'e' niente da scegliere.
+
+## Pubblicare una versione
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Il flusso [.github/workflows/apk.yml](.github/workflows/apk.yml) analizza il
+codice, lancia le prove, costruisce l'APK e crea la release con l'APK allegato.
+Dalla scheda **Actions** si puo' anche lanciare a mano: in quel caso l'APK
+resta fra gli artefatti dell'esecuzione e non viene pubblicata nessuna release.
+
+### Chiave di firma (una volta sola)
+
+Senza una chiave propria l'APK viene firmato con quella di debug, che su ogni
+macchina e' diversa: Android rifiuta l'aggiornamento con "firma non
+corrispondente" e Obtainium si blocca alla prima versione nuova.
+
+```sh
+keytool -genkey -v -keystore spesone.jks \
+  -keyalg RSA -keysize 2048 -validity 10000 -alias spesone
+base64 -w0 spesone.jks     # il testo da incollare nel segreto
+```
+
+Su GitHub, **Settings - Secrets and variables - Actions**, aggiungi:
+
+| Segreto | Contenuto |
+| --- | --- |
+| `ANDROID_KEYSTORE_BASE64` | l'uscita di `base64 -w0 spesone.jks` |
+| `ANDROID_KEYSTORE_PASSWORD` | la password dell'archivio |
+| `ANDROID_KEY_ALIAS` | `spesone` |
+| `ANDROID_KEY_PASSWORD` | la password della chiave |
+
+Conserva `spesone.jks` **fuori** dal repository e non perderlo: senza quella
+chiave non si puo' piu' aggiornare l'app gia' installata.
+
+Per compilare una release firmata sul proprio computer, crea
+`android/key.properties` (ignorato da git):
+
+```properties
+storeFile=/percorso/assoluto/spesone.jks
+storePassword=...
+keyAlias=spesone
+keyPassword=...
+```
+
+## Sviluppo
+
+```sh
+flutter pub get
+dart run build_runner build   # dopo ogni modifica alle tabelle drift
+flutter run
+flutter analyze && flutter test
+```
+
+L'icona si modifica negli SVG in `assets/icona/` e si rigenera con
+`tool/genera_icone.sh`.
