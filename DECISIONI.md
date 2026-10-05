@@ -777,3 +777,80 @@ correzione in un lavoro a mano spesa per spesa, e il tasso non starebbe piu'
 
 **Paletto:** tutte le valute sono trattate con due decimali; yen e dinaro non
 sono gestiti correttamente. I debiti segnati a mano restano in euro.
+
+---
+
+## 033 — Due tipi di spesa: normale e condivisa
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto. Supera la voce 026, dove una
+spesa personale era "una spesa con un solo partecipante".
+
+**Decisione:** la spesa **normale** e quella **condivisa** sono due cose
+distinte fin dal modulo che le registra. La normale chiede importo, data e
+categoria; la condivisa chiede in piu' chi ha pagato, per chi e le quote.
+Entrambe entrano nel totale del viaggio; in "quanto ho speso io" la condivisa
+entra solo con la tua quota, e solo la condivisa muove i saldi.
+
+**Motivazione:** sono i due gesti che si fanno davvero, e l'elenco del README
+li distingueva gia' ("aggiungere spese singole", "aggiungere spese
+condivise"). Trattare la spesa personale come un caso particolare di quella
+condivisa avrebbe fatto pagare a ogni caffe' un modulo con chi ha pagato e per
+chi, cioe' due campi inutili sul gesto piu' frequente. E, soprattutto, i due
+tipi si comportano diversamente quando il gruppo viene condiviso (voce 034):
+una differenza di sostanza, non di presentazione.
+
+---
+
+## 034 — Solo le spese condivise escono dal dispositivo
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto: le spese condivise vanno
+condivise con gli altri, via bluetooth o tramite il backend.
+
+**Decisione:** condividendo un gruppo viaggiano il gruppo con le sue
+impostazioni (partecipanti, valuta principale, tassi) e **le sue spese
+condivise**, nelle due direzioni. Le **spese normali restano sul dispositivo
+su cui sono state scritte**.
+
+**Motivazione:** quanto hai speso tu al bar e' un fatto tuo, e non deve
+raggiungere nessuno per sbaglio insieme al conto della cena. E' anche la
+regola che rende la condivisione prevedibile: cio' che si vede negli stessi
+conti di tutti e' esattamente cio' che riguarda tutti.
+
+**Conseguenza:** il totale di un viaggio e' **diverso su ogni dispositivo**,
+perche' comprende le spese normali di chi lo guarda. I saldi invece sono gli
+stessi per tutti. L'interfaccia deve dirlo, altrimenti sembra un errore.
+
+---
+
+## 035 — Cio' che viaggera' nasce con un identificativo stabile
+
+**Data:** 2026-10-05
+
+**Contesto:** la condivisione dei gruppi arrivera' piu' avanti (voce 034), ma
+le tabelle si scrivono adesso.
+
+**Decisione:** gruppi, partecipanti, spese condivise e rimborsi hanno, oltre
+alla chiave di SQLite, un **identificativo stabile** (UUID) generato alla
+creazione e uguale su ogni dispositivo. Le categorie no: quando un gruppo
+arriva da fuori, le sue categorie si riconoscono **dal nome**, creando quelle
+che mancano.
+
+**Motivazione:** le chiavi di SQLite sono numeri progressivi locali: sul mio
+telefono la cena e' la spesa 7, sul tuo la 3. Senza un identificativo comune
+non c'e' modo di capire che sono la stessa spesa, e ogni scambio creerebbe
+doppioni. Aggiungerlo dopo significherebbe riscrivere i dati gia' salvati
+sui dispositivi, cioe' una migrazione delicata su dati veri: ora costa una
+colonna.
+
+Le categorie fanno eccezione perche' sono un elenco personale e condiviso da
+tutti i gruppi (voce 031): riconoscerle dal nome fa si' che il "Cibo" di
+ciascuno resti il proprio, con il proprio colore, invece di moltiplicarsi a
+ogni scambio.
+
+**Conseguenza:** al momento di ricevere un gruppo servira' un passaggio in
+cui si dichiara **chi sei tu** fra i partecipanti. Non e' deducibile: i nomi
+li ha scelti chi ha creato il gruppo.

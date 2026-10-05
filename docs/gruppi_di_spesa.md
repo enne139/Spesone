@@ -25,13 +25,34 @@ Ogni spesa appartiene a un gruppo: non esistono spese "sciolte". Il gruppo su
 cui si lavora si sceglie dal menu laterale della sezione Spese, esattamente
 come la lista della spesa.
 
-### Spesa
+### Due tipi di spesa
+
+Una spesa e' **normale** o **condivisa**, e sono due cose diverse fin dal
+modulo con cui si registrano.
+
+#### Spesa normale
+
+Una spesa tua e basta: il biglietto del museo, il caffe'.
+
+| Campo | |
+| --- | --- |
+| Descrizione | "Biglietto del museo" |
+| Importo e valuta | quanto hai pagato |
+| Data | |
+| Categoria | facoltativa |
+
+Non chiede chi ha pagato — sei tu — ne' per chi. Entra nel totale del viaggio
+e in "quanto ho speso io", **non tocca i saldi** e non esce dal tuo
+dispositivo.
+
+#### Spesa condivisa
+
+Una spesa che riguarda piu' persone: la cena, la benzina, la casa.
 
 | Campo | |
 | --- | --- |
 | Descrizione | "Cena al ristorante" |
-| Importo | totale pagato, nella valuta in cui si e' pagato |
-| Valuta | una fra quelle del gruppo |
+| Importo e valuta | totale pagato |
 | Chi ha pagato | **un** partecipante |
 | Per chi | uno o piu' partecipanti, con la **quota** di ciascuno |
 | Data | |
@@ -42,8 +63,8 @@ possono correggere a mano: chi non ha preso il dolce, chi ha dormito in camera
 singola. La somma delle quote e' sempre uguale al totale — correggendo una
 quota, il resto si ridistribuisce fra le altre.
 
-Una **spesa personale** e' semplicemente una spesa dove l'unico partecipante
-sei tu: entra nel totale del viaggio, non genera nessun debito.
+Nel totale del viaggio entra tutta; in "quanto ho speso io" entra **solo la
+tua quota**.
 
 ### Categorie
 
@@ -101,15 +122,32 @@ saldo = (quanto ha anticipato) - (somma delle sue quote) + (rimborsi ricevuti e 
 Positivo: ha messo piu' del dovuto, deve ricevere. Negativo: deve dare.
 La somma dei saldi di un gruppo fa sempre zero.
 
+### Cosa viene condiviso
+
+Le spese condivise sono fatte per uscire dal dispositivo: quando si condivide
+un gruppo, via bluetooth o tramite il backend, viaggiano **il gruppo con le
+sue impostazioni** (partecipanti, valuta principale, tassi) e **le sue spese
+condivise**, in tutte e due le direzioni.
+
+Le **spese normali restano dove sono scritte**. Quanto hai speso al bar non
+riguarda nessun altro, e nessuno deve riceverlo per sbaglio insieme al conto
+della cena.
+
+Questo ha una conseguenza che vale **da subito**, molto prima di scrivere la
+condivisione: tutto cio' che un giorno viaggera' — gruppi, partecipanti, spese
+condivise, rimborsi — nasce con un **identificativo stabile**, uguale su ogni
+dispositivo. Aggiungerlo dopo significherebbe riscrivere i dati gia' salvati
+(voce 035).
+
 ### Esempio
 
 Grecia, partecipanti: io, Marco, Lucia.
 
 | Voce | Totale | Ha pagato | Per chi |
 | --- | --- | --- | --- |
-| Cena | 60,00 | io | io, Marco, Lucia (20 ciascuno) |
-| Benzina | 45,00 | Marco | io, Marco, Lucia (15 ciascuno) |
-| Museo | 12,00 | io | io |
+| Cena *(condivisa)* | 60,00 | io | io, Marco, Lucia (20 ciascuno) |
+| Benzina *(condivisa)* | 45,00 | Marco | io, Marco, Lucia (15 ciascuno) |
+| Museo *(normale)* | 12,00 | io | — |
 
 - **Ho speso io**: 20 + 15 + 12 = **47,00**
 - **Saldi**: io 60 + 12 − 47 = **+25**, Marco 45 − 35 = **+10**, Lucia 0 − 35 = **−35**
@@ -145,19 +183,25 @@ Grecia, partecipanti: io, Marco, Lucia.
 - **Chi ha pagato e' una persona sola.** Una spesa pagata a meta' da due
   persone si registra come due spese.
 - **Niente sincronizzazione fra dispositivi** finche' non si fa la
-  condivisione del gruppo.
+  condivisione del gruppo. Quando si fara', viaggeranno solo le spese
+  condivise: le spese normali non escono dal dispositivo su cui sono scritte
+  (voce 034).
 - **Niente ricevute, foto o allegati.**
 
 ## Come lo costruiamo
 
 1. Gruppi e partecipanti: creare, scegliere dal menu, archiviare.
 2. Categorie: elenco, colori, insieme di partenza.
-3. Spese con chi ha pagato, per chi, quote e categoria; totale del gruppo e
-   quanto hai speso tu.
-4. Valute del viaggio e tassi fissi nelle impostazioni del gruppo.
-5. Saldi del gruppo e rimborsi.
-6. Grafico per categoria e nel tempo.
+3. Spese normali: le tue, con categoria. Totale del viaggio e quanto hai
+   speso tu.
+4. Spese condivise: chi ha pagato, per chi, quote.
+5. Valute del viaggio e tassi fissi nelle impostazioni del gruppo.
+6. Saldi del gruppo e rimborsi.
+7. Grafico per categoria e nel tempo.
+8. Condivisione del gruppo via bluetooth e via backend.
 
-Le categorie stanno prima delle spese perche' una spesa le usa; le valute
-dopo, perche' il caso "tutto in euro" deve funzionare da solo prima di
-aggiungere la conversione.
+Le categorie stanno prima delle spese perche' una spesa le usa. Le spese
+normali prima di quelle condivise, perche' sono la meta' piu' semplice dello
+stesso modulo. Le valute dopo, perche' il caso "tutto in euro" deve
+funzionare da solo prima di aggiungere la conversione: altrimenti, quando i
+conti non tornano, non si sa quale dei due pezzi e' rotto.
