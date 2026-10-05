@@ -6,6 +6,8 @@ import 'package:spesone/features/debiti/data/debiti_tables.dart';
 import 'package:spesone/features/lista_spesa/data/liste_dao.dart';
 import 'package:spesone/features/lista_spesa/data/liste_tables.dart';
 import 'package:spesone/features/persone/data/persone_tables.dart';
+import 'package:spesone/features/spese/data/gruppi_dao.dart';
+import 'package:spesone/features/spese/data/gruppi_tables.dart';
 
 part 'app_database.g.dart';
 
@@ -16,8 +18,15 @@ part 'app_database.g.dart';
 /// (`features/<nome>/data/`), qui si dichiara solo quali fanno parte del
 /// database e quali DAO lo accedono (DECISIONI.md, voce 007).
 @DriftDatabase(
-  tables: <Type>[Liste, VociLista, Persone, MovimentiDebito],
-  daos: <Type>[ListeDao, DebitiDao],
+  tables: <Type>[
+    Liste,
+    VociLista,
+    Persone,
+    MovimentiDebito,
+    Gruppi,
+    Partecipanti,
+  ],
+  daos: <Type>[ListeDao, DebitiDao, GruppiDao],
 )
 class AppDatabase extends _$AppDatabase {
   /// Database vero, su file, nella cartella dati dell'app.
@@ -31,9 +40,9 @@ class AppDatabase extends _$AppDatabase {
   /// Da aumentare di uno a ogni modifica delle tabelle, aggiungendo la
   /// migrazione corrispondente in [migration].
   ///
-  /// Storia: 1 liste della spesa, 2 persone e debiti.
+  /// Storia: 1 liste della spesa, 2 persone e debiti, 3 gruppi di spesa.
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -44,6 +53,17 @@ class AppDatabase extends _$AppDatabase {
         if (da < 2) {
           await m.createTable(persone);
           await m.createTable(movimentiDebito);
+        }
+        // `createTable` crea sempre la tabella **di oggi**: chi arriva dalla
+        // versione 1 ha appena creato `persone` con dentro `sonoIo`, e
+        // aggiungere la colonna fallirebbe. La si aggiunge solo a chi la
+        // tabella ce l'aveva gia'.
+        if (da == 2) {
+          await m.addColumn(persone, persone.sonoIo);
+        }
+        if (da < 3) {
+          await m.createTable(gruppi);
+          await m.createTable(partecipanti);
         }
       },
       beforeOpen: (OpeningDetails details) async {

@@ -18,6 +18,9 @@ import 'package:spesone/features/spese/condivisione_gruppo_page.dart';
 import 'package:spesone/features/spese/grafico_spese_page.dart';
 import 'package:spesone/features/spese/gruppi_spesa_page.dart';
 import 'package:spesone/features/spese/panoramica_spese_page.dart';
+import 'package:spesone/features/spese/widgets/fab_nuovo_gruppo.dart';
+import 'package:spesone/features/spese/widgets/selettore_gruppi.dart';
+import 'package:spesone/features/spese/widgets/titolo_gruppo_corrente.dart';
 import 'package:spesone/navigation/app_section.dart';
 
 /// Registro unico della navigazione: aggiungere una voce qui la fa comparire
@@ -27,16 +30,22 @@ final List<AppSection> appSections = <AppSection>[
     label: 'Spese',
     icon: Icons.receipt_long_outlined,
     selectedIcon: Icons.receipt_long,
+    // Come nella sezione Lista, il menu laterale fa scegliere su cosa
+    // lavorare: li' la lista, qui il gruppo.
+    drawerExtra: (BuildContext context) => const SelettoreGruppi(),
     views: <SectionView>[
       SectionView(
         title: 'Panoramica spese',
         icon: Icons.dashboard_outlined,
         builder: (BuildContext context) => const PanoramicaSpesePage(),
+        // Il titolo e' il nome del gruppo aperto, non un'etichetta fissa.
+        appBarTitle: (BuildContext context) => const TitoloGruppoCorrente(),
       ),
       SectionView(
         title: 'Gruppi di spesa',
         icon: Icons.groups_outlined,
         builder: (BuildContext context) => const GruppiSpesaPage(),
+        floatingActionButton: (BuildContext context) => const FabNuovoGruppo(),
       ),
       SectionView(
         title: 'Categorie',

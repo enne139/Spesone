@@ -48,7 +48,13 @@ class ElencoSaldi extends StatelessWidget {
           );
 
         if (visibili.isEmpty) {
-          return _Vuoto(filtro: filtro, nessunaPersona: saldi.isEmpty);
+          // "Ancora niente" vale finche' non e' stato registrato nulla: una
+          // persona in anagrafica c'e' sempre — sei tu — quindi contarle non
+          // direbbe niente.
+          final bool nessunMovimento = saldi.every(
+            (SaldoPersona s) => s.movimenti == 0,
+          );
+          return _Vuoto(filtro: filtro, nessunMovimento: nessunMovimento);
         }
 
         return ListView.builder(
@@ -174,12 +180,12 @@ class _Totale extends StatelessWidget {
 
 /// Cosa si vede quando non c'e' niente da mostrare.
 class _Vuoto extends StatelessWidget {
-  const _Vuoto({required this.filtro, required this.nessunaPersona});
+  const _Vuoto({required this.filtro, required this.nessunMovimento});
 
   final FiltroSaldi filtro;
 
-  /// Vero se non esiste proprio nessuna persona in anagrafica.
-  final bool nessunaPersona;
+  /// Vero se non e' ancora stato registrato nessun movimento.
+  final bool nessunMovimento;
 
   @override
   Widget build(BuildContext context) {
@@ -192,8 +198,8 @@ class _Vuoto extends StatelessWidget {
     ) = switch (filtro) {
       FiltroSaldi.tutti => (
         Icons.balance_outlined,
-        nessunaPersona ? 'Ancora niente' : 'Siete tutti in pari',
-        nessunaPersona
+        nessunMovimento ? 'Ancora niente' : 'Siete tutti in pari',
+        nessunMovimento
             ? 'Tocca Aggiungi per registrare il primo prestito o debito.'
             : 'Nessuno deve niente a nessuno.',
       ),

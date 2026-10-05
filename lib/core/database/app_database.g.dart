@@ -886,8 +886,21 @@ class $PersoneTable extends Persone with TableInfo<$PersoneTable, Persona> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _sonoIoMeta = const VerificationMeta('sonoIo');
   @override
-  List<GeneratedColumn> get $columns => [id, nome, creataIl];
+  late final GeneratedColumn<bool> sonoIo = GeneratedColumn<bool>(
+    'sono_io',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("sono_io" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, nome, creataIl, sonoIo];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -917,6 +930,12 @@ class $PersoneTable extends Persone with TableInfo<$PersoneTable, Persona> {
         creataIl.isAcceptableOrUnknown(data['creata_il']!, _creataIlMeta),
       );
     }
+    if (data.containsKey('sono_io')) {
+      context.handle(
+        _sonoIoMeta,
+        sonoIo.isAcceptableOrUnknown(data['sono_io']!, _sonoIoMeta),
+      );
+    }
     return context;
   }
 
@@ -938,6 +957,10 @@ class $PersoneTable extends Persone with TableInfo<$PersoneTable, Persona> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}creata_il'],
       )!,
+      sonoIo: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}sono_io'],
+      )!,
     );
   }
 
@@ -953,13 +976,26 @@ class Persona extends DataClass implements Insertable<Persona> {
   /// Come la chiami tu: "Marco", "Marco del tennis", "mamma".
   final String nome;
   final DateTime creataIl;
-  const Persona({required this.id, required this.nome, required this.creataIl});
+
+  /// Vero sulla persona che sei tu.
+  ///
+  /// Ce n'e' una sola, creata al primo avvio: cosi' "chi ha pagato" e "per
+  /// chi" sono un elenco unico senza casi speciali, e "quanto ho speso io" e'
+  /// la somma delle quote di quella persona (DECISIONI.md, voce 029).
+  final bool sonoIo;
+  const Persona({
+    required this.id,
+    required this.nome,
+    required this.creataIl,
+    required this.sonoIo,
+  });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['nome'] = Variable<String>(nome);
     map['creata_il'] = Variable<DateTime>(creataIl);
+    map['sono_io'] = Variable<bool>(sonoIo);
     return map;
   }
 
@@ -968,6 +1004,7 @@ class Persona extends DataClass implements Insertable<Persona> {
       id: Value(id),
       nome: Value(nome),
       creataIl: Value(creataIl),
+      sonoIo: Value(sonoIo),
     );
   }
 
@@ -980,6 +1017,7 @@ class Persona extends DataClass implements Insertable<Persona> {
       id: serializer.fromJson<int>(json['id']),
       nome: serializer.fromJson<String>(json['nome']),
       creataIl: serializer.fromJson<DateTime>(json['creataIl']),
+      sonoIo: serializer.fromJson<bool>(json['sonoIo']),
     );
   }
   @override
@@ -989,19 +1027,23 @@ class Persona extends DataClass implements Insertable<Persona> {
       'id': serializer.toJson<int>(id),
       'nome': serializer.toJson<String>(nome),
       'creataIl': serializer.toJson<DateTime>(creataIl),
+      'sonoIo': serializer.toJson<bool>(sonoIo),
     };
   }
 
-  Persona copyWith({int? id, String? nome, DateTime? creataIl}) => Persona(
-    id: id ?? this.id,
-    nome: nome ?? this.nome,
-    creataIl: creataIl ?? this.creataIl,
-  );
+  Persona copyWith({int? id, String? nome, DateTime? creataIl, bool? sonoIo}) =>
+      Persona(
+        id: id ?? this.id,
+        nome: nome ?? this.nome,
+        creataIl: creataIl ?? this.creataIl,
+        sonoIo: sonoIo ?? this.sonoIo,
+      );
   Persona copyWithCompanion(PersoneCompanion data) {
     return Persona(
       id: data.id.present ? data.id.value : this.id,
       nome: data.nome.present ? data.nome.value : this.nome,
       creataIl: data.creataIl.present ? data.creataIl.value : this.creataIl,
+      sonoIo: data.sonoIo.present ? data.sonoIo.value : this.sonoIo,
     );
   }
 
@@ -1010,45 +1052,52 @@ class Persona extends DataClass implements Insertable<Persona> {
     return (StringBuffer('Persona(')
           ..write('id: $id, ')
           ..write('nome: $nome, ')
-          ..write('creataIl: $creataIl')
+          ..write('creataIl: $creataIl, ')
+          ..write('sonoIo: $sonoIo')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, nome, creataIl);
+  int get hashCode => Object.hash(id, nome, creataIl, sonoIo);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is Persona &&
           other.id == this.id &&
           other.nome == this.nome &&
-          other.creataIl == this.creataIl);
+          other.creataIl == this.creataIl &&
+          other.sonoIo == this.sonoIo);
 }
 
 class PersoneCompanion extends UpdateCompanion<Persona> {
   final Value<int> id;
   final Value<String> nome;
   final Value<DateTime> creataIl;
+  final Value<bool> sonoIo;
   const PersoneCompanion({
     this.id = const Value.absent(),
     this.nome = const Value.absent(),
     this.creataIl = const Value.absent(),
+    this.sonoIo = const Value.absent(),
   });
   PersoneCompanion.insert({
     this.id = const Value.absent(),
     required String nome,
     this.creataIl = const Value.absent(),
+    this.sonoIo = const Value.absent(),
   }) : nome = Value(nome);
   static Insertable<Persona> custom({
     Expression<int>? id,
     Expression<String>? nome,
     Expression<DateTime>? creataIl,
+    Expression<bool>? sonoIo,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (nome != null) 'nome': nome,
       if (creataIl != null) 'creata_il': creataIl,
+      if (sonoIo != null) 'sono_io': sonoIo,
     });
   }
 
@@ -1056,11 +1105,13 @@ class PersoneCompanion extends UpdateCompanion<Persona> {
     Value<int>? id,
     Value<String>? nome,
     Value<DateTime>? creataIl,
+    Value<bool>? sonoIo,
   }) {
     return PersoneCompanion(
       id: id ?? this.id,
       nome: nome ?? this.nome,
       creataIl: creataIl ?? this.creataIl,
+      sonoIo: sonoIo ?? this.sonoIo,
     );
   }
 
@@ -1076,6 +1127,9 @@ class PersoneCompanion extends UpdateCompanion<Persona> {
     if (creataIl.present) {
       map['creata_il'] = Variable<DateTime>(creataIl.value);
     }
+    if (sonoIo.present) {
+      map['sono_io'] = Variable<bool>(sonoIo.value);
+    }
     return map;
   }
 
@@ -1084,7 +1138,8 @@ class PersoneCompanion extends UpdateCompanion<Persona> {
     return (StringBuffer('PersoneCompanion(')
           ..write('id: $id, ')
           ..write('nome: $nome, ')
-          ..write('creataIl: $creataIl')
+          ..write('creataIl: $creataIl, ')
+          ..write('sonoIo: $sonoIo')
           ..write(')'))
         .toString();
   }
@@ -1509,6 +1564,857 @@ class MovimentiDebitoCompanion extends UpdateCompanion<MovimentoDebito> {
   }
 }
 
+class $GruppiTable extends Gruppi with TableInfo<$GruppiTable, Gruppo> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $GruppiTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _nomeMeta = const VerificationMeta('nome');
+  @override
+  late final GeneratedColumn<String> nome = GeneratedColumn<String>(
+    'nome',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 80,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _valutaPrincipaleMeta = const VerificationMeta(
+    'valutaPrincipale',
+  );
+  @override
+  late final GeneratedColumn<String> valutaPrincipale = GeneratedColumn<String>(
+    'valuta_principale',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 3,
+      maxTextLength: 3,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('EUR'),
+  );
+  static const VerificationMeta _creatoIlMeta = const VerificationMeta(
+    'creatoIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> creatoIl = GeneratedColumn<DateTime>(
+    'creato_il',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _archiviatoIlMeta = const VerificationMeta(
+    'archiviatoIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> archiviatoIl = GeneratedColumn<DateTime>(
+    'archiviato_il',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _correnteMeta = const VerificationMeta(
+    'corrente',
+  );
+  @override
+  late final GeneratedColumn<bool> corrente = GeneratedColumn<bool>(
+    'corrente',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("corrente" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    nome,
+    valutaPrincipale,
+    creatoIl,
+    archiviatoIl,
+    corrente,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'gruppi';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Gruppo> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('nome')) {
+      context.handle(
+        _nomeMeta,
+        nome.isAcceptableOrUnknown(data['nome']!, _nomeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nomeMeta);
+    }
+    if (data.containsKey('valuta_principale')) {
+      context.handle(
+        _valutaPrincipaleMeta,
+        valutaPrincipale.isAcceptableOrUnknown(
+          data['valuta_principale']!,
+          _valutaPrincipaleMeta,
+        ),
+      );
+    }
+    if (data.containsKey('creato_il')) {
+      context.handle(
+        _creatoIlMeta,
+        creatoIl.isAcceptableOrUnknown(data['creato_il']!, _creatoIlMeta),
+      );
+    }
+    if (data.containsKey('archiviato_il')) {
+      context.handle(
+        _archiviatoIlMeta,
+        archiviatoIl.isAcceptableOrUnknown(
+          data['archiviato_il']!,
+          _archiviatoIlMeta,
+        ),
+      );
+    }
+    if (data.containsKey('corrente')) {
+      context.handle(
+        _correnteMeta,
+        corrente.isAcceptableOrUnknown(data['corrente']!, _correnteMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Gruppo map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Gruppo(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      nome: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}nome'],
+      )!,
+      valutaPrincipale: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}valuta_principale'],
+      )!,
+      creatoIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}creato_il'],
+      )!,
+      archiviatoIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}archiviato_il'],
+      ),
+      corrente: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}corrente'],
+      )!,
+    );
+  }
+
+  @override
+  $GruppiTable createAlias(String alias) {
+    return $GruppiTable(attachedDatabase, alias);
+  }
+}
+
+class Gruppo extends DataClass implements Insertable<Gruppo> {
+  final int id;
+
+  /// Identificativo stabile, uguale su ogni dispositivo.
+  ///
+  /// La chiave di SQLite e' un numero progressivo locale: sul mio telefono
+  /// questo gruppo e' il 7, sul tuo il 3. Quando i gruppi viaggeranno servira'
+  /// un identificativo comune, e aggiungerlo dopo vorrebbe dire migrare dati
+  /// veri sui telefoni delle persone (DECISIONI.md, voce 035).
+  final String uuid;
+  final String nome;
+
+  /// Codice ISO della valuta in cui sono espressi totale e saldi.
+  ///
+  /// Le altre valute del viaggio, con i loro tassi fissi, arriveranno nella
+  /// tappa delle valute (DECISIONI.md, voce 032).
+  final String valutaPrincipale;
+  final DateTime creatoIl;
+
+  /// Quando il viaggio e' stato archiviato; `null` se e' ancora in corso.
+  final DateTime? archiviatoIl;
+
+  /// Vero sul solo gruppo su cui si sta lavorando.
+  final bool corrente;
+  const Gruppo({
+    required this.id,
+    required this.uuid,
+    required this.nome,
+    required this.valutaPrincipale,
+    required this.creatoIl,
+    this.archiviatoIl,
+    required this.corrente,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['uuid'] = Variable<String>(uuid);
+    map['nome'] = Variable<String>(nome);
+    map['valuta_principale'] = Variable<String>(valutaPrincipale);
+    map['creato_il'] = Variable<DateTime>(creatoIl);
+    if (!nullToAbsent || archiviatoIl != null) {
+      map['archiviato_il'] = Variable<DateTime>(archiviatoIl);
+    }
+    map['corrente'] = Variable<bool>(corrente);
+    return map;
+  }
+
+  GruppiCompanion toCompanion(bool nullToAbsent) {
+    return GruppiCompanion(
+      id: Value(id),
+      uuid: Value(uuid),
+      nome: Value(nome),
+      valutaPrincipale: Value(valutaPrincipale),
+      creatoIl: Value(creatoIl),
+      archiviatoIl: archiviatoIl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(archiviatoIl),
+      corrente: Value(corrente),
+    );
+  }
+
+  factory Gruppo.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Gruppo(
+      id: serializer.fromJson<int>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      nome: serializer.fromJson<String>(json['nome']),
+      valutaPrincipale: serializer.fromJson<String>(json['valutaPrincipale']),
+      creatoIl: serializer.fromJson<DateTime>(json['creatoIl']),
+      archiviatoIl: serializer.fromJson<DateTime?>(json['archiviatoIl']),
+      corrente: serializer.fromJson<bool>(json['corrente']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'nome': serializer.toJson<String>(nome),
+      'valutaPrincipale': serializer.toJson<String>(valutaPrincipale),
+      'creatoIl': serializer.toJson<DateTime>(creatoIl),
+      'archiviatoIl': serializer.toJson<DateTime?>(archiviatoIl),
+      'corrente': serializer.toJson<bool>(corrente),
+    };
+  }
+
+  Gruppo copyWith({
+    int? id,
+    String? uuid,
+    String? nome,
+    String? valutaPrincipale,
+    DateTime? creatoIl,
+    Value<DateTime?> archiviatoIl = const Value.absent(),
+    bool? corrente,
+  }) => Gruppo(
+    id: id ?? this.id,
+    uuid: uuid ?? this.uuid,
+    nome: nome ?? this.nome,
+    valutaPrincipale: valutaPrincipale ?? this.valutaPrincipale,
+    creatoIl: creatoIl ?? this.creatoIl,
+    archiviatoIl: archiviatoIl.present ? archiviatoIl.value : this.archiviatoIl,
+    corrente: corrente ?? this.corrente,
+  );
+  Gruppo copyWithCompanion(GruppiCompanion data) {
+    return Gruppo(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      nome: data.nome.present ? data.nome.value : this.nome,
+      valutaPrincipale: data.valutaPrincipale.present
+          ? data.valutaPrincipale.value
+          : this.valutaPrincipale,
+      creatoIl: data.creatoIl.present ? data.creatoIl.value : this.creatoIl,
+      archiviatoIl: data.archiviatoIl.present
+          ? data.archiviatoIl.value
+          : this.archiviatoIl,
+      corrente: data.corrente.present ? data.corrente.value : this.corrente,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Gruppo(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('nome: $nome, ')
+          ..write('valutaPrincipale: $valutaPrincipale, ')
+          ..write('creatoIl: $creatoIl, ')
+          ..write('archiviatoIl: $archiviatoIl, ')
+          ..write('corrente: $corrente')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    uuid,
+    nome,
+    valutaPrincipale,
+    creatoIl,
+    archiviatoIl,
+    corrente,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Gruppo &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.nome == this.nome &&
+          other.valutaPrincipale == this.valutaPrincipale &&
+          other.creatoIl == this.creatoIl &&
+          other.archiviatoIl == this.archiviatoIl &&
+          other.corrente == this.corrente);
+}
+
+class GruppiCompanion extends UpdateCompanion<Gruppo> {
+  final Value<int> id;
+  final Value<String> uuid;
+  final Value<String> nome;
+  final Value<String> valutaPrincipale;
+  final Value<DateTime> creatoIl;
+  final Value<DateTime?> archiviatoIl;
+  final Value<bool> corrente;
+  const GruppiCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.nome = const Value.absent(),
+    this.valutaPrincipale = const Value.absent(),
+    this.creatoIl = const Value.absent(),
+    this.archiviatoIl = const Value.absent(),
+    this.corrente = const Value.absent(),
+  });
+  GruppiCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    required String nome,
+    this.valutaPrincipale = const Value.absent(),
+    this.creatoIl = const Value.absent(),
+    this.archiviatoIl = const Value.absent(),
+    this.corrente = const Value.absent(),
+  }) : uuid = Value(uuid),
+       nome = Value(nome);
+  static Insertable<Gruppo> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<String>? nome,
+    Expression<String>? valutaPrincipale,
+    Expression<DateTime>? creatoIl,
+    Expression<DateTime>? archiviatoIl,
+    Expression<bool>? corrente,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (nome != null) 'nome': nome,
+      if (valutaPrincipale != null) 'valuta_principale': valutaPrincipale,
+      if (creatoIl != null) 'creato_il': creatoIl,
+      if (archiviatoIl != null) 'archiviato_il': archiviatoIl,
+      if (corrente != null) 'corrente': corrente,
+    });
+  }
+
+  GruppiCompanion copyWith({
+    Value<int>? id,
+    Value<String>? uuid,
+    Value<String>? nome,
+    Value<String>? valutaPrincipale,
+    Value<DateTime>? creatoIl,
+    Value<DateTime?>? archiviatoIl,
+    Value<bool>? corrente,
+  }) {
+    return GruppiCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      nome: nome ?? this.nome,
+      valutaPrincipale: valutaPrincipale ?? this.valutaPrincipale,
+      creatoIl: creatoIl ?? this.creatoIl,
+      archiviatoIl: archiviatoIl ?? this.archiviatoIl,
+      corrente: corrente ?? this.corrente,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (nome.present) {
+      map['nome'] = Variable<String>(nome.value);
+    }
+    if (valutaPrincipale.present) {
+      map['valuta_principale'] = Variable<String>(valutaPrincipale.value);
+    }
+    if (creatoIl.present) {
+      map['creato_il'] = Variable<DateTime>(creatoIl.value);
+    }
+    if (archiviatoIl.present) {
+      map['archiviato_il'] = Variable<DateTime>(archiviatoIl.value);
+    }
+    if (corrente.present) {
+      map['corrente'] = Variable<bool>(corrente.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('GruppiCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('nome: $nome, ')
+          ..write('valutaPrincipale: $valutaPrincipale, ')
+          ..write('creatoIl: $creatoIl, ')
+          ..write('archiviatoIl: $archiviatoIl, ')
+          ..write('corrente: $corrente')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PartecipantiTable extends Partecipanti
+    with TableInfo<$PartecipantiTable, Partecipante> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PartecipantiTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _uuidMeta = const VerificationMeta('uuid');
+  @override
+  late final GeneratedColumn<String> uuid = GeneratedColumn<String>(
+    'uuid',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
+  );
+  static const VerificationMeta _gruppoIdMeta = const VerificationMeta(
+    'gruppoId',
+  );
+  @override
+  late final GeneratedColumn<int> gruppoId = GeneratedColumn<int>(
+    'gruppo_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES gruppi (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _personaIdMeta = const VerificationMeta(
+    'personaId',
+  );
+  @override
+  late final GeneratedColumn<int> personaId = GeneratedColumn<int>(
+    'persona_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES persone (id) ON DELETE RESTRICT',
+    ),
+  );
+  static const VerificationMeta _aggiuntoIlMeta = const VerificationMeta(
+    'aggiuntoIl',
+  );
+  @override
+  late final GeneratedColumn<DateTime> aggiuntoIl = GeneratedColumn<DateTime>(
+    'aggiunto_il',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    uuid,
+    gruppoId,
+    personaId,
+    aggiuntoIl,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'partecipanti';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<Partecipante> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('uuid')) {
+      context.handle(
+        _uuidMeta,
+        uuid.isAcceptableOrUnknown(data['uuid']!, _uuidMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_uuidMeta);
+    }
+    if (data.containsKey('gruppo_id')) {
+      context.handle(
+        _gruppoIdMeta,
+        gruppoId.isAcceptableOrUnknown(data['gruppo_id']!, _gruppoIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_gruppoIdMeta);
+    }
+    if (data.containsKey('persona_id')) {
+      context.handle(
+        _personaIdMeta,
+        personaId.isAcceptableOrUnknown(data['persona_id']!, _personaIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_personaIdMeta);
+    }
+    if (data.containsKey('aggiunto_il')) {
+      context.handle(
+        _aggiuntoIlMeta,
+        aggiuntoIl.isAcceptableOrUnknown(data['aggiunto_il']!, _aggiuntoIlMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {gruppoId, personaId},
+  ];
+  @override
+  Partecipante map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Partecipante(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      uuid: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}uuid'],
+      )!,
+      gruppoId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}gruppo_id'],
+      )!,
+      personaId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}persona_id'],
+      )!,
+      aggiuntoIl: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}aggiunto_il'],
+      )!,
+    );
+  }
+
+  @override
+  $PartecipantiTable createAlias(String alias) {
+    return $PartecipantiTable(attachedDatabase, alias);
+  }
+}
+
+class Partecipante extends DataClass implements Insertable<Partecipante> {
+  final int id;
+
+  /// Identificativo stabile: le quote delle spese condivise punteranno qui, e
+  /// devono significare la stessa cosa su ogni dispositivo.
+  final String uuid;
+  final int gruppoId;
+
+  /// `restrict`: una persona che fa parte di un gruppo non si puo' eliminare.
+  ///
+  /// Con `cascade` sparirebbe dal viaggio insieme alle sue spese, cambiando i
+  /// conti di tutti gli altri senza dirlo.
+  final int personaId;
+  final DateTime aggiuntoIl;
+  const Partecipante({
+    required this.id,
+    required this.uuid,
+    required this.gruppoId,
+    required this.personaId,
+    required this.aggiuntoIl,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['uuid'] = Variable<String>(uuid);
+    map['gruppo_id'] = Variable<int>(gruppoId);
+    map['persona_id'] = Variable<int>(personaId);
+    map['aggiunto_il'] = Variable<DateTime>(aggiuntoIl);
+    return map;
+  }
+
+  PartecipantiCompanion toCompanion(bool nullToAbsent) {
+    return PartecipantiCompanion(
+      id: Value(id),
+      uuid: Value(uuid),
+      gruppoId: Value(gruppoId),
+      personaId: Value(personaId),
+      aggiuntoIl: Value(aggiuntoIl),
+    );
+  }
+
+  factory Partecipante.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Partecipante(
+      id: serializer.fromJson<int>(json['id']),
+      uuid: serializer.fromJson<String>(json['uuid']),
+      gruppoId: serializer.fromJson<int>(json['gruppoId']),
+      personaId: serializer.fromJson<int>(json['personaId']),
+      aggiuntoIl: serializer.fromJson<DateTime>(json['aggiuntoIl']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'uuid': serializer.toJson<String>(uuid),
+      'gruppoId': serializer.toJson<int>(gruppoId),
+      'personaId': serializer.toJson<int>(personaId),
+      'aggiuntoIl': serializer.toJson<DateTime>(aggiuntoIl),
+    };
+  }
+
+  Partecipante copyWith({
+    int? id,
+    String? uuid,
+    int? gruppoId,
+    int? personaId,
+    DateTime? aggiuntoIl,
+  }) => Partecipante(
+    id: id ?? this.id,
+    uuid: uuid ?? this.uuid,
+    gruppoId: gruppoId ?? this.gruppoId,
+    personaId: personaId ?? this.personaId,
+    aggiuntoIl: aggiuntoIl ?? this.aggiuntoIl,
+  );
+  Partecipante copyWithCompanion(PartecipantiCompanion data) {
+    return Partecipante(
+      id: data.id.present ? data.id.value : this.id,
+      uuid: data.uuid.present ? data.uuid.value : this.uuid,
+      gruppoId: data.gruppoId.present ? data.gruppoId.value : this.gruppoId,
+      personaId: data.personaId.present ? data.personaId.value : this.personaId,
+      aggiuntoIl: data.aggiuntoIl.present
+          ? data.aggiuntoIl.value
+          : this.aggiuntoIl,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Partecipante(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('gruppoId: $gruppoId, ')
+          ..write('personaId: $personaId, ')
+          ..write('aggiuntoIl: $aggiuntoIl')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, uuid, gruppoId, personaId, aggiuntoIl);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Partecipante &&
+          other.id == this.id &&
+          other.uuid == this.uuid &&
+          other.gruppoId == this.gruppoId &&
+          other.personaId == this.personaId &&
+          other.aggiuntoIl == this.aggiuntoIl);
+}
+
+class PartecipantiCompanion extends UpdateCompanion<Partecipante> {
+  final Value<int> id;
+  final Value<String> uuid;
+  final Value<int> gruppoId;
+  final Value<int> personaId;
+  final Value<DateTime> aggiuntoIl;
+  const PartecipantiCompanion({
+    this.id = const Value.absent(),
+    this.uuid = const Value.absent(),
+    this.gruppoId = const Value.absent(),
+    this.personaId = const Value.absent(),
+    this.aggiuntoIl = const Value.absent(),
+  });
+  PartecipantiCompanion.insert({
+    this.id = const Value.absent(),
+    required String uuid,
+    required int gruppoId,
+    required int personaId,
+    this.aggiuntoIl = const Value.absent(),
+  }) : uuid = Value(uuid),
+       gruppoId = Value(gruppoId),
+       personaId = Value(personaId);
+  static Insertable<Partecipante> custom({
+    Expression<int>? id,
+    Expression<String>? uuid,
+    Expression<int>? gruppoId,
+    Expression<int>? personaId,
+    Expression<DateTime>? aggiuntoIl,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (uuid != null) 'uuid': uuid,
+      if (gruppoId != null) 'gruppo_id': gruppoId,
+      if (personaId != null) 'persona_id': personaId,
+      if (aggiuntoIl != null) 'aggiunto_il': aggiuntoIl,
+    });
+  }
+
+  PartecipantiCompanion copyWith({
+    Value<int>? id,
+    Value<String>? uuid,
+    Value<int>? gruppoId,
+    Value<int>? personaId,
+    Value<DateTime>? aggiuntoIl,
+  }) {
+    return PartecipantiCompanion(
+      id: id ?? this.id,
+      uuid: uuid ?? this.uuid,
+      gruppoId: gruppoId ?? this.gruppoId,
+      personaId: personaId ?? this.personaId,
+      aggiuntoIl: aggiuntoIl ?? this.aggiuntoIl,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (uuid.present) {
+      map['uuid'] = Variable<String>(uuid.value);
+    }
+    if (gruppoId.present) {
+      map['gruppo_id'] = Variable<int>(gruppoId.value);
+    }
+    if (personaId.present) {
+      map['persona_id'] = Variable<int>(personaId.value);
+    }
+    if (aggiuntoIl.present) {
+      map['aggiunto_il'] = Variable<DateTime>(aggiuntoIl.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PartecipantiCompanion(')
+          ..write('id: $id, ')
+          ..write('uuid: $uuid, ')
+          ..write('gruppoId: $gruppoId, ')
+          ..write('personaId: $personaId, ')
+          ..write('aggiuntoIl: $aggiuntoIl')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1518,8 +2424,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $MovimentiDebitoTable movimentiDebito = $MovimentiDebitoTable(
     this,
   );
+  late final $GruppiTable gruppi = $GruppiTable(this);
+  late final $PartecipantiTable partecipanti = $PartecipantiTable(this);
   late final ListeDao listeDao = ListeDao(this as AppDatabase);
   late final DebitiDao debitiDao = DebitiDao(this as AppDatabase);
+  late final GruppiDao gruppiDao = GruppiDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1529,6 +2438,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     vociLista,
     persone,
     movimentiDebito,
+    gruppi,
+    partecipanti,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -1545,6 +2456,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('movimenti_debito', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'gruppi',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('partecipanti', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -2186,11 +3104,13 @@ typedef $$PersoneTableCreateCompanionBuilder = PersoneCompanion Function({
   Value<int> id,
   required String nome,
   Value<DateTime> creataIl,
+  Value<bool> sonoIo,
 });
 typedef $$PersoneTableUpdateCompanionBuilder = PersoneCompanion Function({
   Value<int> id,
   Value<String> nome,
   Value<DateTime> creataIl,
+  Value<bool> sonoIo,
 });
 
 final class $$PersoneTableReferences
@@ -2212,6 +3132,24 @@ final class $$PersoneTableReferences
     final cache = $_typedResult.readTableOrNull(
       _movimentiDebitoRefsTable($_db),
     );
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
+  static MultiTypedResultKey<$PartecipantiTable, List<Partecipante>>
+  _partecipantiRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.partecipanti,
+    aliasName: 'persone__id__partecipanti__persona_id',
+  );
+
+  $$PartecipantiTableProcessedTableManager get partecipantiRefs {
+    final manager = $$PartecipantiTableTableManager(
+      $_db,
+      $_db.partecipanti,
+    ).filter((f) => f.personaId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_partecipantiRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -2242,6 +3180,11 @@ class $$PersoneTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<bool> get sonoIo => $composableBuilder(
+    column: $table.sonoIo,
+    builder: (column) => ColumnFilters(column),
+  );
+
   Expression<bool> movimentiDebitoRefs(
     Expression<bool> Function($$MovimentiDebitoTableFilterComposer f) f,
   ) {
@@ -2258,6 +3201,31 @@ class $$PersoneTableFilterComposer
           }) => $$MovimentiDebitoTableFilterComposer(
             $db: $db,
             $table: $db.movimentiDebito,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> partecipantiRefs(
+    Expression<bool> Function($$PartecipantiTableFilterComposer f) f,
+  ) {
+    final $$PartecipantiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.personaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableFilterComposer(
+            $db: $db,
+            $table: $db.partecipanti,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2291,6 +3259,11 @@ class $$PersoneTableOrderingComposer
     column: $table.creataIl,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get sonoIo => $composableBuilder(
+    column: $table.sonoIo,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$PersoneTableAnnotationComposer
@@ -2310,6 +3283,9 @@ class $$PersoneTableAnnotationComposer
 
   GeneratedColumn<DateTime> get creataIl =>
       $composableBuilder(column: $table.creataIl, builder: (column) => column);
+
+  GeneratedColumn<bool> get sonoIo =>
+      $composableBuilder(column: $table.sonoIo, builder: (column) => column);
 
   Expression<T> movimentiDebitoRefs<T extends Object>(
     Expression<T> Function($$MovimentiDebitoTableAnnotationComposer a) f,
@@ -2335,6 +3311,31 @@ class $$PersoneTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> partecipantiRefs<T extends Object>(
+    Expression<T> Function($$PartecipantiTableAnnotationComposer a) f,
+  ) {
+    final $$PartecipantiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.personaId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$PersoneTableTableManager
@@ -2350,7 +3351,10 @@ class $$PersoneTableTableManager
           $$PersoneTableUpdateCompanionBuilder,
           (Persona, $$PersoneTableReferences),
           Persona,
-          PrefetchHooks Function({bool movimentiDebitoRefs})
+          PrefetchHooks Function({
+            bool movimentiDebitoRefs,
+            bool partecipantiRefs,
+          })
         > {
   $$PersoneTableTableManager(_$AppDatabase db, $PersoneTable table)
     : super(
@@ -2363,16 +3367,30 @@ class $$PersoneTableTableManager
               $$PersoneTableOrderingComposer($db: db, $table: table),
           createComputedFieldComposer: () =>
               $$PersoneTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            Value<String> nome = const Value.absent(),
-            Value<DateTime> creataIl = const Value.absent(),
-          }) => PersoneCompanion(id: id, nome: nome, creataIl: creataIl),
-          createCompanionCallback: ({
-            Value<int> id = const Value.absent(),
-            required String nome,
-            Value<DateTime> creataIl = const Value.absent(),
-          }) => PersoneCompanion.insert(id: id, nome: nome, creataIl: creataIl),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> nome = const Value.absent(),
+                Value<DateTime> creataIl = const Value.absent(),
+                Value<bool> sonoIo = const Value.absent(),
+              }) => PersoneCompanion(
+                id: id,
+                nome: nome,
+                creataIl: creataIl,
+                sonoIo: sonoIo,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String nome,
+                Value<DateTime> creataIl = const Value.absent(),
+                Value<bool> sonoIo = const Value.absent(),
+              }) => PersoneCompanion.insert(
+                id: id,
+                nome: nome,
+                creataIl: creataIl,
+                sonoIo: sonoIo,
+              ),
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
@@ -2381,37 +3399,63 @@ class $$PersoneTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({movimentiDebitoRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (movimentiDebitoRefs) db.movimentiDebito,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (movimentiDebitoRefs)
-                    await $_getPrefetchedData<
-                      Persona,
-                      $PersoneTable,
-                      MovimentoDebito
-                    >(
-                      currentTable: table,
-                      referencedTable: $$PersoneTableReferences
-                          ._movimentiDebitoRefsTable(db),
-                      managerFromTypedResult: (p0) => $$PersoneTableReferences(
-                        db,
-                        table,
-                        p0,
-                      ).movimentiDebitoRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where((e) => e.personaId == item.id),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({movimentiDebitoRefs = false, partecipantiRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (movimentiDebitoRefs) db.movimentiDebito,
+                    if (partecipantiRefs) db.partecipanti,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (movimentiDebitoRefs)
+                        await $_getPrefetchedData<
+                          Persona,
+                          $PersoneTable,
+                          MovimentoDebito
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersoneTableReferences
+                              ._movimentiDebitoRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersoneTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).movimentiDebitoRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (partecipantiRefs)
+                        await $_getPrefetchedData<
+                          Persona,
+                          $PersoneTable,
+                          Partecipante
+                        >(
+                          currentTable: table,
+                          referencedTable: $$PersoneTableReferences
+                              ._partecipantiRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$PersoneTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).partecipantiRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.personaId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -2428,7 +3472,7 @@ typedef $$PersoneTableProcessedTableManager =
       $$PersoneTableUpdateCompanionBuilder,
       (Persona, $$PersoneTableReferences),
       Persona,
-      PrefetchHooks Function({bool movimentiDebitoRefs})
+      PrefetchHooks Function({bool movimentiDebitoRefs, bool partecipantiRefs})
     >;
 typedef $$MovimentiDebitoTableCreateCompanionBuilder =
     MovimentiDebitoCompanion Function({
@@ -2767,6 +3811,735 @@ typedef $$MovimentiDebitoTableProcessedTableManager =
       MovimentoDebito,
       PrefetchHooks Function({bool personaId})
     >;
+typedef $$GruppiTableCreateCompanionBuilder = GruppiCompanion Function({
+  Value<int> id,
+  required String uuid,
+  required String nome,
+  Value<String> valutaPrincipale,
+  Value<DateTime> creatoIl,
+  Value<DateTime?> archiviatoIl,
+  Value<bool> corrente,
+});
+typedef $$GruppiTableUpdateCompanionBuilder = GruppiCompanion Function({
+  Value<int> id,
+  Value<String> uuid,
+  Value<String> nome,
+  Value<String> valutaPrincipale,
+  Value<DateTime> creatoIl,
+  Value<DateTime?> archiviatoIl,
+  Value<bool> corrente,
+});
+
+final class $$GruppiTableReferences
+    extends BaseReferences<_$AppDatabase, $GruppiTable, Gruppo> {
+  $$GruppiTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$PartecipantiTable, List<Partecipante>>
+  _partecipantiRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.partecipanti,
+    aliasName: 'gruppi__id__partecipanti__gruppo_id',
+  );
+
+  $$PartecipantiTableProcessedTableManager get partecipantiRefs {
+    final manager = $$PartecipantiTableTableManager(
+      $_db,
+      $_db.partecipanti,
+    ).filter((f) => f.gruppoId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_partecipantiRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$GruppiTableFilterComposer
+    extends Composer<_$AppDatabase, $GruppiTable> {
+  $$GruppiTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get valutaPrincipale => $composableBuilder(
+    column: $table.valutaPrincipale,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get creatoIl => $composableBuilder(
+    column: $table.creatoIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get archiviatoIl => $composableBuilder(
+    column: $table.archiviatoIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get corrente => $composableBuilder(
+    column: $table.corrente,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> partecipantiRefs(
+    Expression<bool> Function($$PartecipantiTableFilterComposer f) f,
+  ) {
+    final $$PartecipantiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.gruppoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableFilterComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$GruppiTableOrderingComposer
+    extends Composer<_$AppDatabase, $GruppiTable> {
+  $$GruppiTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get nome => $composableBuilder(
+    column: $table.nome,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get valutaPrincipale => $composableBuilder(
+    column: $table.valutaPrincipale,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get creatoIl => $composableBuilder(
+    column: $table.creatoIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get archiviatoIl => $composableBuilder(
+    column: $table.archiviatoIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get corrente => $composableBuilder(
+    column: $table.corrente,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$GruppiTableAnnotationComposer
+    extends Composer<_$AppDatabase, $GruppiTable> {
+  $$GruppiTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<String> get nome =>
+      $composableBuilder(column: $table.nome, builder: (column) => column);
+
+  GeneratedColumn<String> get valutaPrincipale => $composableBuilder(
+    column: $table.valutaPrincipale,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get creatoIl =>
+      $composableBuilder(column: $table.creatoIl, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get archiviatoIl => $composableBuilder(
+    column: $table.archiviatoIl,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get corrente =>
+      $composableBuilder(column: $table.corrente, builder: (column) => column);
+
+  Expression<T> partecipantiRefs<T extends Object>(
+    Expression<T> Function($$PartecipantiTableAnnotationComposer a) f,
+  ) {
+    final $$PartecipantiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.partecipanti,
+      getReferencedColumn: (t) => t.gruppoId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PartecipantiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.partecipanti,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$GruppiTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $GruppiTable,
+          Gruppo,
+          $$GruppiTableFilterComposer,
+          $$GruppiTableOrderingComposer,
+          $$GruppiTableAnnotationComposer,
+          $$GruppiTableCreateCompanionBuilder,
+          $$GruppiTableUpdateCompanionBuilder,
+          (Gruppo, $$GruppiTableReferences),
+          Gruppo,
+          PrefetchHooks Function({bool partecipantiRefs})
+        > {
+  $$GruppiTableTableManager(_$AppDatabase db, $GruppiTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$GruppiTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$GruppiTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$GruppiTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<String> nome = const Value.absent(),
+                Value<String> valutaPrincipale = const Value.absent(),
+                Value<DateTime> creatoIl = const Value.absent(),
+                Value<DateTime?> archiviatoIl = const Value.absent(),
+                Value<bool> corrente = const Value.absent(),
+              }) => GruppiCompanion(
+                id: id,
+                uuid: uuid,
+                nome: nome,
+                valutaPrincipale: valutaPrincipale,
+                creatoIl: creatoIl,
+                archiviatoIl: archiviatoIl,
+                corrente: corrente,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String uuid,
+                required String nome,
+                Value<String> valutaPrincipale = const Value.absent(),
+                Value<DateTime> creatoIl = const Value.absent(),
+                Value<DateTime?> archiviatoIl = const Value.absent(),
+                Value<bool> corrente = const Value.absent(),
+              }) => GruppiCompanion.insert(
+                id: id,
+                uuid: uuid,
+                nome: nome,
+                valutaPrincipale: valutaPrincipale,
+                creatoIl: creatoIl,
+                archiviatoIl: archiviatoIl,
+                corrente: corrente,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$GruppiTable, Gruppo>(table),
+                  $$GruppiTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({partecipantiRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (partecipantiRefs) db.partecipanti],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (partecipantiRefs)
+                    await $_getPrefetchedData<
+                      Gruppo,
+                      $GruppiTable,
+                      Partecipante
+                    >(
+                      currentTable: table,
+                      referencedTable: $$GruppiTableReferences
+                          ._partecipantiRefsTable(db),
+                      managerFromTypedResult: (p0) => $$GruppiTableReferences(
+                        db,
+                        table,
+                        p0,
+                      ).partecipantiRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where((e) => e.gruppoId == item.id),
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$GruppiTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $GruppiTable,
+      Gruppo,
+      $$GruppiTableFilterComposer,
+      $$GruppiTableOrderingComposer,
+      $$GruppiTableAnnotationComposer,
+      $$GruppiTableCreateCompanionBuilder,
+      $$GruppiTableUpdateCompanionBuilder,
+      (Gruppo, $$GruppiTableReferences),
+      Gruppo,
+      PrefetchHooks Function({bool partecipantiRefs})
+    >;
+typedef $$PartecipantiTableCreateCompanionBuilder =
+    PartecipantiCompanion Function({
+      Value<int> id,
+      required String uuid,
+      required int gruppoId,
+      required int personaId,
+      Value<DateTime> aggiuntoIl,
+    });
+typedef $$PartecipantiTableUpdateCompanionBuilder =
+    PartecipantiCompanion Function({
+      Value<int> id,
+      Value<String> uuid,
+      Value<int> gruppoId,
+      Value<int> personaId,
+      Value<DateTime> aggiuntoIl,
+    });
+
+final class $$PartecipantiTableReferences
+    extends BaseReferences<_$AppDatabase, $PartecipantiTable, Partecipante> {
+  $$PartecipantiTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $GruppiTable _gruppoIdTable(_$AppDatabase db) =>
+      db.gruppi.createAlias('partecipanti__gruppo_id__gruppi__id');
+
+  $$GruppiTableProcessedTableManager get gruppoId {
+    final $_column = $_itemColumn<int>('gruppo_id')!;
+
+    final manager = $$GruppiTableTableManager(
+      $_db,
+      $_db.gruppi,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_gruppoIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $PersoneTable _personaIdTable(_$AppDatabase db) =>
+      db.persone.createAlias('partecipanti__persona_id__persone__id');
+
+  $$PersoneTableProcessedTableManager get personaId {
+    final $_column = $_itemColumn<int>('persona_id')!;
+
+    final manager = $$PersoneTableTableManager(
+      $_db,
+      $_db.persone,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_personaIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$PartecipantiTableFilterComposer
+    extends Composer<_$AppDatabase, $PartecipantiTable> {
+  $$PartecipantiTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get aggiuntoIl => $composableBuilder(
+    column: $table.aggiuntoIl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$GruppiTableFilterComposer get gruppoId {
+    final $$GruppiTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableFilterComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersoneTableFilterComposer get personaId {
+    final $$PersoneTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personaId,
+      referencedTable: $db.persone,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersoneTableFilterComposer(
+            $db: $db,
+            $table: $db.persone,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PartecipantiTableOrderingComposer
+    extends Composer<_$AppDatabase, $PartecipantiTable> {
+  $$PartecipantiTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get uuid => $composableBuilder(
+    column: $table.uuid,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get aggiuntoIl => $composableBuilder(
+    column: $table.aggiuntoIl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$GruppiTableOrderingComposer get gruppoId {
+    final $$GruppiTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableOrderingComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersoneTableOrderingComposer get personaId {
+    final $$PersoneTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personaId,
+      referencedTable: $db.persone,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersoneTableOrderingComposer(
+            $db: $db,
+            $table: $db.persone,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PartecipantiTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PartecipantiTable> {
+  $$PartecipantiTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get uuid =>
+      $composableBuilder(column: $table.uuid, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get aggiuntoIl => $composableBuilder(
+    column: $table.aggiuntoIl,
+    builder: (column) => column,
+  );
+
+  $$GruppiTableAnnotationComposer get gruppoId {
+    final $$GruppiTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.gruppoId,
+      referencedTable: $db.gruppi,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$GruppiTableAnnotationComposer(
+            $db: $db,
+            $table: $db.gruppi,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$PersoneTableAnnotationComposer get personaId {
+    final $$PersoneTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.personaId,
+      referencedTable: $db.persone,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$PersoneTableAnnotationComposer(
+            $db: $db,
+            $table: $db.persone,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$PartecipantiTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $PartecipantiTable,
+          Partecipante,
+          $$PartecipantiTableFilterComposer,
+          $$PartecipantiTableOrderingComposer,
+          $$PartecipantiTableAnnotationComposer,
+          $$PartecipantiTableCreateCompanionBuilder,
+          $$PartecipantiTableUpdateCompanionBuilder,
+          (Partecipante, $$PartecipantiTableReferences),
+          Partecipante,
+          PrefetchHooks Function({bool gruppoId, bool personaId})
+        > {
+  $$PartecipantiTableTableManager(_$AppDatabase db, $PartecipantiTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PartecipantiTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PartecipantiTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PartecipantiTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> uuid = const Value.absent(),
+                Value<int> gruppoId = const Value.absent(),
+                Value<int> personaId = const Value.absent(),
+                Value<DateTime> aggiuntoIl = const Value.absent(),
+              }) => PartecipantiCompanion(
+                id: id,
+                uuid: uuid,
+                gruppoId: gruppoId,
+                personaId: personaId,
+                aggiuntoIl: aggiuntoIl,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String uuid,
+                required int gruppoId,
+                required int personaId,
+                Value<DateTime> aggiuntoIl = const Value.absent(),
+              }) => PartecipantiCompanion.insert(
+                id: id,
+                uuid: uuid,
+                gruppoId: gruppoId,
+                personaId: personaId,
+                aggiuntoIl: aggiuntoIl,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$PartecipantiTable, Partecipante>(table),
+                  $$PartecipantiTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({gruppoId = false, personaId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (gruppoId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.gruppoId,
+                        referencedTable: $$PartecipantiTableReferences
+                            ._gruppoIdTable(db),
+                        referencedColumn: $$PartecipantiTableReferences
+                            ._gruppoIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+                    if (personaId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.personaId,
+                        referencedTable: $$PartecipantiTableReferences
+                            ._personaIdTable(db),
+                        referencedColumn: $$PartecipantiTableReferences
+                            ._personaIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$PartecipantiTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $PartecipantiTable,
+      Partecipante,
+      $$PartecipantiTableFilterComposer,
+      $$PartecipantiTableOrderingComposer,
+      $$PartecipantiTableAnnotationComposer,
+      $$PartecipantiTableCreateCompanionBuilder,
+      $$PartecipantiTableUpdateCompanionBuilder,
+      (Partecipante, $$PartecipantiTableReferences),
+      Partecipante,
+      PrefetchHooks Function({bool gruppoId, bool personaId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2779,4 +4552,8 @@ class $AppDatabaseManager {
       $$PersoneTableTableManager(_db, _db.persone);
   $$MovimentiDebitoTableTableManager get movimentiDebito =>
       $$MovimentiDebitoTableTableManager(_db, _db.movimentiDebito);
+  $$GruppiTableTableManager get gruppi =>
+      $$GruppiTableTableManager(_db, _db.gruppi);
+  $$PartecipantiTableTableManager get partecipanti =>
+      $$PartecipantiTableTableManager(_db, _db.partecipanti);
 }

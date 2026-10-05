@@ -190,7 +190,7 @@ Grecia, partecipanti: io, Marco, Lucia.
 
 ## Come lo costruiamo
 
-1. Gruppi e partecipanti: creare, scegliere dal menu, archiviare.
+1. ~~Gruppi e partecipanti: creare, scegliere dal menu, archiviare.~~ **fatto**
 2. Categorie: elenco, colori, insieme di partenza.
 3. Spese normali: le tue, con categoria. Totale del viaggio e quanto hai
    speso tu.

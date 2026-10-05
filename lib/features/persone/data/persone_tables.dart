@@ -13,4 +13,11 @@ class Persone extends Table {
   TextColumn get nome => text().withLength(min: 1, max: 60)();
 
   DateTimeColumn get creataIl => dateTime().withDefault(currentDateAndTime)();
+
+  /// Vero sulla persona che sei tu.
+  ///
+  /// Ce n'e' una sola, creata al primo avvio: cosi' "chi ha pagato" e "per
+  /// chi" sono un elenco unico senza casi speciali, e "quanto ho speso io" e'
+  /// la somma delle quote di quella persona (DECISIONI.md, voce 029).
+  BoolColumn get sonoIo => boolean().withDefault(const Constant(false))();
 }

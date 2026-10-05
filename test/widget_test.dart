@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:spesone/core/database/app_database.dart';
+import 'package:spesone/features/spese/data/gruppi_dao.dart';
 
 import 'supporto.dart';
 
@@ -16,7 +17,10 @@ void main() {
 
   testWidgets('la barra in basso cambia sezione', (WidgetTester tester) async {
     await avviaApp(tester, db);
-    expect(find.widgetWithText(AppBar, 'Panoramica spese'), findsOneWidget);
+    expect(
+      find.widgetWithText(AppBar, GruppiDao.nomePredefinito),
+      findsOneWidget,
+    );
 
     await tester.tap(find.byIcon(Icons.account_balance_wallet_outlined));
     await tester.pumpAndSettle();

@@ -854,3 +854,49 @@ ogni scambio.
 **Conseguenza:** al momento di ricevere un gruppo servira' un passaggio in
 cui si dichiara **chi sei tu** fra i partecipanti. Non e' deducibile: i nomi
 li ha scelti chi ha creato il gruppo.
+
+---
+
+## 036 — Al primo avvio c'e' gia' un gruppo, con te dentro
+
+**Data:** 2026-10-05
+
+**Contesto:** la sezione Spese non ha senso senza un gruppo, e un gruppo non
+ha senso senza di te.
+
+**Decisione:** al primo avvio nascono insieme la persona "Io" (voce 029) e un
+gruppo chiamato "Le mie spese" che la contiene, ed e' il gruppo corrente. Ogni
+gruppo creato dopo nasce anch'esso con te gia' dentro.
+
+**Motivazione:** la stessa ragione della lista della spesa (voce 011): chi apre
+l'app deve poter registrare qualcosa subito, non trovarsi davanti a una
+schermata che chiede prima di creare un contenitore. "Le mie spese" e' anche
+il nome giusto per il caso piu' semplice — le proprie spese, senza nessun
+altro.
+
+**Conseguenza:** non esiste lo stato "nessun gruppo": archiviando o eliminando
+quello aperto, il lavoro passa al piu' recente fra i rimanenti, e se non ne
+resta nessuno ne nasce uno nuovo.
+
+---
+
+## 037 — Una persona che fa parte di un gruppo non si elimina
+
+**Data:** 2026-10-05
+
+**Contesto:** l'anagrafica permette di eliminare una persona, ma ora quella
+persona puo' essere dentro dei gruppi di spesa.
+
+**Decisione:** il vincolo nel database e' `restrict`, e il DAO si ferma prima
+con un messaggio che dice in quanti gruppi compare. Te stesso non sei
+eliminabile in nessun caso. Per togliere qualcuno da un viaggio si usa
+"Togli dal gruppo" nelle impostazioni del viaggio.
+
+**Motivazione:** con `cascade` eliminare una persona la toglierebbe dai
+viaggi insieme alle sue spese, cambiando in silenzio i conti di tutti gli
+altri partecipanti. Un'eliminazione che altera i numeri di un viaggio chiuso
+e' il tipo di danno che ci si accorge mesi dopo, quando non si ricorda piu'
+cosa si e' fatto.
+
+**Conseguenza:** i debiti segnati a mano restano invece a `cascade`:
+riguardano solo te e quella persona, e la conferma lo dice gia'.

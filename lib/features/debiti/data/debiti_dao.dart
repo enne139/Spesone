@@ -85,6 +85,26 @@ class DebitiDao extends DatabaseAccessor<AppDatabase> with _$DebitiDaoMixin {
 
   // --- Scritture sulle persone -----------------------------------------------
 
+  /// Garantisce che esista la persona che sei tu, e la restituisce.
+  ///
+  /// Nasce al primo avvio con il nome "Io" e si puo' rinominare. Non apre una
+  /// transazione di proposito: viene chiamata anche da GruppiDao prima di
+  /// aprirne una, e una transazione dentro l'altra resterebbe appesa
+  /// (voce 014).
+  Future<Persona> assicuraPersonaIo() async {
+    final Persona? esistente = await (select(
+      persone,
+    )..where((Persone t) => t.sonoIo.equals(true))).getSingleOrNull();
+    if (esistente != null) {
+      return esistente;
+    }
+
+    final int id = await into(persone).insert(
+      PersoneCompanion.insert(nome: 'Io', sonoIo: const Value<bool>(true)),
+    );
+    return (select(persone)..where((Persone t) => t.id.equals(id))).getSingle();
+  }
+
   Future<int> aggiungiPersona(String nome) {
     return into(persone).insert(PersoneCompanion.insert(nome: nome.trim()));
   }
@@ -96,8 +116,42 @@ class DebitiDao extends DatabaseAccessor<AppDatabase> with _$DebitiDaoMixin {
   }
 
   /// Elimina una persona e, per il vincolo `cascade`, tutti i suoi movimenti.
-  Future<void> eliminaPersona(int id) {
-    return (delete(persone)..where((Persone t) => t.id.equals(id))).go();
+  ///
+  /// Rifiuta di eliminare te stesso: senza, le spese e i saldi di ogni gruppo
+  /// perderebbero il loro punto di vista. Rifiuta anche chi fa parte di un
+  /// gruppo, spiegando quale: toglierlo cambierebbe i conti di tutti gli
+  /// altri senza dirlo.
+  Future<void> eliminaPersona(int id) async {
+    final Persona persona = await (select(
+      persone,
+    )..where((Persone t) => t.id.equals(id))).getSingle();
+    if (persona.sonoIo) {
+      throw Exception('Non puoi eliminare te stesso dall\'anagrafica.');
+    }
+
+    final int gruppi = await _quantiGruppi(id);
+    if (gruppi > 0) {
+      throw Exception(
+        '${persona.nome} fa parte di $gruppi '
+        '${gruppi == 1 ? 'gruppo di spesa' : 'gruppi di spesa'}: '
+        'toglila prima da li.',
+      );
+    }
+
+    await (delete(persone)..where((Persone t) => t.id.equals(id))).go();
+  }
+
+  /// In quanti gruppi di spesa compare una persona.
+  Future<int> _quantiGruppi(int personaId) async {
+    final Expression<int> quanti = attachedDatabase.partecipanti.id.count();
+    final TypedResult? riga =
+        await (selectOnly(attachedDatabase.partecipanti)
+              ..addColumns(<Expression<Object>>[quanti])
+              ..where(
+                attachedDatabase.partecipanti.personaId.equals(personaId),
+              ))
+            .getSingleOrNull();
+    return riga?.read(quanti) ?? 0;
   }
 
   // --- Scritture sui movimenti -----------------------------------------------
