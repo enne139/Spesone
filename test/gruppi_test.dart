@@ -190,4 +190,35 @@ void main() {
 
     await chiudiApp(tester);
   });
+
+  testWidgets('archiviando l unico gruppo la panoramica non resta a caricare', (
+    WidgetTester tester,
+  ) async {
+    await avviaApp(tester, db);
+    await apriDrawer(tester);
+
+    // C'e' un gruppo solo: quello creato al primo avvio.
+    await tester.tap(
+      find.descendant(
+        of: find.ancestor(
+          of: find.text(GruppiDao.nomePredefinito),
+          matching: find.byType(ListTile),
+        ),
+        matching: find.byIcon(Icons.more_vert),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Archivia'));
+    await tester.pumpAndSettle();
+
+    // Il messaggio con "Annulla" tiene un timer.
+    await tester.pump(const Duration(seconds: 6));
+    await tester.pumpAndSettle();
+
+    // Niente rotella: al posto del gruppo archiviato ne e' nato un altro.
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text('Ancora nessuna spesa'), findsOneWidget);
+
+    await chiudiApp(tester);
+  });
 }

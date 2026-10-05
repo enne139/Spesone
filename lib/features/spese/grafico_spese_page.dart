@@ -10,6 +10,7 @@ import 'package:spesone/features/spese/model/totale_per_categoria.dart';
 import 'package:spesone/features/spese/widgets/grafico_categorie.dart';
 import 'package:spesone/features/spese/widgets/grafico_nel_tempo.dart';
 import 'package:spesone/features/spese/widgets/gruppo_corrente_builder.dart';
+import 'package:spesone/features/spese/widgets/nessun_gruppo.dart';
 
 /// Rappresentazione grafica delle spese: per categoria e nel tempo.
 ///
@@ -55,6 +56,7 @@ class _GraficoSpesePageState extends State<GraficoSpesePage> {
     return GruppoCorrenteBuilder(
       onErrore: (BuildContext context, Object errore) =>
           ErroreView(errore: errore),
+      senzaGruppo: (BuildContext context) => const NessunGruppo(),
       builder: (BuildContext context, GruppiDao dao, Gruppo? gruppo) {
         if (gruppo == null) {
           return const Center(child: CircularProgressIndicator());

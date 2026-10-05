@@ -14,6 +14,7 @@ import 'package:spesone/features/spese/impostazioni_viaggio_page.dart';
 import 'package:spesone/features/spese/model/spesa_completa.dart';
 import 'package:spesone/features/spese/widgets/elenco_spese.dart';
 import 'package:spesone/features/spese/widgets/gruppo_corrente_builder.dart';
+import 'package:spesone/features/spese/widgets/nessun_gruppo.dart';
 import 'package:spesone/features/spese/widgets/modulo_spesa.dart';
 
 /// Vista di apertura della sezione Spese: il gruppo aperto, i suoi totali e
@@ -157,6 +158,7 @@ class _PanoramicaSpesePageState extends State<PanoramicaSpesePage> {
     return GruppoCorrenteBuilder(
       onErrore: (BuildContext context, Object errore) =>
           ErroreView(errore: errore, onRiprova: _riprova),
+      senzaGruppo: (BuildContext context) => const NessunGruppo(),
       builder: (BuildContext context, GruppiDao dao, Gruppo? gruppo) {
         if (gruppo == null) {
           return const Center(child: CircularProgressIndicator());

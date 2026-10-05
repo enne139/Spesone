@@ -68,7 +68,12 @@ Un guasto deve **vedersi**, mai diventare un caricamento infinito:
 - ogni scrittura sul database fatta da un gesto dell'utente passa da
   `eseguiSegnalandoErrori`, che mostra un messaggio se fallisce.
 
-Il perche' e' nella voce 017 di [DECISIONI.md](DECISIONI.md).
+Non basta: **"sto leggendo" e "non c'e' niente" vanno distinti**. In uno
+`StreamBuilder` il dato e' `null` in tutti e due i casi, e confonderli
+trasforma ogni stato vuoto in un caricamento eterno. Quando uno stream puo'
+legittimamente non dare niente, la schermata lo dice e offre cosa fare.
+
+Il perche' e' nelle voci 017, 044 e 046 di [DECISIONI.md](DECISIONI.md).
 
 ## Denaro e transazioni
 

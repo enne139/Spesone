@@ -303,7 +303,12 @@ class GruppiDao extends DatabaseAccessor<AppDatabase> with _$GruppiDaoMixin {
     );
   }
 
-  /// Riapre il gruppo in corso piu' recente, se nessuno e' segnato corrente.
+  /// Riapre il gruppo in corso piu' recente; se non ne resta nessuno, ne crea
+  /// uno.
+  ///
+  /// Non puo' esistere lo stato "nessun gruppo": la sezione Spese non avrebbe
+  /// niente da mostrare e resterebbe a caricare per sempre. Succede
+  /// archiviando o eliminando l'ultimo gruppo rimasto (DECISIONI.md, voce 036).
   Future<void> _garantisciCorrente() async {
     final Gruppo? corrente = await (select(
       gruppi,
@@ -319,8 +324,7 @@ class GruppiDao extends DatabaseAccessor<AppDatabase> with _$GruppiDaoMixin {
               ])
               ..limit(1))
             .getSingleOrNull();
-    if (piuRecente != null) {
-      await _apri(piuRecente.id);
-    }
+
+    await _apri(piuRecente?.id ?? await _creaGruppo(nomePredefinito));
   }
 }

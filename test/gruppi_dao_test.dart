@@ -146,4 +146,26 @@ void main() {
     // L'anagrafica dei debiti non c'entra niente e resta vuota.
     expect(await db.select(db.persone).get(), isEmpty);
   });
+
+  test('archiviando l unico gruppo ne nasce uno nuovo', () async {
+    final int unico = (await dao.assicuraGruppoCorrente()).id;
+
+    await dao.archiviaGruppo(unico);
+
+    // Non puo' restare "nessun gruppo": la sezione Spese non avrebbe niente
+    // da mostrare e resterebbe a caricare (voce 036).
+    final Gruppo? corrente = await dao.osservaGruppoCorrente().first;
+    expect(corrente, isNotNull);
+    expect(corrente!.id, isNot(unico));
+  });
+
+  test('eliminando l unico gruppo ne nasce uno nuovo', () async {
+    final int unico = (await dao.assicuraGruppoCorrente()).id;
+
+    await dao.eliminaGruppo(unico);
+
+    final Gruppo? corrente = await dao.osservaGruppoCorrente().first;
+    expect(corrente, isNotNull);
+    expect(corrente!.id, isNot(unico));
+  });
 }

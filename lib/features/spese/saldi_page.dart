@@ -12,6 +12,7 @@ import 'package:spesone/features/spese/data/gruppi_dao.dart';
 import 'package:spesone/features/spese/data/saldi_dao.dart';
 import 'package:spesone/features/spese/model/saldo_partecipante.dart';
 import 'package:spesone/features/spese/widgets/gruppo_corrente_builder.dart';
+import 'package:spesone/features/spese/widgets/nessun_gruppo.dart';
 import 'package:spesone/features/spese/widgets/modulo_rimborso.dart';
 
 /// Chi deve dare quanto a chi, e i rimborsi gia' registrati.
@@ -95,6 +96,7 @@ class _SaldiPageState extends State<SaldiPage> {
     return GruppoCorrenteBuilder(
       onErrore: (BuildContext context, Object errore) =>
           ErroreView(errore: errore),
+      senzaGruppo: (BuildContext context) => const NessunGruppo(),
       builder: (BuildContext context, GruppiDao dao, Gruppo? gruppo) {
         if (gruppo == null) {
           return const Center(child: CircularProgressIndicator());

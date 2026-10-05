@@ -14,6 +14,7 @@ class GruppoCorrenteBuilder extends StatefulWidget {
   const GruppoCorrenteBuilder({
     required this.builder,
     this.onErrore,
+    this.senzaGruppo,
     super.key,
   });
 
@@ -25,6 +26,15 @@ class GruppoCorrenteBuilder extends StatefulWidget {
   /// Cosa mostrare se il database da' errore. Chi riempie un pezzo della
   /// barra lo lascia `null`: li' non c'e' spazio per un messaggio.
   final Widget Function(BuildContext context, Object errore)? onErrore;
+
+  /// Cosa mostrare quando il database ha risposto e un gruppo non c'e'.
+  ///
+  /// Senza questa distinzione, "sto ancora leggendo" e "non c'e' niente"
+  /// finirebbero nello stesso ramo, e il secondo diventerebbe una rotella che
+  /// gira per sempre. Non dovrebbe capitare — un gruppo c'e' sempre
+  /// (voce 036) — ma e' esattamente il genere di cosa che non deve poter
+  /// capitare per sbaglio.
+  final WidgetBuilder? senzaGruppo;
 
   @override
   State<GruppoCorrenteBuilder> createState() => _GruppoCorrenteBuilderState();
@@ -52,6 +62,14 @@ class _GruppoCorrenteBuilderState extends State<GruppoCorrenteBuilder> {
       builder: (BuildContext context, AsyncSnapshot<Gruppo?> snapshot) {
         if (snapshot.hasError && widget.onErrore != null) {
           return widget.onErrore!(context, snapshot.error!);
+        }
+        // `connectionState` distingue l'attesa dalla risposta vuota: il dato
+        // e' `null` in tutti e due i casi.
+        final bool haRisposto =
+            snapshot.connectionState == ConnectionState.active ||
+            snapshot.connectionState == ConnectionState.done;
+        if (haRisposto && snapshot.data == null && widget.senzaGruppo != null) {
+          return widget.senzaGruppo!(context);
         }
         return widget.builder(context, _dao!, snapshot.data);
       },

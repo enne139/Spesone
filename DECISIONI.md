@@ -1104,3 +1104,36 @@ temporale: un numero su ogni barra sarebbe rumore.
 **Alternative scartate:** la torta (confronti imprecisi, inutilizzabile oltre
 le cinque fette); due assi sullo stesso grafico per mostrare totale e media
 insieme (due scale diverse sullo stesso disegno si leggono male e ingannano).
+
+---
+
+## 046 — "Sto leggendo" e "non c'e' niente" non sono la stessa cosa
+
+**Data:** 2026-10-05
+
+**Contesto:** segnalazione dall'uso reale: archiviando l'ultimo gruppo la
+sezione Spese restava a caricare all'infinito.
+
+**Decisione:** due correzioni, una alla causa e una alla categoria di
+problema.
+
+La causa: archiviare o eliminare l'ultimo gruppo lasciava il database senza
+nessun gruppo corrente, mentre la voce 036 diceva che quello stato non deve
+esistere. Ora, se non ne resta nessuno, ne nasce uno — come gia' faceva la
+lista della spesa.
+
+La categoria: `GruppoCorrenteBuilder` ora distingue "il database non ha ancora
+risposto" da "ha risposto, e un gruppo non c'e'". Nel secondo caso le
+schermate mostrano una via d'uscita — un messaggio e un pulsante per creare un
+gruppo — invece della rotella.
+
+**Motivazione:** in uno `StreamBuilder` il dato e' `null` tanto durante
+l'attesa quanto quando non c'e' niente da mostrare, e trattare i due casi allo
+stesso modo trasforma ogni stato vuoto imprevisto in un caricamento eterno.
+E' la terza volta che un'attesa infinita arriva da qui (voci 017 e 044): la
+cura non e' solo chiudere il buco, e' non lasciare che il ramo "nessun dato"
+finisca in una rotella.
+
+**Regola che ne deriva:** quando uno stream puo' legittimamente non avere
+niente da dare, la schermata lo dice e offre cosa fare. Il caricamento si
+mostra solo mentre si sta davvero aspettando.
