@@ -69,23 +69,56 @@ jobs:
           echo "nome=$NOME" >> "$GITHUB_OUTPUT"
           echo "Versione: $NOME"
 
-      - name: Prepara la chiave di firma
+      # I tre passi che seguono preparano la firma. Sono separati di proposito:
+      # i log delle esecuzioni sono leggibili solo da chi amministra il
+      # repository, quindi il *nome* del passo che fallisce deve bastare a
+      # capire cos'e' andato storto.
+      #
+      # Senza chiave propria ogni macchina firma con una chiave di debug
+      # diversa e Android rifiuta l'aggiornamento ("firma non corrispondente"):
+      # con i segreti impostati, tutte le release sono firmate uguali.
+      - name: Decodifica la chiave di firma
         if: env.CHIAVE_BASE64 != ''
-        # Senza chiave propria, ogni macchina firma con una chiave di debug
-        # diversa e Android rifiuta l'aggiornamento ("firma non corrispondente").
-        # Con i segreti impostati, tutte le release sono firmate uguali.
+        run: |
+          # Spazi e a capo finiscono facilmente nel segreto quando si copia e
+          # incolla, e manderebbero base64 in errore: via prima di decodificare.
+          printf '%s' "$CHIAVE_BASE64" | tr -d '[:space:]' | base64 --decode \
+            > "${RUNNER_TEMP}/spesone.jks"
+          BYTE=$(stat -c%s "${RUNNER_TEMP}/spesone.jks")
+          echo "Archivio decodificato: ${BYTE} byte"
+          if [ "$BYTE" -lt 1000 ]; then
+            echo "::error::L'archivio decodificato e' troppo piccolo (${BYTE} byte): il segreto ANDROID_KEYSTORE_BASE64 e' probabilmente incompleto. Rigeneralo con 'base64 -w0 spesone.jks'."
+            exit 1
+          fi
+
+      - name: Verifica chiave, password e alias
+        if: env.CHIAVE_BASE64 != ''
+        env:
+          PASSWORD_ARCHIVIO: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          # Meglio accorgersi qui che password o alias non tornano, con un
+          # messaggio chiaro, che a meta' della build di Gradle.
+          if ! keytool -list -keystore "${RUNNER_TEMP}/spesone.jks" \
+              -storepass "$PASSWORD_ARCHIVIO" -alias "$ALIAS" > /dev/null 2>&1; then
+            echo "::error::La chiave non si apre: controlla ANDROID_KEYSTORE_PASSWORD e ANDROID_KEY_ALIAS."
+            exit 1
+          fi
+          echo "Chiave valida, alias '${ALIAS}' presente."
+
+      - name: Scrivi key.properties
+        if: env.CHIAVE_BASE64 != ''
         env:
           PASSWORD_ARCHIVIO: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           PASSWORD_CHIAVE: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          echo "$CHIAVE_BASE64" | base64 --decode > "${RUNNER_TEMP}/spesone.jks"
-          cat > android/key.properties <<PROPS
-          storeFile=${RUNNER_TEMP}/spesone.jks
-          storePassword=${PASSWORD_ARCHIVIO}
-          keyAlias=${ALIAS}
-          keyPassword=${PASSWORD_CHIAVE}
-          PROPS
+          {
+            echo "storeFile=${RUNNER_TEMP}/spesone.jks"
+            echo "storePassword=${PASSWORD_ARCHIVIO}"
+            echo "keyAlias=${ALIAS}"
+            echo "keyPassword=${PASSWORD_CHIAVE}"
+          } > android/key.properties
 
       - name: Avvisa se la firma manca
         if: env.CHIAVE_BASE64 == ''
