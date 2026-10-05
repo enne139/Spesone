@@ -1,15 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Strato in primo piano dell'icona adattiva di Android: solo il carrello, su
-  fondo trasparente.
-  
-  Android ritaglia l'icona adattiva in forme diverse a seconda del telefono
-  (cerchio, goccia, quadrato stondato), quindi il disegno sta nella meta'
-  centrale della tela: cosi' nessun ritaglio lo tocca. Il colore del fondo lo
-  mette flutter_launcher_icons (#FFC400).
+  Strato in primo piano dell'icona adattiva di Android: lo stesso libro
+  dell'icona piena, senza fondo.
+
+  Android ritaglia l'icona adattiva nella forma che usa quel telefono (cerchio,
+  goccia, quadrato stondato) e la rimpicciolisce ancora un po'. Per questo il
+  libro sta a tre quarti della tela e centrato, cosi' nessun ritaglio ne tocca
+  i bordi. Il fondo blu notte lo mette flutter_launcher_icons.
 -->
 <svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
-  <g transform="translate(512 512) scale(23) translate(-11.3 -12)" fill="#2B2200">
-    <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+  <g transform="translate(512 512) scale(0.76) translate(-512 -512)">
+    <!-- Pagine: sporgono a destra e danno lo spessore. -->
+    <rect x="246" y="210" width="544" height="604" rx="14" fill="#EAF0FF"/>
+
+    <!-- Copertina. -->
+    <rect x="206" y="186" width="528" height="652" rx="22" fill="#2563EB"/>
+
+    <!-- Dorso: arrotondato solo a sinistra, come la costa di un libro. -->
+    <path d="M278 186 H228 a22 22 0 0 0 -22 22 V816 a22 22 0 0 0 22 22 H278 Z"
+          fill="#1540A8"/>
+    <!-- Piega fra dorso e copertina. -->
+    <rect x="288" y="186" width="7" height="652" fill="#1540A8" opacity="0.6"/>
+
+    <!-- Carrello al centro della copertina, non di tutta la tela: il dorso
+         occupa spazio a sinistra. -->
+    <g transform="translate(508 512) scale(15) translate(-11.3 -12)" fill="#FFC400">
+      <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>
+    </g>
   </g>
 </svg>

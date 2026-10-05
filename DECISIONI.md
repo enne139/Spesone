@@ -492,3 +492,26 @@ Android si accorge che c'e' un aggiornamento solo se quel numero sale.
 **Conseguenze:** l'archivio `spesone.jks` va conservato fuori dal repository e
 non va perso: senza, l'app installata non si puo' piu' aggiornare. Le
 istruzioni sono nel [README](README.md).
+
+---
+
+## 021 — Icona: libro blu con carrello giallo
+
+**Data:** 2026-10-05
+
+**Contesto:** richiesta dell'autore del progetto. Supera la parte sull'icona
+della voce 019, che descriveva un carrello scuro su fondo giallo.
+
+**Decisione:** un libro visto di fronte, copertina blu, con il carrello giallo
+al centro. Tre blu distinti — fondo blu notte, copertina, dorso — e le pagine
+chiare che sporgono a destra.
+
+**Motivazione:** il libro dice "lista, qualcosa che si scrive e si tiene", il
+carrello dice "spesa": insieme raccontano l'app meglio del solo carrello. I
+tre blu servono alla leggibilita': a 48 pixel un libro tutto dello stesso blu
+diventa un rettangolo qualunque, e sono il dorso scuro e le pagine chiare a
+farlo riconoscere come libro.
+
+**Conseguenze:** cambia anche il colore di fondo dell'icona adattiva Android e
+quello della pagina web (`#0A2050`). Il carrello giallo resta lo stesso
+simbolo della sezione Lista nella barra in basso.

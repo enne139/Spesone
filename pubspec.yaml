@@ -95,13 +95,13 @@ flutter:
 
 # Icone dell'app, generate dagli SVG in assets/icona/ con tool/genera_icone.sh.
 #
-# Il fondo giallo e il carrello scuro sono gli stessi su tutte le piattaforme;
-# su Android l'icona e' adattiva, cioe' il sistema ritaglia il carrello nella
-# forma che usa quel telefono.
+# Il libro blu con il carrello giallo e' lo stesso su tutte le piattaforme; su
+# Android l'icona e' adattiva, cioe' il sistema la ritaglia nella forma che usa
+# quel telefono.
 flutter_launcher_icons:
   image_path: "assets/icona/spesone.png"
   android: "ic_launcher"
-  adaptive_icon_background: "#FFC400"
+  adaptive_icon_background: "#0A2050"
   adaptive_icon_foreground: "assets/icona/spesone_primo_piano.png"
   min_sdk_android: 21
   ios: true
@@ -109,8 +109,8 @@ flutter_launcher_icons:
   remove_alpha_ios: true
   web:
     generate: true
-    background_color: "#FFC400"
-    theme_color: "#FFC400"
+    background_color: "#0A2050"
+    theme_color: "#0A2050"
   windows:
     generate: true
     icon_size: 256
