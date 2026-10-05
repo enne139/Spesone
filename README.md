@@ -14,7 +14,7 @@ Compatibile con apple, android, web
     - [x] aggiungere spese singole 
     - [x] aggiungere spese condivise
     - [x] categoria spesa e data
-    - [ ] grafico spese
+    - [x] grafico spese
     - [x] calcolo dei debiti intelligente
  - [x] creazione di persone (anagrafica dei debiti; i gruppi di spesa hanno i propri partecipanti, scritti a mano)
 

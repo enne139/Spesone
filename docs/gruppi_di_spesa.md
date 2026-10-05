@@ -202,7 +202,7 @@ Grecia, partecipanti: io, Marco, Lucia.
 4. ~~Spese condivise: chi ha pagato, per chi, quote.~~ **fatto**
 5. ~~Valute del viaggio e tassi fissi nelle impostazioni del gruppo.~~ **fatto**
 6. ~~Saldi del gruppo e rimborsi.~~ **fatto**
-7. Grafico per categoria e nel tempo.
+7. ~~Grafico per categoria e nel tempo.~~ **fatto**
 8. Condivisione del gruppo via bluetooth e via backend.
 
 Le categorie stanno prima delle spese perche' una spesa le usa. Le spese

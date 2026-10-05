@@ -8,6 +8,7 @@ import 'package:spesone/features/spese/data/categorie_tables.dart';
 import 'package:spesone/features/spese/data/gruppi_tables.dart';
 import 'package:spesone/features/spese/data/spese_tables.dart';
 import 'package:spesone/features/spese/model/spesa_completa.dart';
+import 'package:spesone/features/spese/model/totale_per_categoria.dart';
 
 part 'spese_dao.g.dart';
 
@@ -103,6 +104,91 @@ class SpeseDao extends DatabaseAccessor<AppDatabase> with _$SpeseDaoMixin {
         totale: righe.first.read<int>('totale'),
         tuo: righe.first.read<int>('tuo'),
       ),
+    );
+  }
+
+  /// Quanto e' finito in ogni categoria, dalla piu' grossa.
+  ///
+  /// Con [soloPartecipante] conta solo le quote di quella persona: e' il
+  /// filtro "solo le mie" del grafico. Le somme sono sulle quote convertite,
+  /// per la stessa ragione dei totali (voce 043).
+  Stream<List<TotalePerCategoria>> osservaSpesaPerCategoria({
+    required int gruppoId,
+    int? soloPartecipante,
+  }) {
+    return customSelect(
+      '''
+      SELECT cat.*, SUM($_convertita) AS totale
+      FROM quote q
+      JOIN spese s ON s.id = q.spesa_id
+      LEFT JOIN cambi c
+        ON c.gruppo_id = s.gruppo_id AND c.codice = s.valuta
+      LEFT JOIN categorie cat ON cat.id = s.categoria_id
+      WHERE s.gruppo_id = ? AND (? = -1 OR q.partecipante_id = ?)
+      GROUP BY s.categoria_id
+      ORDER BY totale DESC
+      ''',
+      variables: <Variable<Object>>[
+        Variable<int>(gruppoId),
+        // -1 significa "nessun filtro": un NULL dentro un confronto
+        // renderebbe la condizione sempre falsa.
+        Variable<int>(soloPartecipante ?? -1),
+        Variable<int>(soloPartecipante ?? -1),
+      ],
+      readsFrom: <ResultSetImplementation<Object, Object>>{
+        quote,
+        spese,
+        cambi,
+        categorie,
+      },
+    ).watch().map(
+      (List<QueryRow> righe) => righe
+          .map(
+            (QueryRow r) => TotalePerCategoria(
+              // La categoria puo' non esserci: la spesa e' senza etichetta.
+              categoria: r.data['id'] == null ? null : categorie.map(r.data),
+              centesimi: r.read<int>('totale'),
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  /// Quanto si e' speso giorno per giorno, dal primo all'ultimo.
+  Stream<List<TotalePerGiorno>> osservaSpesaNelTempo({
+    required int gruppoId,
+    int? soloPartecipante,
+  }) {
+    return customSelect(
+      '''
+      SELECT s.data AS giorno, SUM($_convertita) AS totale
+      FROM quote q
+      JOIN spese s ON s.id = q.spesa_id
+      LEFT JOIN cambi c
+        ON c.gruppo_id = s.gruppo_id AND c.codice = s.valuta
+      WHERE s.gruppo_id = ? AND (? = -1 OR q.partecipante_id = ?)
+      GROUP BY date(s.data, 'unixepoch')
+      ORDER BY s.data ASC
+      ''',
+      variables: <Variable<Object>>[
+        Variable<int>(gruppoId),
+        // -1 significa "nessun filtro": un NULL dentro un confronto
+        // renderebbe la condizione sempre falsa.
+        Variable<int>(soloPartecipante ?? -1),
+        Variable<int>(soloPartecipante ?? -1),
+      ],
+      readsFrom: <ResultSetImplementation<Object, Object>>{quote, spese, cambi},
+    ).watch().map(
+      (List<QueryRow> righe) => righe
+          .map(
+            (QueryRow r) => TotalePerGiorno(
+              giorno: DateTime.fromMillisecondsSinceEpoch(
+                r.read<int>('giorno') * 1000,
+              ),
+              centesimi: r.read<int>('totale'),
+            ),
+          )
+          .toList(),
     );
   }
 

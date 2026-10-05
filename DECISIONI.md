@@ -1075,3 +1075,32 @@ e' un'attesa infinita — la stessa famiglia delle voci 014 e 025.
 **Regola che ne deriva, e un presidio:** `VistaDati` ora si ferma con
 un'asserzione se riceve uno stream nullo. Anche quello mostrava la rotella per
 sempre, ed e' successo per una riga dimenticata.
+
+---
+
+## 045 — Il grafico: barre, non torte
+
+**Data:** 2026-10-05
+
+**Contesto:** "grafico spese" nel README. La torta e' la forma che viene in
+mente per prima quando si parla di categorie.
+
+**Decisione:** **barre orizzontali** per la spesa per categoria, **barre
+verticali** per l'andamento nel tempo (una per giorno, accorpate per mese oltre
+il mese). Nessuna torta. Un filtro sopra i grafici sceglie fra tutto il gruppo
+e la sola parte propria.
+
+**Motivazione:** il lavoro di questo grafico e' confrontare grandezze, e le
+lunghezze su una base comune si confrontano a colpo d'occhio mentre gli
+spicchi no — soprattutto quando due categorie sono simili. Orizzontali perche'
+i nomi delle categorie sono parole, che cosi' si leggono dritte.
+
+Il colore viene dalla categoria (voce 040), quindi la stessa categoria ha lo
+stesso colore nell'elenco e nel grafico; ogni barra porta comunque nome e
+importo scritti accanto, perche' il colore non deve mai essere l'unico modo di
+riconoscere qualcosa. L'importo compare solo sulla barra piu' alta del grafico
+temporale: un numero su ogni barra sarebbe rumore.
+
+**Alternative scartate:** la torta (confronti imprecisi, inutilizzabile oltre
+le cinque fette); due assi sullo stesso grafico per mostrare totale e media
+insieme (due scale diverse sullo stesso disegno si leggono male e ingannano).
